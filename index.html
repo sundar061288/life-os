@@ -56,79 +56,7 @@ textarea,input[type=text],input[type=number]{user-select:text}
 .qbtn:active{background:var(--bg3);transform:scale(.96)}
 .qbi{font-size:19px;margin-bottom:4px}
 .qbl{font-size:9px;font-weight:600;color:var(--t1)}
-/* Mobile layout: phones in BOTH orientations + small tablets.
-   Landscape phones are ~800-930px wide, so 700px was too low and caused the
-   desktop layout (sidebar + top tabs) to appear on rotation. */
-@media (max-width:1024px), (orientation:landscape) and (max-height:600px){
-  #sb{display:none}
-  .tnav{display:none}
-  body{font-size:14px}
-  #top{height:calc(52px + env(safe-area-inset-top))}
-  #main{padding:14px 12px calc(84px + env(safe-area-inset-bottom));padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
-  .g2,.g3,.g4{grid-template-columns:1fr}
-  .g4{grid-template-columns:1fr 1fr}
-  .mx{min-height:auto}
-  .domain-grid{grid-template-columns:repeat(2,1fr)}
-  .hl-grid{grid-template-columns:repeat(4,1fr)}
-  .wg{grid-template-columns:1fr;gap:6px}
-  .wdc{display:flex;flex-wrap:wrap;align-items:center;gap:6px;text-align:left;padding:9px 11px}
-  .wdc .wdn{width:34px}.wdc .wdnum{font-size:15px;width:24px;margin:0}
-  .ph{flex-direction:column;gap:10px}
-  .ph-a{flex-wrap:wrap}
-  .ph-t{font-size:20px}
-  .btn{padding:9px 15px;font-size:12px}
-  .ti,textarea.jta,select{font-size:14px!important;padding:10px 12px!important}
-  .hd{width:32px;height:32px;font-size:12px}
-  .hdays{gap:4px}
-  .ni,.tnb{padding:10px}
-  .hl-cell{padding:10px 4px}
-  input[type=range]{height:28px}
-  #clk{display:none}
-  /* Sidebar becomes a slide-in drawer, opened by the ☰ button */
-  body.sb-open #sb{display:flex;position:fixed;top:0;left:0;bottom:0;width:min(272px,80vw);z-index:350;
-    padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);
-    box-shadow:0 0 40px rgba(0,0,0,.6);animation:sbin .22s ease}
-  @keyframes sbin{from{transform:translateX(-100%)}to{transform:translateX(0)}}
-  #bnav{display:flex;position:fixed;bottom:0;left:0;right:0;height:calc(62px + env(safe-area-inset-bottom));
-    background:rgba(14,18,32,.97);backdrop-filter:blur(14px);border-top:1px solid var(--b2);z-index:300;
-    padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
-  .bni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--t2);transition:var(--trans)}
-  .bni.on{color:var(--ind)}
-  .bni:active{background:var(--bg3)}
-  .bni-ic{font-size:19px;line-height:1}
-  .bni-lb{font-size:8.5px;font-weight:700;letter-spacing:.02em}
-  #moresheet.on{display:flex;position:fixed;inset:0;background:rgba(8,11,20,.85);backdrop-filter:blur(8px);z-index:400;align-items:flex-end}
-  .msheet{background:var(--bg1);border-radius:18px 18px 0 0;border-top:1px solid var(--b2);width:100%;padding:18px 16px calc(22px + env(safe-area-inset-bottom));max-height:78vh;max-height:78dvh;overflow-y:auto}
-  .ms-hd{width:36px;height:4px;background:var(--bg5);border-radius:2px;margin:0 auto 16px}
-  .ms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  .ms-it{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:15px 6px;text-align:center;cursor:pointer}
-  .ms-it:active{background:var(--bg3)}
-  .ms-ic{font-size:20px;margin-bottom:5px}
-  .ms-lb{font-size:9.5px;font-weight:600;color:var(--t1)}
-}
-/* Narrow phones */
-@media (max-width:400px){
-  .g4{grid-template-columns:1fr 1fr}
-  .qrow{grid-template-columns:repeat(4,1fr);gap:6px}
-  .qbl{font-size:8.5px}
-  .ms-grid{grid-template-columns:repeat(3,1fr);gap:8px}
-  .brand{display:none}
-}
-/* Landscape phone: shorter chrome so content still fits */
-@media (orientation:landscape) and (max-height:520px){
-  #top{height:calc(42px + env(safe-area-inset-top))}
-  #bnav{height:calc(50px + env(safe-area-inset-bottom))}
-  .bni-ic{font-size:16px}
-  .bni-lb{font-size:8px}
-  #main{padding-top:12px;padding-bottom:calc(66px + env(safe-area-inset-bottom))}
-  .ebadge{display:none}
-  body.sb-open #sb{width:min(240px,60vw)}
-}
-/* Tablet / desktop: two-column grids stay, sidebar can be toggled off */
-@media (min-width:1025px) and (max-width:1320px){
-  #sb{width:196px}
-  .g3{grid-template-columns:repeat(2,1fr)}
-}
+
 
 /* ── TOPBAR ── */
 #top{height:calc(48px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top);background:var(--bg1);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right));gap:10px;flex-shrink:0;z-index:100}
@@ -424,6 +352,92 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 .mxi:last-child{border-bottom:none}
 .mxd{width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:5px}
 
+/* Mobile layout: phones in BOTH orientations + small tablets.
+   Landscape phones are ~800-930px wide, so 700px was too low and caused the
+   desktop layout (sidebar + top tabs) to appear on rotation. */
+@media (max-width:1024px), (orientation:landscape) and (max-height:600px){
+  body #sb{display:none}
+  body .tnav{display:none}
+  body.sb-open #sbdrop{display:block}
+  body{font-size:14px}
+  #top{height:calc(52px + env(safe-area-inset-top))}
+  #main{padding:14px 12px calc(84px + env(safe-area-inset-bottom));padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  .g4{grid-template-columns:1fr 1fr}
+  .mx{min-height:auto}
+  .domain-grid{grid-template-columns:repeat(2,1fr)}
+  .hl-grid{grid-template-columns:repeat(4,1fr)}
+  .wg{grid-template-columns:1fr;gap:6px}
+  .wdc{display:flex;flex-wrap:wrap;align-items:center;gap:6px;text-align:left;padding:9px 11px}
+  .wdc .wdn{width:34px}.wdc .wdnum{font-size:15px;width:24px;margin:0}
+  .ph{flex-direction:column;gap:10px}
+  .ph-a{flex-wrap:wrap}
+  .ph-t{font-size:20px}
+  .btn{padding:9px 15px;font-size:12px}
+  .ti,textarea.jta,select{font-size:14px!important;padding:10px 12px!important}
+  .hd{width:32px;height:32px;font-size:12px}
+  .hdays{gap:4px}
+  .ni,.tnb{padding:10px}
+  .hl-cell{padding:10px 4px}
+  input[type=range]{height:28px}
+  #clk{display:none}
+  /* Sidebar becomes a slide-in drawer, opened by the ☰ button */
+  body.sb-open #sb{display:flex!important;position:fixed;top:0;left:0;bottom:0;width:min(272px,80vw);z-index:350;
+    padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);
+    box-shadow:0 0 40px rgba(0,0,0,.6);animation:sbin .22s ease}
+  @keyframes sbin{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+  #bnav{display:flex;position:fixed;bottom:0;left:0;right:0;height:calc(62px + env(safe-area-inset-bottom));
+    background:rgba(14,18,32,.97);backdrop-filter:blur(14px);border-top:1px solid var(--b2);z-index:300;
+    padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+  .bni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--t2);transition:var(--trans)}
+  .bni.on{color:var(--ind)}
+  .bni:active{background:var(--bg3)}
+  .bni-ic{font-size:19px;line-height:1}
+  .bni-lb{font-size:8.5px;font-weight:700;letter-spacing:.02em}
+  #moresheet.on{display:flex;position:fixed;inset:0;background:rgba(8,11,20,.85);backdrop-filter:blur(8px);z-index:400;align-items:flex-end}
+  .msheet{background:var(--bg1);border-radius:18px 18px 0 0;border-top:1px solid var(--b2);width:100%;padding:18px 16px calc(22px + env(safe-area-inset-bottom));max-height:78vh;max-height:78dvh;overflow-y:auto}
+  .ms-hd{width:36px;height:4px;background:var(--bg5);border-radius:2px;margin:0 auto 16px}
+  .ms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .ms-it{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:15px 6px;text-align:center;cursor:pointer}
+  .ms-it:active{background:var(--bg3)}
+  .ms-ic{font-size:20px;margin-bottom:5px}
+  .ms-lb{font-size:9.5px;font-weight:600;color:var(--t1)}
+}
+/* Narrow phones */
+@media (max-width:400px){
+  .g4{grid-template-columns:1fr 1fr}
+  .qrow{grid-template-columns:repeat(4,1fr);gap:6px}
+  .qbl{font-size:8.5px}
+  .ms-grid{grid-template-columns:repeat(3,1fr);gap:8px}
+  .brand{display:none}
+}
+/* Landscape phone: shorter chrome so content still fits */
+@media (orientation:landscape) and (max-height:520px){
+  #top{height:calc(42px + env(safe-area-inset-top))}
+  #bnav{height:calc(50px + env(safe-area-inset-bottom))}
+  .bni-ic{font-size:16px}
+  .bni-lb{font-size:8px}
+  #main{padding-top:12px;padding-bottom:calc(66px + env(safe-area-inset-bottom))}
+  .ebadge{display:none}
+  body.sb-open #sb{width:min(240px,60vw)}
+}
+/* Tablet / desktop: two-column grids stay, sidebar can be toggled off */
+@media (min-width:1025px) and (max-width:1320px){
+  #sb{width:196px}
+  .g3{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ── SIDEBAR COLLAPSE (all sizes) ── */
+#sb{transition:width .22s ease, transform .22s ease}
+body.sb-off #sb{display:none!important}
+#sbclose{display:none}
+@media (max-width:1024px), (orientation:landscape) and (max-height:600px){
+  #sbclose{display:flex;align-items:center;gap:8px;margin:10px 10px 0;padding:9px 11px;
+    background:var(--bg3);border:1px solid var(--b1);border-radius:9px;color:var(--t1);
+    font-size:11.5px;font-weight:600;cursor:pointer}
+  #sbclose:active{background:var(--bg4)}
+}
+
 </style>
 </head>
 <body>
@@ -453,6 +467,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 <div id="shell">
   <!-- SIDEBAR -->
   <aside id="sb">
+    <div id="sbclose" onclick="closeSidebarDrawer()">← Hide menu</div>
     <div class="score-w">
       <div class="sw-lbl">Life Score</div>
       <div class="sw-row"><div class="sw-big" id="lifescore">0</div><div class="sw-dom">/100</div></div>
@@ -1003,6 +1018,13 @@ const isMobileLayout=()=>{
   const w=window.innerWidth,h=window.innerHeight;   // fallback for old browsers
   return w<=1024||(w>h&&h<=600);
 };
+function setTogIcon(){
+  const b=document.getElementById('sbtog');if(!b)return;
+  const visible=isMobileLayout()?document.body.classList.contains('sb-open')
+                                :!document.body.classList.contains('sb-off');
+  b.textContent=visible?'←':'☰';
+  b.title=visible?'Hide menu':'Show menu';
+}
 function toggleSidebar(){
   if(isMobileLayout()){
     const open=document.body.classList.toggle('sb-open');
@@ -1011,10 +1033,12 @@ function toggleSidebar(){
     const off=document.body.classList.toggle('sb-off');
     DB.set('sbOff',off);
   }
+  setTogIcon();
 }
 function closeSidebarDrawer(){
   document.body.classList.remove('sb-open');
-  document.getElementById('sbdrop').classList.remove('on');
+  const dp=document.getElementById('sbdrop');if(dp)dp.classList.remove('on');
+  setTogIcon();
 }
 // ── ORIENTATION / RESIZE HANDLING ──────────────
 // Rotating a phone changed the matched media query and left stale layout state
@@ -1029,6 +1053,7 @@ function syncLayout(){
     if(DB.get('sbOff',false))document.body.classList.add('sb-off');
   }
   document.documentElement.style.setProperty('--vh',window.innerHeight*0.01+'px');
+  setTogIcon();
 }
 function onViewportChange(){
   clearTimeout(rzT);
