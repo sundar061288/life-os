@@ -1,0 +1,2449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Life OS">
+<meta name="theme-color" content="#0a0d17">
+<title>Life OS — Personal Intelligence System</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<link rel="icon" href="./icon-192.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=DM+Serif+Display:ital@0;1&display=swap');
+
+/* ══════════════════════════════════════════
+   LIFE OS v3 — DESIGN SYSTEM
+   Signature: Obsidian black + Indigo pulse
+   + Saffron gold life-line + Event timeline
+══════════════════════════════════════════ */
+:root {
+  --bg0:#080b14; --bg1:#0e1220; --bg2:#141928; --bg3:#1a2035;
+  --bg4:#212840; --bg5:#2a3350; --rim:#334;
+  --ind:#6366f1; --vio:#8b5cf6; --saf:#f59e0b;
+  --em:#10b981; --sky:#38bdf8; --ros:#f43f5e;
+  --cor:#fb923c; --pin:#ec4899;
+  --is:rgba(99,102,241,.15); --vs:rgba(139,92,246,.13);
+  --ss:rgba(245,158,11,.13); --es:rgba(16,185,129,.12);
+  --ks:rgba(56,189,248,.11); --rs:rgba(244,63,94,.12);
+  --t0:#f0f3ff; --t1:#9ba5c2; --t2:#4e5878; --t3:#2c3452;
+  --b1:rgba(255,255,255,.055); --b2:rgba(255,255,255,.1); --b3:rgba(255,255,255,.17);
+  --r:10px; --rl:14px; --trans:160ms ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',sans-serif;background:var(--bg0);color:var(--t0);display:flex;flex-direction:column;font-size:13px}
+button{font-family:inherit;cursor:pointer;border:none;outline:none}
+input,textarea,select{font-family:inherit;outline:none}
+textarea,input[type=text],input[type=number]{user-select:text}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:4px}
+
+
+@keyframes starpop{0%{transform:scale(.3) rotate(-25deg);opacity:0}60%{transform:scale(1.25) rotate(6deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+/* ══ MOBILE-FIRST MINIMALIST LAYER (v5) ══ */
+#bnav{display:none}
+#moresheet{display:none}
+.nudgecard{background:linear-gradient(135deg,rgba(99,102,241,.14),rgba(245,158,11,.08));border:1px solid rgba(99,102,241,.25);border-radius:var(--rl);padding:14px 16px;margin-bottom:14px}
+.nc-lbl{font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--saf);margin-bottom:5px}
+.nc-txt{font-size:12.5px;color:var(--t0);line-height:1.6}
+.nc-act{margin-top:8px;font-size:11px;font-weight:700;color:var(--ind);cursor:pointer}
+.qrow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.qbtn{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:13px 4px;text-align:center;cursor:pointer;transition:var(--trans)}
+.qbtn:active{background:var(--bg3);transform:scale(.96)}
+.qbi{font-size:19px;margin-bottom:4px}
+.qbl{font-size:9px;font-weight:600;color:var(--t1)}
+@media(max-width:700px){
+  #sb{display:none}.tnav{display:none}
+  body{font-size:14px}
+  #top{height:52px;padding:0 12px}
+  #main{padding:14px 12px 82px}
+  .g2,.g3,.g4{grid-template-columns:1fr}
+  .g4{grid-template-columns:1fr 1fr}
+  .mx{min-height:auto}
+  .domain-grid{grid-template-columns:repeat(2,1fr)}
+  .hl-grid{grid-template-columns:repeat(4,1fr)}
+  .wg{grid-template-columns:1fr;gap:6px}
+  .wdc{display:flex;flex-wrap:wrap;align-items:center;gap:6px;text-align:left;padding:9px 11px}
+  .wdc .wdn{width:34px}.wdc .wdnum{font-size:15px;width:24px;margin:0}
+  .ph{flex-direction:column;gap:10px}
+  .ph-a{flex-wrap:wrap}
+  .ph-t{font-size:20px}
+  .btn{padding:9px 15px;font-size:12px}
+  .ti,textarea.jta,select{font-size:14px!important;padding:10px 12px!important}
+  .hd{width:32px;height:32px;font-size:12px}
+  .hdays{gap:4px}
+  .ni,.tnb{padding:10px}
+  .hl-cell{padding:10px 4px}
+  input[type=range]{height:28px}
+  #bnav{display:flex;position:fixed;bottom:0;left:0;right:0;height:62px;background:rgba(14,18,32,.97);backdrop-filter:blur(14px);border-top:1px solid var(--b2);z-index:300;padding-bottom:env(safe-area-inset-bottom)}
+  .bni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--t2);transition:var(--trans)}
+  .bni.on{color:var(--ind)}
+  .bni-ic{font-size:19px;line-height:1}
+  .bni-lb{font-size:8.5px;font-weight:700;letter-spacing:.02em}
+  #moresheet.on{display:flex;position:fixed;inset:0;background:rgba(8,11,20,.85);backdrop-filter:blur(8px);z-index:400;align-items:flex-end}
+  .msheet{background:var(--bg1);border-radius:18px 18px 0 0;border-top:1px solid var(--b2);width:100%;padding:18px 16px calc(22px + env(safe-area-inset-bottom));max-height:75vh;overflow-y:auto}
+  .ms-hd{width:36px;height:4px;background:var(--bg5);border-radius:2px;margin:0 auto 16px}
+  .ms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .ms-it{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:15px 6px;text-align:center;cursor:pointer}
+  .ms-it:active{background:var(--bg3)}
+  .ms-ic{font-size:20px;margin-bottom:5px}
+  .ms-lb{font-size:9.5px;font-weight:600;color:var(--t1)}
+}
+
+/* ── TOPBAR ── */
+#top{height:48px;background:var(--bg1);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;z-index:100}
+.logo{width:30px;height:30px;background:linear-gradient(135deg,var(--ind),var(--vio));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 0 18px rgba(99,102,241,.4)}
+.brand{font-size:13px;font-weight:700;letter-spacing:.03em}
+.ver{font-size:9px;color:var(--t3);background:var(--bg3);padding:2px 6px;border-radius:4px;border:1px solid var(--b1);font-family:'JetBrains Mono',monospace}
+.sp{flex:1}
+.tnav{display:flex;gap:1px}
+.tnb{padding:4px 11px;border-radius:6px;font-size:11px;font-weight:500;background:transparent;color:var(--t2);transition:var(--trans)}
+.tnb:hover{background:var(--bg3);color:var(--t1)}
+.tnb.on{background:var(--is);color:var(--ind)}
+.tright{display:flex;align-items:center;gap:8px}
+#clk{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t1);background:var(--bg3);padding:3px 9px;border-radius:5px;border:1px solid var(--b1)}
+.ebadge{display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;background:var(--es);border:1px solid rgba(16,185,129,.25);font-size:10px;font-weight:600;color:var(--em);cursor:pointer;transition:var(--trans)}
+.epulse{width:6px;height:6px;border-radius:50%;background:var(--em);animation:ep 2s infinite}
+@keyframes ep{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.6)}50%{box-shadow:0 0 0 4px rgba(16,185,129,0)}}
+.lifeline{height:2px;background:linear-gradient(90deg,var(--ind),var(--vio),var(--saf),var(--em),var(--ind));background-size:300%;animation:ll 5s linear infinite;flex-shrink:0}
+@keyframes ll{0%{background-position:0%}100%{background-position:300%}}
+
+/* ── SHELL ── */
+#shell{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+#sb{width:220px;background:var(--bg1);border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0}
+.score-w{margin:12px 10px 6px;background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(139,92,246,.05));border:1px solid rgba(99,102,241,.2);border-radius:var(--r);padding:14px}
+.sw-lbl{font-size:8px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--t2);margin-bottom:6px}
+.sw-row{display:flex;align-items:baseline;gap:3px}
+.sw-big{font-family:'DM Serif Display',serif;font-size:40px;color:var(--ind);line-height:1}
+.sw-dom{font-size:9px;color:var(--t2)}
+.sw-bar-bg{margin-top:7px;background:var(--bg4);border-radius:3px;height:4px;overflow:hidden}
+.sw-bar{height:4px;border-radius:3px;background:linear-gradient(90deg,var(--ind),var(--vio));transition:width .6s ease}
+.sw-sub{font-size:9px;color:var(--t2);margin-top:5px}
+.ng{padding:10px 8px 4px}
+.ngl{font-size:8px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--t3);padding:0 6px;margin-bottom:3px}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:7px;font-size:11.5px;font-weight:500;color:var(--t1);cursor:pointer;transition:var(--trans);margin-bottom:1px;position:relative}
+.ni:hover{background:var(--bg3);color:var(--t0)}
+.ni.on{background:var(--is);color:var(--ind)}
+.ni.on::before{content:'';position:absolute;left:0;top:22%;bottom:22%;width:3px;border-radius:0 3px 3px 0;background:var(--ind)}
+.nic{font-size:13px;width:16px;text-align:center;flex-shrink:0}
+.nbadge{margin-left:auto;font-size:8px;font-weight:800;padding:1px 5px;border-radius:10px;background:var(--ind);color:#fff}
+.nbadge.g{background:var(--em)} .nbadge.s{background:var(--saf);color:#000}
+.sdiv{height:1px;background:var(--b1);margin:5px 10px}
+.sb-stats{padding:6px 14px 14px;display:flex;flex-direction:column;gap:6px}
+.ssr{display:flex;justify-content:space-between;align-items:center}
+.ssn{font-size:10px;color:var(--t2)}
+.ssv{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600}
+
+/* ── MAIN ── */
+#main{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg0);padding:22px 26px}
+.panel{display:none}.panel.on{display:block;animation:pin .16s ease}
+@keyframes pin{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+.ph-t{font-family:'DM Serif Display',serif;font-size:22px;color:var(--t0)}
+.ph-s{font-size:10.5px;color:var(--t2);margin-top:2px}
+.ph-a{display:flex;gap:7px;flex-shrink:0}
+.btn{padding:6px 14px;border-radius:7px;font-size:11px;font-weight:600;transition:var(--trans);display:inline-flex;align-items:center;gap:5px}
+.bp{background:var(--ind);color:#fff}.bp:hover{background:#7577f3;box-shadow:0 0 14px rgba(99,102,241,.35)}
+.bg{background:var(--bg3);color:var(--t1);border:1px solid var(--b2)}.bg:hover{background:var(--bg4);color:var(--t0)}
+.bd{background:var(--rs);color:var(--ros);border:1px solid rgba(244,63,94,.2)}.bd:hover{background:rgba(244,63,94,.18)}
+.bsm{padding:4px 10px;font-size:10.5px;border-radius:6px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.card{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:16px}
+.card:hover{border-color:var(--b2)}
+.chd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ct{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--t1)}
+.ca{font-size:10px;color:var(--ind);cursor:pointer;font-weight:600}
+.ca:hover{text-decoration:underline}
+.sc{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:14px 16px;transition:var(--trans)}
+.sc:hover{transform:translateY(-1px);border-color:var(--b2)}
+.sl{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t2)}
+.sv{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;margin:5px 0 2px;line-height:1}
+.sd{font-size:10px}
+.up{color:var(--em)}.dn{color:var(--ros)}
+.sdiv2{display:flex;align-items:center;gap:8px;margin:18px 0 14px}
+.sdiv2-l{flex:1;height:1px;background:var(--b1)}
+.sdiv2-t{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);white-space:nowrap}
+input[type=range]{width:100%;height:4px;border-radius:4px;-webkit-appearance:none;appearance:none;background:var(--bg4);cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--ind);border:2px solid var(--bg2);box-shadow:0 0 6px rgba(99,102,241,.5)}
+.tog{position:relative;width:36px;height:20px;background:var(--bg4);border-radius:10px;cursor:pointer;transition:var(--trans);flex-shrink:0}
+.tog.on{background:var(--ind)}
+.tog::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:3px;left:3px;transition:var(--trans);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.tog.on::after{left:19px}
+.pr{margin-bottom:11px}
+.pr-hd{display:flex;justify-content:space-between;margin-bottom:3px}
+.pr-n{font-size:11px;color:var(--t1);font-weight:500}
+.pr-p{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t2)}
+.pr-bg{background:var(--bg4);border-radius:3px;height:5px;overflow:hidden}
+.pr-f{height:5px;border-radius:3px;transition:width .7s cubic-bezier(.4,0,.2,1)}
+
+/* ── TOAST ── */
+#ta{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column-reverse;gap:7px;z-index:999}
+.toast{background:var(--bg4);border:1px solid var(--b2);border-radius:7px;padding:9px 14px;font-size:12px;color:var(--t0);box-shadow:0 4px 20px rgba(0,0,0,.5);animation:tin .18s ease;display:flex;align-items:center;gap:7px;max-width:280px}
+@keyframes tin{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+
+/* ── FOCUS MODAL ── */
+#fov{position:fixed;inset:0;background:rgba(8,11,20,.92);backdrop-filter:blur(14px);display:none;align-items:center;justify-content:center;z-index:998}
+#fov.on{display:flex;animation:foin .2s ease}
+@keyframes foin{from{opacity:0}to{opacity:1}}
+.fbox{background:var(--bg2);border:1px solid var(--b2);border-radius:var(--rl);width:400px;padding:32px;text-align:center;box-shadow:0 0 80px rgba(99,102,241,.18)}
+.flbl{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ind);margin-bottom:6px}
+.ftask{font-size:16px;font-weight:700;color:var(--t0);margin:4px 0 20px;font-family:'DM Serif Display',serif}
+.fring{position:relative;width:110px;height:110px;margin:0 auto 14px}
+.fring svg{width:110px;height:110px;transform:rotate(-90deg)}
+.frb{fill:none;stroke:var(--bg4);stroke-width:7}
+.frf{fill:none;stroke:var(--ind);stroke-width:7;stroke-linecap:round;stroke-dasharray:314;transition:stroke-dashoffset 1s linear}
+.ftnum{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--ind)}
+.fmeta{font-size:10px;color:var(--t2);margin-bottom:20px}
+.fbtns{display:flex;gap:7px;justify-content:center}
+.fsel{margin-bottom:14px;background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:7px 10px;color:var(--t1);font-size:11px;width:100%}
+
+/* ── EVENT TIMELINE ── */
+.ev-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--b1);align-items:flex-start}
+.ev-item:last-child{border-bottom:none}
+.ev-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.ev-time{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--t2);width:40px;flex-shrink:0;padding-top:1px}
+.ev-body{flex:1}
+.ev-type{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.ev-detail{font-size:11px;color:var(--t1);margin-top:1px}
+.ev-meta{font-size:9px;color:var(--t2);margin-top:2px;display:flex;gap:8px}
+.ev-tag{font-size:8.5px;font-weight:700;padding:1px 6px;border-radius:10px}
+
+/* ── HOURLY LOGGER ── */
+.hl-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.hl-cell{background:var(--bg3);border-radius:6px;padding:8px 6px;text-align:center;cursor:pointer;border:1px solid transparent;transition:var(--trans)}
+.hl-cell:hover{border-color:var(--b2);background:var(--bg4)}
+.hl-cell.logged{border-color:rgba(99,102,241,.3);background:var(--is)}
+.hl-hour{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t2);margin-bottom:3px}
+.hl-energy{font-size:14px;line-height:1}
+.hl-mood{font-size:9px;color:var(--t1);margin-top:2px}
+
+/* ── DECISION JOURNAL ── */
+.dj-item{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);padding:12px 14px;margin-bottom:8px}
+.dj-hd{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.dj-type{font-size:8.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:10px}
+.dj-date{font-size:9.5px;color:var(--t2);font-family:'JetBrains Mono',monospace;margin-left:auto}
+.dj-decision{font-size:12px;font-weight:600;color:var(--t0);margin-bottom:6px}
+.dj-row{display:flex;gap:16px;font-size:10.5px;color:var(--t1)}
+.dj-field{display:flex;gap:4px}
+.dj-lbl{color:var(--t2);font-weight:600}
+.dj-val{color:var(--t0)}
+.dj-outcome{display:flex;align-items:center;gap:6px;margin-top:6px;padding-top:6px;border-top:1px solid var(--b1)}
+.outcome-bar{flex:1;background:var(--bg4);border-radius:3px;height:4px;overflow:hidden}
+.outcome-fill{height:4px;border-radius:3px}
+
+/* ── KNOWLEDGE GRAPH ── */
+.kg-node{text-align:center;cursor:pointer}
+.kg-circle{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 4px;font-size:10px;font-weight:700;transition:var(--trans)}
+.kg-circle:hover{transform:scale(1.1)}
+.kg-label{font-size:9px;color:var(--t1);font-weight:500}
+.kg-arrow{display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:14px;padding:2px 0}
+
+/* ── LIFE DOMAINS RING ── */
+.domain-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.domain-card{background:var(--bg3);border:1px solid var(--b1);border-radius:8px;padding:10px;text-align:center;cursor:pointer;transition:var(--trans)}
+.domain-card:hover{border-color:var(--b2);transform:translateY(-1px)}
+.domain-icon{font-size:18px;margin-bottom:4px}
+.domain-name{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--t1)}
+.domain-score{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:800;margin-top:2px}
+.domain-bar{margin-top:6px;background:var(--bg4);border-radius:3px;height:3px;overflow:hidden}
+.domain-fill{height:3px;border-radius:3px}
+
+/* ── AI MEMORY ── */
+.mem-item{background:var(--bg3);border:1px solid var(--b1);border-radius:7px;padding:10px 12px;margin-bottom:6px;display:flex;gap:10px;align-items:flex-start}
+.mem-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.mem-text{font-size:11.5px;color:var(--t0);line-height:1.5;flex:1}
+.mem-date{font-size:9px;color:var(--t2);font-family:'JetBrains Mono',monospace;margin-top:3px}
+.mem-del{color:var(--t3);cursor:pointer;font-size:14px;flex-shrink:0}
+.mem-del:hover{color:var(--ros)}
+
+/* ── AI CHAT ── */
+.ai-shell{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;display:flex;flex-direction:column;height:calc(100vh - 170px)}
+.aiqb{display:flex;flex-wrap:wrap;gap:5px;padding:10px 14px;border-bottom:1px solid var(--b1);background:var(--bg3)}
+.qc{padding:4px 11px;border-radius:18px;font-size:10.5px;font-weight:500;background:var(--bg2);color:var(--t1);border:1px solid var(--b2);cursor:pointer;transition:var(--trans)}
+.qc:hover{background:var(--is);color:var(--ind);border-color:rgba(99,102,241,.3)}
+.aimsg{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+.msg{display:flex;gap:8px;max-width:88%}
+.msg.u{margin-left:auto;flex-direction:row-reverse}
+.mav{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.mav.b{background:linear-gradient(135deg,var(--ind),var(--vio))}
+.mav.u{background:var(--bg4);border:1px solid var(--b2)}
+.mb{padding:10px 13px;font-size:12.5px;line-height:1.6;border-radius:10px}
+.msg.b .mb{background:var(--bg3);border:1px solid var(--b1);color:var(--t0);border-radius:3px 10px 10px 10px}
+.msg.u .mb{background:var(--is);border:1px solid rgba(99,102,241,.22);color:var(--t0);border-radius:10px 3px 10px 10px}
+.thk{display:flex;gap:4px;align-items:center;padding:10px 13px;background:var(--bg3);border:1px solid var(--b1);border-radius:3px 10px 10px 10px;width:fit-content}
+.td{width:5px;height:5px;border-radius:50%;background:var(--ind);animation:tdb 1.2s ease-in-out infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes tdb{0%,80%,100%{opacity:.2}40%{opacity:1}}
+.aibar{display:flex;gap:7px;padding:10px 14px;background:var(--bg3);border-top:1px solid var(--b1)}
+#aiinp{flex:1;background:var(--bg2);border:1px solid var(--b2);border-radius:7px;padding:9px 12px;color:var(--t0);font-size:12.5px;resize:none;height:42px;line-height:1.4}
+#aiinp:focus{border-color:var(--ind)}
+#aisend{width:42px;height:42px;border-radius:7px;background:var(--ind);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:var(--trans)}
+#aisend:hover{background:#7577f3}
+#aisend:disabled{background:var(--bg4);color:var(--t3);cursor:not-allowed}
+
+/* ── TASK UI ── */
+.ti{width:100%;background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:8px 12px;color:var(--t0);font-size:12.5px;margin-bottom:8px}
+.ti:focus{border-color:var(--ind)}
+.trow{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.trow:last-child{border-bottom:none}
+.tck{width:17px;height:17px;border-radius:4px;border:1.5px solid var(--bg5);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:var(--trans)}
+.tck.d{background:var(--em);border-color:var(--em);color:#000}
+.ttx{flex:1;font-size:12px;color:var(--t0)}
+.ttx.d{text-decoration:line-through;color:var(--t2)}
+.ttag{font-size:8.5px;font-weight:700;padding:1px 6px;border-radius:10px;letter-spacing:.04em;text-transform:uppercase}
+.tx{color:var(--t3);cursor:pointer;font-size:15px;transition:var(--trans);padding:0 3px}
+.tx:hover{color:var(--ros)}
+
+/* ── HABIT UI ── */
+.hrow{display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.hrow:last-child{border-bottom:none}
+.hname{width:130px;flex-shrink:0}
+.hnm{font-size:11.5px;font-weight:500;color:var(--t0)}
+.hct{font-size:9px;color:var(--t2)}
+.hdays{display:flex;gap:3px}
+.hd{width:26px;height:26px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;transition:var(--trans);font-weight:700}
+.hd:hover{filter:brightness(1.2);transform:scale(1.08)}
+.hdon{background:var(--em);color:#000}
+.hmis{background:var(--bg4);color:var(--t3)}
+.htod{background:var(--is);color:var(--ind);border:1px solid rgba(99,102,241,.4)}
+.hstr{margin-left:auto;text-align:right;min-width:40px}
+.hsv{font-size:11.5px;font-weight:700;color:var(--saf)}
+.hsl{font-size:8.5px;color:var(--t2)}
+
+/* ── SCHEDULE BLOCKS ── */
+.tbr{display:flex;gap:9px;margin-bottom:7px;align-items:stretch}
+.tbt{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--t2);width:38px;flex-shrink:0;padding-top:8px}
+.tbc{flex:1;border-radius:7px;border-left:3px solid;padding:8px 11px;cursor:pointer;transition:var(--trans)}
+.tbc:hover{filter:brightness(1.08)}
+.tbcd{border-color:var(--ind);background:var(--is)}
+.tbct{border-color:var(--saf);background:var(--ss)}
+.tbcb{border-color:var(--em);background:var(--es)}
+.tbca{border-color:var(--sky);background:var(--ks)}
+.tbcr{border-color:var(--t3);background:var(--bg3)}
+.tbcv{border-color:var(--vio);background:var(--vs)}
+.tbn{font-size:11.5px;font-weight:600;color:var(--t0)}
+.tbd{font-size:10px;color:var(--t1);margin-top:2px}
+.tbtg{font-size:8.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:1px 6px;border-radius:8px;display:inline-block;margin-top:3px}
+
+/* ── WEEK GRID ── */
+.wg{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:14px}
+.wdc{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--r);padding:9px;min-height:120px}
+.wdc.tod{border-color:rgba(99,102,241,.4);background:var(--is)}
+.wdn{font-size:8.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--t2);text-align:center;margin-bottom:3px}
+.wdc.tod .wdn{color:var(--ind)}
+.wdnum{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;text-align:center;margin-bottom:6px}
+.wdp{font-size:8.5px;padding:2px 5px;border-radius:3px;background:var(--bg4);color:var(--t1);margin-bottom:2px;cursor:pointer;transition:var(--trans)}
+.wdp:hover{background:var(--bg5);color:var(--t0)}
+
+/* ── GOAL TREE ── */
+.gtree{position:relative;padding-left:16px}
+.gtree::before{content:'';position:absolute;left:7px;top:0;bottom:0;width:1px;background:var(--b2)}
+.gnode{position:relative;margin-bottom:7px}
+.gnode::before{content:'';position:absolute;left:-12px;top:14px;width:9px;height:1px;background:var(--b2)}
+.gni{background:var(--bg3);border:1px solid var(--b1);border-radius:7px;padding:9px 12px;display:flex;align-items:center;gap:9px;cursor:pointer;transition:var(--trans)}
+.gni:hover{border-color:var(--b2);background:var(--bg4)}
+.gmark{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.gntx{font-size:11.5px;font-weight:500;color:var(--t0)}
+.gnmt{font-size:9.5px;color:var(--t2);margin-top:1px}
+.gntag{margin-left:auto;padding:1px 7px;border-radius:10px;font-size:8.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+
+/* ── JOURNAL ── */
+.jta{width:100%;background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:10px 12px;color:var(--t0);font-size:12px;resize:vertical;min-height:80px;line-height:1.6}
+.jta:focus{border-color:var(--ind)}
+.jentry{background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);padding:12px 14px;margin-bottom:8px}
+.jedate{font-size:9px;color:var(--t2);font-weight:600;margin-bottom:6px;font-family:'JetBrains Mono',monospace}
+.jecont{font-size:11.5px;color:var(--t1);line-height:1.7}
+
+/* ── BURNOUT ── */
+.gc{position:relative;width:150px;height:90px;margin:0 auto 6px}
+.gc svg{width:150px;height:90px}
+.gcenter{position:absolute;bottom:0;left:0;right:0;text-align:center}
+.gnum{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:800}
+.gsub{font-size:9.5px;color:var(--t2)}
+
+/* ── MATRIX ── */
+.mx{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;min-height:280px}
+.mxc{border-radius:8px;padding:11px;border:1px solid}
+.mx1{background:var(--is);border-color:rgba(99,102,241,.2)}.mx2{background:var(--es);border-color:rgba(16,185,129,.2)}
+.mx3{background:var(--ss);border-color:rgba(245,158,11,.2)}.mx4{background:var(--rs);border-color:rgba(244,63,94,.2)}
+.mxq{font-size:8.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}
+.mx1 .mxq{color:var(--ind)}.mx2 .mxq{color:var(--em)}.mx3 .mxq{color:var(--saf)}.mx4 .mxq{color:var(--ros)}
+.mxi{font-size:10.5px;color:var(--t1);padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05);display:flex;gap:5px;align-items:flex-start}
+.mxi:last-child{border-bottom:none}
+.mxd{width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:5px}
+
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="top">
+  <div class="logo">L</div>
+  <div class="brand">Life OS</div>
+  <span class="ver">v6</span>
+  <div class="sp"></div>
+  <div class="tnav" id="tnav"></div>
+  <div class="tright">
+    <div id="clk"></div>
+    <div class="ebadge" id="ebadge" onclick="cycleEnergy()">
+      <div class="epulse" id="epulse"></div>
+      <span id="elbl">High Energy</span>
+    </div>
+    <button class="btn bp bsm" onclick="openFocus()">⏱ Focus</button>
+  </div>
+</div>
+<div class="lifeline"></div>
+
+<!-- SHELL -->
+<div id="shell">
+  <!-- SIDEBAR -->
+  <aside id="sb">
+    <div class="score-w">
+      <div class="sw-lbl">Life Score</div>
+      <div class="sw-row"><div class="sw-big" id="lifescore">0</div><div class="sw-dom">/100</div></div>
+      <div class="sw-bar-bg"><div class="sw-bar" id="lifebar" style="width:0%"></div></div>
+      <div class="sw-sub" id="lifesub">Computing…</div>
+    </div>
+    <div id="sb-nav"></div>
+    <div class="sdiv"></div>
+    <div class="sb-stats">
+      <div class="ngl" style="padding:0 0 3px">Live Metrics</div>
+      <div class="ssr"><span class="ssn">Deep Work</span><span class="ssv" style="color:var(--ind)" id="ss-dw">0h 0m</span></div>
+      <div class="ssr"><span class="ssn">Tasks Done</span><span class="ssv" style="color:var(--em)" id="ss-td">0/0</span></div>
+      <div class="ssr"><span class="ssn">Focus Sessions</span><span class="ssv" style="color:var(--vio)" id="ss-fs">0</span></div>
+      <div class="ssr"><span class="ssn">Events Logged</span><span class="ssv" style="color:var(--saf)" id="ss-ev">0</span></div>
+      <div class="ssr"><span class="ssn">Best Streak</span><span class="ssv" style="color:var(--saf)" id="ss-st">🔥 —</span></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main id="main">
+    <div id="panels"></div>
+  </main>
+</div>
+
+<!-- FOCUS MODAL -->
+<div id="fov">
+  <div class="fbox">
+    <div class="flbl">Deep Focus · Pomodoro</div>
+    <div class="ftask" id="ftask">Focus Session</div>
+    <select class="fsel" id="fsel" onchange="ftaskChange()"></select>
+    <div class="fring">
+      <svg viewBox="0 0 110 110">
+        <circle class="frb" cx="55" cy="55" r="48"/>
+        <circle class="frf" id="fring" cx="55" cy="55" r="48"/>
+      </svg>
+      <div class="ftnum" id="ftnum"></div>
+    </div>
+    <div class="fmeta" id="fmeta">Ready to begin</div>
+    <div class="fbtns">
+      <button class="btn bg bsm" onclick="closeFocus()">✕ Exit</button>
+      <button class="btn bp bsm" id="ftog" onclick="toggleFocus()">▶ Start</button>
+      <button class="btn bg bsm" onclick="resetFocus()">↺ Reset</button>
+    </div>
+    <div style="margin-top:12px;font-size:9.5px;color:var(--t3)">Sessions today: <span id="fscount" style="color:var(--ind)">0</span></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV (mobile) -->
+<div id="bnav">
+  <div class="bni on" data-b="dashboard" onclick="goPanelB('dashboard')"><span class="bni-ic">⬡</span><span class="bni-lb">Home</span></div>
+  <div class="bni" data-b="tasks" onclick="goPanelB('tasks')"><span class="bni-ic">✓</span><span class="bni-lb">Tasks</span></div>
+  <div class="bni" data-b="hourly" onclick="goPanelB('hourly')"><span class="bni-ic">⚡</span><span class="bni-lb">Log</span></div>
+  <div class="bni" data-b="screentime" onclick="goPanelB('screentime')"><span class="bni-ic">📱</span><span class="bni-lb">Screen</span></div>
+  <div class="bni" data-b="more" onclick="openMore()"><span class="bni-ic">☰</span><span class="bni-lb">More</span></div>
+</div>
+<!-- MORE SHEET -->
+<div id="moresheet" onclick="if(event.target===this)closeMore()">
+  <div class="msheet">
+    <div class="ms-hd"></div>
+    <div class="ms-grid" id="ms-grid"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="ta"></div>
+
+
+<script>
+/* ═══════════════════════════════════════════════
+   LIFE OS v4 — COMPLETE INTELLIGENCE RUNTIME\n   + Activity Tracking Engine (time · focus · energy)
+   Layers: Event Store + Metrics + Memory + AI
+═══════════════════════════════════════════════ */
+
+// ── PERSISTENCE ENGINE (localStorage) ──────────
+const DB = {
+  get(k,def=null){try{const v=localStorage.getItem('los_'+k);return v?JSON.parse(v):def}catch{return def}},
+  set(k,v){try{localStorage.setItem('los_'+k,JSON.stringify(v))}catch(e){console.warn('DB full',e)}},
+  del(k){localStorage.removeItem('los_'+k)}
+};
+
+// ── DATE HELPERS ───────────────────────────────
+const dkey=(d=new Date())=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today=()=>dkey();
+const mondayOf=(d=new Date())=>{const x=new Date(d);const dow=(x.getDay()+6)%7;x.setDate(x.getDate()-dow);x.setHours(0,0,0,0);return x};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const fmtD=d=>d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
+const escH=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+// ── ACTIVITY TRACKING ENGINE ───────────────────
+// Tracks WHERE attention goes (panel/module time), WHAT you do (hourly+events),
+// and the FOCUS/ENERGY behind it — all local-first, exportable.
+const PANEL_CAT={screentime:'Wellness',rewards:'Discipline',dashboard:'Overview',planner:'Planning',tasks:'Execution',goals:'Planning',habits:'Discipline',events:'Logging',hourly:'Logging',decisions:'Reflection',ai:'AI Coaching',memory:'AI Coaching',domains:'Analytics',knowledge:'Analytics',weekly:'Planning',burnout:'Wellness',audit:'Analytics',journal:'Reflection',procrastination:'Wellness',settings:'System',focus:'Deep Work'};
+const ACT={
+  data:DB.get('activity',{}),
+  cur:'dashboard',curStart:Date.now(),
+  ensure(k){if(!this.data[k])this.data[k]={panels:{},focusMin:0,sessions:1,energySum:0,energyN:0,focusSum:0,focusN:0,firstSeen:Date.now(),lastSeen:Date.now()};return this.data[k]},
+  flush(){
+    const now=Date.now(),secs=Math.round((now-this.curStart)/1000);
+    if(secs>0&&secs<3600*3){const d=this.ensure(today());d.panels[this.cur]=(d.panels[this.cur]||0)+secs;d.lastSeen=now;}
+    this.curStart=now;DB.set('activity',this.data);
+  },
+  switch(panel){this.flush();this.cur=panel;},
+  logSample(energy,focus){const d=this.ensure(today());if(energy){d.energySum+=energy;d.energyN++;}if(focus){d.focusSum+=focus;d.focusN++;}DB.set('activity',this.data);},
+  logFocusMin(min){const d=this.ensure(today());d.focusMin+=min;DB.set('activity',this.data);},
+  todayPanelSecs(){this.flush();const d=this.data[today()];return d?d.panels:{}},
+  daySummary(k){const d=this.data[k];if(!d)return null;const tot=Object.values(d.panels).reduce((a,b)=>a+b,0);return{total:tot,focusMin:d.focusMin,avgE:d.energyN?d.energySum/d.energyN:null,avgF:d.focusN?d.focusSum/d.focusN:null,panels:d.panels}},
+  init(){
+    document.addEventListener('visibilitychange',()=>{if(document.hidden)this.flush();else this.curStart=Date.now();});
+    window.addEventListener('beforeunload',()=>this.flush());
+    setInterval(()=>this.flush(),20000);
+    const d=this.ensure(today());d.sessions=(d.sessions||0)+1;DB.set('activity',this.data);
+  }
+};
+
+// ── PROFILE & CONFIG (persisted) ───────────────
+const PROFILE=DB.get('profile',{name:'Sundar',location:'Chennai',wake:'05:00',sleep:'22:30'});
+const FCFG=DB.get('focusCfg',{work:25,brk:5});
+const FRESH=DB.get('mode',null); // null=first run · 'fresh' · 'sample'
+
+// ── GLOBAL STATE ───────────────────────────────
+// Sample data — loaded ONLY if user chooses "Load Sample Data" on first run
+const SAMPLE={
+  tasks:[
+    {id:1,text:'Review Nifty 50 setups — HTF/MTF/LTF',cat:'trade',done:false,ts:Date.now()},
+    {id:2,text:'Morning sadhana + pranayama',cat:'body',done:false,ts:Date.now()},
+    {id:3,text:'GoCharting CVD scan — top 5 stocks',cat:'trade',done:false,ts:Date.now()},
+    {id:4,text:'Strength training 45 min',cat:'body',done:false,ts:Date.now()},
+    {id:5,text:'Backtest 5 Volume Profile setups',cat:'trade',done:false,ts:Date.now()},
+    {id:6,text:'Learning block — AI & software',cat:'learn',done:false,ts:Date.now()},
+    {id:7,text:'Evening review + plan tomorrow',cat:'mind',done:false,ts:Date.now()},
+  ],
+  habits:[
+    {name:'05:00 Wake',cat:'Morning',log:{}},
+    {name:'Morning Yoga',cat:'Morning',log:{}},
+    {name:'Sidha Vidya',cat:'Mind',log:{}},
+    {name:'Strength Train',cat:'Body',log:{}},
+    {name:'Trade Checklist',cat:'Trading',log:{}},
+    {name:'Deep Work ≥3h',cat:'Trading',log:{}},
+    {name:'Reading 30m',cat:'Learning',log:{}},
+    {name:'Evening Review',cat:'Mind',log:{}},
+    {name:'Water ≥3L',cat:'Body',log:{}},
+    {name:'Sleep 22:30',cat:'Morning',log:{}},
+  ],
+  events:[
+    {id:1,ts:'2026-06-14T05:05',type:'deep_work',detail:'Morning sadhana — Sidha Vidya 40 min',energy:8,focus:9,domain:'mind'},
+    {id:2,ts:'2026-06-14T06:35',type:'exercise',detail:'Strength training + asanas 45 min',energy:9,focus:8,domain:'body'},
+    {id:3,ts:'2026-06-14T09:10',type:'deep_work',detail:'GoCharting HTF analysis — Nifty 50',energy:8,focus:9,domain:'trade'},
+    {id:4,ts:'2026-06-14T11:05',type:'trade',detail:'Long position Bank Nifty — CVD divergence signal',energy:7,focus:8,domain:'trade'},
+    {id:5,ts:'2026-06-14T15:00',type:'learning',detail:'AI & software building block 1h',energy:7,focus:7,domain:'learn'},
+    {id:6,ts:'2026-06-14T21:05',type:'review',detail:'Evening journal — strong day, 3 wins logged',energy:6,focus:6,domain:'mind'},
+  ],
+  aiMemory:[
+    {id:1,text:'Sundar performs best during 09:00–11:00 deep work window for trading analysis.',icon:'📈',date:'Jun 14'},
+    {id:2,text:'Sidha Vidya practice in the morning correlates with higher focus score the same day.',icon:'🧘',date:'Jun 13'},
+    {id:3,text:'Afternoon energy dips consistently around 13:30–14:30 — schedule learning not trading.',icon:'⚡',date:'Jun 12'},
+    {id:4,text:'14-day unbroken streak on morning yoga and meditation.',icon:'🔥',date:'Jun 10'},
+    {id:5,text:'Struggles with procrastination on backtesting tasks — best done in morning not afternoon.',icon:'⚠️',date:'Jun 09'},
+  ],
+  decisions:[
+    {id:1,date:'Jun 14',type:'trade',decision:'Long HDFC Bank — CVD bullish divergence on 15m',reason:'Volume Profile POC held, CVD rising, BOS on 1H',expected:'2R target',actual:'1.4R',outcome:70},
+    {id:2,date:'Jun 13',type:'trade',decision:'Skipped Nifty long setup at 09:30',reason:'Pre-trade checklist red on energy level',expected:'Avoid loss',actual:'Setup worked — missed 1.8R',outcome:40},
+    {id:3,date:'Jun 12',type:'life',decision:'Added 30-min reading block at 15:30',reason:'Learning stagnating — need structured input',expected:'1 book/month',actual:'Ongoing — 3 days consistent',outcome:85},
+  ],
+  journalEntries:[
+    {date:'Jun 14 2026',wins:'Strong market analysis session. Sadhana felt deep.',drain:'Afternoon slump after lunch.',tomorrow:'Start backtest immediately at 09:00.',insight:'Stillness practice before trading removes fear.'},
+    {date:'Jun 13 2026',wins:'14-day streak maintained. Read 30 pages.',drain:'Spent 45min on unplanned news browsing.',tomorrow:'No news until after trade review.',insight:'Energy is information — trust body signals.'},
+  ],
+  goals:[
+    {id:1,level:'Year',text:'Consistent NSE intraday profitability 2026',domain:'Trading',progress:35},
+    {id:2,level:'Quarter',text:'CVD multi-timeframe system — live test Q3',domain:'Trading',progress:50},
+    {id:3,level:'Month',text:'Backtest 50 setups with Volume Profile POC/VAH/VAL',domain:'Trading',progress:40},
+    {id:4,level:'Week',text:'10 paper trades on GoCharting with 15-item checklist',domain:'Trading',progress:30},
+    {id:5,level:'Today',text:'Pre-trade checklist · Chartink scan before 09:00',domain:'Trading',progress:0},
+    {id:6,level:'Year',text:'Peak physical + mental performance through daily practice',domain:'Wellness',progress:60},
+    {id:7,level:'Quarter',text:'Sidha Vidya 90-day immersion — deepen stillness',domain:'Wellness',progress:45},
+    {id:8,level:'Month',text:'Unbroken morning sadhana — 30 consecutive days',domain:'Wellness',progress:50},
+    {id:9,level:'Week',text:'4 strength sessions + daily yoga asanas',domain:'Wellness',progress:25},
+  ],
+};
+const EMPTY={tasks:[],habits:[],events:[],aiMemory:[],decisions:[],journalEntries:[],goals:[]};
+const SEED=FRESH==='sample'?SAMPLE:EMPTY;
+
+// Migrate old-format habits (days[7] arrays) → date-anchored logs
+function migrateHabits(hs){
+  if(!Array.isArray(hs))return[];
+  return hs.map(h=>{
+    if(h.log)return h;
+    const log={},mon=mondayOf();
+    (h.days||[]).forEach((v,i)=>{if(v===true)log[dkey(addDays(mon,i))]=true;});
+    return{name:h.name,cat:h.cat,log};
+  });
+}
+// Migrate old hourly logs (keyed by hour) → keyed by date|hour
+function migrateHourly(hl){
+  const out={};
+  Object.entries(hl||{}).forEach(([k,v])=>{
+    if(k.includes('|'))out[k]=v;
+    else out[(v.ts?v.ts.slice(0,10):today())+'|'+k]=v;
+  });
+  return out;
+}
+
+const S = {
+  panel:'dashboard',
+  energy:0,
+  focusSecs:FCFG.work*60, focusRunning:false, focusInt:null,
+  focusSessions: DB.get('focusSessions',0),
+  deepWorkSecs:0, dwInt:null,
+  tasks: DB.get('tasks',SEED.tasks),
+  nextTaskId: DB.get('nextTaskId',100),
+  habits: migrateHabits(DB.get('habits',SEED.habits)),
+  events: DB.get('events',SEED.events),
+  nextEventId: DB.get('nextEventId',100),
+  aiMemory: DB.get('aiMemory',SEED.aiMemory),
+  nextMemoryId: DB.get('nextMemoryId',100),
+  decisions: DB.get('decisions',SEED.decisions),
+  nextDecisionId: DB.get('nextDecisionId',100),
+  journalEntries: DB.get('journalEntries',SEED.journalEntries),
+  goals: DB.get('goals',SEED.goals),
+  nextGoalId: DB.get('nextGoalId',100),
+  weekPlans: DB.get('weekPlans',{}),   // {weekKey:{0:[items],1:[…]}}
+  weekReviews: DB.get('weekReviews',{}),// {weekKey:{wins,lessons,next3,recovery}}
+  hourlyLog: migrateHourly(DB.get('hourlyLog',{})),
+  screenTime: DB.get('screenTime',{}),
+  burnout: DB.get('burnout',{energy:65,clarity:72,sleep:78,motivation:68,stress:35}),
+  weekOffset:0, habitWeekOffset:0,
+  aiHistory:[],
+  domains: DB.get('domains') || {
+    health:{score:82,color:'var(--em)',icon:'💪'},
+    learning:{score:68,color:'var(--ind)',icon:'📚'},
+    trading:{score:75,color:'var(--saf)',icon:'📈'},
+    mindfulness:{score:90,color:'var(--vio)',icon:'🧘'},
+    relationships:{score:65,color:'var(--pin)',icon:'❤️'},
+    finance:{score:70,color:'var(--cor)',icon:'💰'},
+    recovery:{score:72,color:'var(--sky)',icon:'♾️'},
+  }
+};
+
+function save(){
+  DB.set('tasks',S.tasks);DB.set('nextTaskId',S.nextTaskId);
+  DB.set('habits',S.habits);DB.set('events',S.events);
+  DB.set('nextEventId',S.nextEventId);DB.set('aiMemory',S.aiMemory);
+  DB.set('nextMemoryId',S.nextMemoryId);DB.set('decisions',S.decisions);
+  DB.set('nextDecisionId',S.nextDecisionId);DB.set('journalEntries',S.journalEntries);
+  DB.set('hourlyLog',S.hourlyLog);DB.set('burnout',S.burnout);
+  DB.set('focusSessions',S.focusSessions);
+  DB.set('goals',S.goals);DB.set('nextGoalId',S.nextGoalId);
+  DB.set('weekPlans',S.weekPlans);DB.set('weekReviews',S.weekReviews);
+  DB.set('domains',S.domains);DB.set('screenTime',S.screenTime);
+  checkStorage();
+}
+
+
+
+
+// ── PHONE SCREEN TIME ──────────────────────────
+// Browser apps cannot read other apps' usage (OS sandbox). You enter the numbers
+// from Android Digital Wellbeing / iOS Screen Time — 20 seconds a day — and Life OS
+// turns them into trend, cost analysis, and reclaim targets.
+const ST_CATS=[
+  {k:'social',l:'Social Media',i:'💬',c:'var(--ros)'},
+  {k:'video',l:'Short Video / Reels',i:'📱',c:'var(--cor)'},
+  {k:'ott',l:'OTT / Streaming',i:'📺',c:'var(--pin)'},
+  {k:'news',l:'News / Browsing',i:'📰',c:'var(--saf)'},
+  {k:'work',l:'Productive Apps',i:'💼',c:'var(--em)'},
+];
+function renderScreentime(){
+  const p=document.getElementById('p-screentime');
+  const tk=today(),cur=S.screenTime[tk]||{};
+  const days=[...Array(7)].map((_,i)=>{const d=addDays(new Date(),-(6-i));const r=S.screenTime[dkey(d)]||{};
+    const waste=(r.social||0)+(r.video||0)+(r.ott||0)+(r.news||0);
+    return{d,waste,work:r.work||0,tot:waste+(r.work||0)};});
+  const maxT=Math.max(...days.map(x=>x.tot),60);
+  const logged=days.filter(x=>x.tot>0);
+  const avgWaste=logged.length?Math.round(logged.reduce((a,x)=>a+x.waste,0)/logged.length):0;
+  const todayWaste=(cur.social||0)+(cur.video||0)+(cur.ott||0)+(cur.news||0);
+  const act=ACT.daySummary(tk);const focusMin=act?act.focusMin:0;
+  const hm=m=>`${Math.floor(m/60)}h ${m%60}m`;
+  // Cost analysis
+  const yearHrs=Math.round(avgWaste*365/60);
+  const ratio=focusMin>0?(todayWaste/focusMin).toFixed(1):null;
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">Phone Screen Time</div><div class="ph-s">From Android Digital Wellbeing / iPhone Screen Time · 20 seconds daily</div></div></div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="chd"><span class="ct">Log Today · ${new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})}</span></div>
+      <div style="font-size:10.5px;color:var(--t2);line-height:1.6;margin-bottom:12px;">Open <strong style="color:var(--t1)">Settings → Digital Wellbeing</strong> (Android) or <strong style="color:var(--t1)">Settings → Screen Time</strong> (iPhone), then type today's minutes below.</div>
+      ${ST_CATS.map(c=>`
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;">
+          <div style="width:20px;font-size:15px;">${c.i}</div>
+          <div style="flex:1;font-size:12px;color:var(--t1);">${c.l}</div>
+          <input type="number" class="ti" id="st-${c.k}" value="${cur[c.k]||''}" placeholder="0" min="0" max="1440" style="width:82px;margin:0;text-align:right;">
+          <span style="font-size:10px;color:var(--t2);width:20px;">min</span>
+        </div>`).join('')}
+      <button class="btn bp" style="width:100%;margin-top:8px;" onclick="saveScreenTime()">Save Today's Screen Time</button>
+    </div>
+    ${todayWaste>0?`<div class="card" style="margin-bottom:14px;background:${todayWaste>180?'var(--rs)':'var(--bg2)'};">
+      <div class="chd"><span class="ct">Today's Reality Check</span></div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <div><div class="sl">Distracted</div><div class="sv" style="color:var(--ros);font-size:24px;">${hm(todayWaste)}</div></div>
+        <div><div class="sl">Deep Focus</div><div class="sv" style="color:var(--em);font-size:24px;">${hm(focusMin)}</div></div>
+        <div><div class="sl">Productive Apps</div><div class="sv" style="color:var(--sky);font-size:24px;">${hm(cur.work||0)}</div></div>
+      </div>
+      <div style="font-size:11.5px;color:var(--t1);line-height:1.7;margin-top:12px;padding-top:10px;border-top:1px solid var(--b1);">
+        ${ratio?`⚖️ You spent <strong style="color:var(--ros)">${ratio}×</strong> more time on distraction than deep focus today.<br>`:''}
+        ${todayWaste>=120?`🔄 Reclaiming just <strong style="color:var(--t0)">30 min/day</strong> from this = <strong style="color:var(--em)">${Math.round(30*365/60)} hours a year</strong> toward your goals.`:'✅ Distraction time is under control today. Protect it.'}
+      </div>
+    </div>`:''}
+    <div class="card" style="margin-bottom:14px;">
+      <div class="chd"><span class="ct">7-Day Trend</span></div>
+      ${logged.length?`
+      <div style="display:flex;align-items:flex-end;gap:6px;height:100px;padding-top:8px;">
+        ${days.map(x=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <div style="font-size:8px;color:var(--t2);font-family:'JetBrains Mono',monospace;">${x.tot?Math.round(x.tot/60*10)/10+'h':''}</div>
+          <div style="width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:64px;">
+            <div style="background:var(--ros);border-radius:3px 3px 0 0;height:${Math.round(x.waste/maxT*64)}px;"></div>
+            <div style="background:var(--em);border-radius:${x.waste?'0':'3px 3px 0 0'};height:${Math.round(x.work/maxT*64)}px;"></div>
+          </div>
+          <div style="font-size:8.5px;color:${dkey(x.d)===tk?'var(--saf)':'var(--t2)'};">${x.d.toLocaleDateString('en-IN',{weekday:'short'}).slice(0,2)}</div>
+        </div>`).join('')}
+      </div>
+      <div style="display:flex;gap:14px;margin-top:8px;font-size:9px;color:var(--t2);"><span><span style="display:inline-block;width:8px;height:8px;background:var(--ros);border-radius:2px;margin-right:4px;"></span>Distraction</span><span><span style="display:inline-block;width:8px;height:8px;background:var(--em);border-radius:2px;margin-right:4px;"></span>Productive</span></div>
+      <div style="font-size:11.5px;color:var(--t1);line-height:1.8;margin-top:12px;padding-top:10px;border-top:1px solid var(--b1);">
+        📊 Daily average distraction: <strong style="color:var(--ros)">${hm(avgWaste)}</strong><br>
+        📅 At this rate: <strong style="color:var(--t0)">${yearHrs} hours a year</strong> — about ${Math.round(yearHrs/24)} full days.<br>
+        🎯 Target: cut it by 25% → reclaim <strong style="color:var(--em)">${Math.round(yearHrs*.25)} hours</strong> for your goals.
+      </div>`:'<div style="font-size:11.5px;color:var(--t2);padding:14px 0;">Log a few days to see your trend, yearly cost, and reclaim target.</div>'}
+    </div>
+    <div class="card">
+      <div class="chd"><span class="ct">Why manual?</span></div>
+      <div style="font-size:11px;color:var(--t2);line-height:1.7;">Phone operating systems block web apps from reading other apps' usage — that's a privacy protection, not a bug. Your OS already counts it perfectly; this takes the number and turns it into trend, cost and a reclaim plan. A future native version could read it automatically on Android.</div>
+    </div>`;
+}
+function saveScreenTime(){
+  const tk=today(),rec={};
+  ST_CATS.forEach(c=>{const v=parseInt(document.getElementById('st-'+c.k).value);if(v>0)rec[c.k]=Math.min(1440,v);});
+  S.screenTime[tk]=rec;DB.set('screenTime',S.screenTime);
+  const waste=(rec.social||0)+(rec.video||0)+(rec.ott||0)+(rec.news||0);
+  logEvent('review',`Screen time logged: ${Math.floor(waste/60)}h ${waste%60}m distraction`,5,5,'general');
+  toast('📱','Screen time saved');renderScreentime();
+}
+
+// ── REWARDS ────────────────────────────────────
+function renderRewards(){
+  const p=document.getElementById('p-rewards');
+  const lv=Math.floor(RW.stars/5)+1,inLv=RW.stars%5;
+  const rate=RW.total?Math.round(RW.yes/RW.total*100):0;
+  const recent=RW.history.slice(0,12);
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">Focus Rewards</div><div class="ph-s">3 honest check-ins in a row = 1 star</div></div>
+    <div class="ph-a"><button class="btn bp bsm" onclick="showCheckin(true)">🎯 Check in now</button></div></div>
+    <div class="card" style="text-align:center;margin-bottom:14px;background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(99,102,241,.06));border-color:rgba(245,158,11,.22);">
+      <div style="font-size:44px;line-height:1;margin-bottom:4px;">⭐</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:38px;color:var(--saf);line-height:1;">${RW.stars}</div>
+      <div style="font-size:10px;color:var(--t2);margin-top:4px;">STARS EARNED · LEVEL ${lv}</div>
+      <div style="display:flex;gap:5px;justify-content:center;margin-top:12px;">${[0,1,2,3,4].map(i=>`<div style="width:26px;height:5px;border-radius:3px;background:${i<inLv?'var(--saf)':'var(--bg4)'};"></div>`).join('')}</div>
+      <div style="font-size:10.5px;color:var(--t2);margin-top:6px;">${5-inLv} more star${5-inLv===1?'':'s'} to Level ${lv+1}</div>
+    </div>
+    <div class="g4" style="grid-template-columns:repeat(4,1fr);">
+      <div class="sc"><div class="sl">Current Streak</div><div class="sv" style="color:var(--em);font-size:22px;">${RW.streak}</div><div class="sd">${3-(RW.streak%3)} to next ⭐</div></div>
+      <div class="sc"><div class="sl">Best Streak</div><div class="sv" style="color:var(--ind);font-size:22px;">${RW.best}</div><div class="sd">personal record</div></div>
+      <div class="sc"><div class="sl">On-Task Rate</div><div class="sv" style="color:${rate>=70?'var(--em)':rate>=45?'var(--saf)':'var(--ros)'};font-size:22px;">${rate}%</div><div class="sd">${RW.yes}/${RW.total} check-ins</div></div>
+      <div class="sc"><div class="sl">Distractions</div><div class="sv" style="color:var(--ros);font-size:22px;">${RW.no}</div><div class="sd">caught & reset</div></div>
+    </div>
+    <div class="card">
+      <div class="chd"><span class="ct">Recent Check-ins</span></div>
+      ${recent.length?recent.map(h=>`<div style="display:flex;gap:9px;align-items:center;padding:7px 0;border-bottom:1px solid var(--b1);font-size:11.5px;">
+        <span style="font-size:14px;">${h.ans==='done'?'🏁':h.ans==='yes'?'✓':'✕'}</span>
+        <span style="flex:1;color:${h.ans==='no'?'var(--t2)':'var(--t1)'};">${escH(h.task||'—')}</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--t2);">${new Date(h.ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</span>
+      </div>`).join(''):'<div style="font-size:11.5px;color:var(--t2);padding:10px 0;">No check-ins yet. The first prompt appears once you have an open task and check-ins are on.</div>'}
+    </div>`;
+}
+
+
+// ── STORAGE MANAGEMENT ─────────────────────────
+const LS_LIMIT=5*1024*1024; // conservative browser floor (~5MB)
+function storageBytes(){
+  let t=0;
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith('los_'))t+=(k.length+(localStorage.getItem(k)||'').length)*2;}
+  return t;
+}
+function storagePct(){return Math.min(100,Math.round(storageBytes()/LS_LIMIT*100));}
+function fmtBytes(b){return b>1024*1024?(b/1024/1024).toFixed(2)+' MB':(b/1024).toFixed(0)+' KB';}
+function daysOfData(){
+  const keys=new Set();
+  Object.keys(S.hourlyLog).forEach(k=>keys.add(k.split('|')[0]));
+  Object.keys(S.screenTime).forEach(k=>keys.add(k));
+  Object.keys(ACT.data).forEach(k=>keys.add(k));
+  return keys.size;
+}
+// Trim data older than N days (events, hourly logs, completed tasks) — daily records
+// like screen time, habits and activity summaries are tiny and always kept.
+function archiveOlderThan(days){
+  const cutoff=dkey(addDays(new Date(),-days));
+  const cutMs=addDays(new Date(),-days).getTime();
+  const before=storageBytes();
+  S.events=S.events.filter(e=>!e.ts||e.ts.slice(0,10)>=cutoff);
+  Object.keys(S.hourlyLog).forEach(k=>{if(k.split('|')[0]<cutoff)delete S.hourlyLog[k];});
+  S.tasks=S.tasks.filter(t=>!t.done||!t.ts||t.ts>=cutMs);
+  S.journalEntries=S.journalEntries.slice(0,180);
+  save();
+  const freed=before-storageBytes();
+  toast('🗜',`Freed ${fmtBytes(freed)} · ${daysOfData()} days of summaries kept`);
+  renderSettings();
+}
+function checkStorage(){
+  const pct=storagePct();
+  const lastWarn=DB.get('lastStorageWarn',0);
+  if(pct>=75&&Date.now()-lastWarn>24*3600*1000){
+    DB.set('lastStorageWarn',Date.now());
+    toast('⚠️',`Storage ${pct}% full — export a backup, then archive old logs in Settings`);
+  }
+}
+
+// ── HOURLY LOG PROMPT ──────────────────────────
+// Fires once per hour while the app is open, if the previous hour is unlogged.
+const HP={last:DB.get('lastHourPrompt','')};
+function maybeHourPrompt(){
+  if(!CHK.enabled||inQuiet())return;
+  if(document.getElementById('chk-ov')||document.getElementById('hp-ov')||document.getElementById('rw-ov'))return;
+  const now=new Date(),prevH=new Date(now.getTime()-3600*1000);
+  const hk=String(prevH.getHours()).padStart(2,'0');
+  const slot=dkey(prevH)+'|'+hk;
+  if(S.hourlyLog[slot])return;          // already logged
+  if(HP.last===slot)return;             // already asked about this hour
+  if(now.getMinutes()<5)return;         // give the hour a moment to finish
+  HP.last=slot;DB.set('lastHourPrompt',slot);
+  showHourPrompt(hk,slot);
+}
+function showHourPrompt(hk,slot){
+  const ov=document.createElement('div');ov.id='hp-ov';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(8,11,20,.9);backdrop-filter:blur(8px);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--b2);border-radius:18px;padding:22px 20px;max-width:360px;width:100%;">
+    <div style="text-align:center;font-size:24px;margin-bottom:6px;">⏱</div>
+    <div style="text-align:center;font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--sky);margin-bottom:10px;">HOUR ${hk}:00 — WHAT DID YOU DO?</div>
+    <input type="text" class="ti" id="hp-act" placeholder="e.g. Backtesting, scrolling Instagram, meeting…" style="margin:0 0 12px;" onkeydown="if(event.key==='Enter')saveHourPrompt('${slot}','${hk}')">
+    <div style="font-size:10px;color:var(--t2);margin-bottom:4px;">Energy during that hour</div>
+    <input type="range" id="hp-en" min="1" max="10" value="6" style="width:100%;margin-bottom:6px;" oninput="document.getElementById('hp-env').textContent=this.value">
+    <div style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--saf);margin-bottom:14px;"><span id="hp-env">6</span>/10</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn bg" style="flex:1;padding:11px;" onclick="document.getElementById('hp-ov').remove()">Skip</button>
+      <button class="btn bp" style="flex:2;padding:11px;" onclick="saveHourPrompt('${slot}','${hk}')">Save log</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  if(navigator.vibrate)try{navigator.vibrate(40)}catch(e){}
+}
+function saveHourPrompt(slot,hk){
+  const a=document.getElementById('hp-act').value.trim();
+  if(!a){toast('⚠️','Write what you did, or tap Skip');return;}
+  const en=parseInt(document.getElementById('hp-en').value);
+  S.hourlyLog[slot]={hour:hk,activity:a,energy:en,mood:en>=7?'Focused':en>=4?'Neutral':'Drained',ts:new Date().toISOString()};
+  save();
+  document.getElementById('hp-ov').remove();
+  logEvent('hourly_log',`${hk}:00 — ${a}`,en,en,'general');
+  toast('⏱','Hour logged');
+  if(S.panel==='hourly'){renderHLGrid();renderHLInsights();}
+}
+
+// ── CHECK-IN PROMPT + REWARD ENGINE ────────────
+// Periodically asks "are you on your priority?" — 3 consecutive YES = ⭐ reward.
+const CHK=DB.get('chkCfg',{enabled:true,every:45,from:7,to:22});
+const RW=DB.get('rewards',{stars:0,streak:0,best:0,total:0,yes:0,no:0,history:[],lastPrompt:0,snoozeUntil:0});
+function saveRW(){DB.set('rewards',RW);}
+function topPriorityTask(){
+  const open=S.tasks.filter(t=>!t.done).sort((a,b)=>(a.pri||2)-(b.pri||2));
+  return open[0]||null;
+}
+function inQuiet(){const h=new Date().getHours();return h<CHK.from||h>=CHK.to;}
+function maybePrompt(){
+  if(!CHK.enabled||inQuiet())return;
+  if(document.getElementById('chk-ov'))return;
+  if(Date.now()<RW.snoozeUntil)return;
+  if(Date.now()-RW.lastPrompt < CHK.every*60*1000)return;
+  showCheckin();
+}
+function showCheckin(manual){
+  const t=topPriorityTask();
+  const q=t?`Are you working on your top priority right now?`:`No open task set. Want to capture what matters most right now?`;
+  const sub=t?`<div style="margin-top:10px;padding:11px 13px;background:var(--is);border:1px solid rgba(99,102,241,.25);border-radius:10px;font-size:13px;color:var(--t0);line-height:1.5;">${escH(t.text)}</div>`:'';
+  const ov=document.createElement('div');ov.id='chk-ov';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(8,11,20,.9);backdrop-filter:blur(8px);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--b2);border-radius:18px;padding:24px 20px;max-width:360px;width:100%;text-align:center;">
+    <div style="font-size:26px;margin-bottom:8px;">🎯</div>
+    <div style="font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--saf);margin-bottom:8px;">CHECK-IN · ${RW.streak}/3 TO A STAR</div>
+    <div style="font-size:14px;color:var(--t0);line-height:1.5;">${q}</div>
+    ${sub}
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:18px;">
+      ${t?`<button class="btn bp" style="padding:12px;" onclick="answerCheckin('yes')">✓ Yes, I'm on it</button>
+      <button class="btn bp" style="padding:12px;background:var(--em);" onclick="answerCheckin('done')">🏁 Just completed it</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn bg" style="flex:1;padding:11px;" onclick="answerCheckin('no')">✕ Got distracted</button>
+        <button class="btn bg" style="flex:1;padding:11px;" onclick="answerCheckin('snooze')">⏱ Snooze 15m</button>
+      </div>`
+      :`<button class="btn bp" style="padding:12px;" onclick="closeCheckin();goPanelB('tasks')">＋ Add my priority task</button>
+        <button class="btn bg" style="padding:11px;" onclick="answerCheckin('snooze')">Later</button>`}
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  RW.lastPrompt=Date.now();saveRW();
+  if(navigator.vibrate)try{navigator.vibrate(60)}catch(e){}
+}
+function closeCheckin(){const o=document.getElementById('chk-ov');if(o)o.remove();}
+function answerCheckin(ans){
+  const t=topPriorityTask();
+  closeCheckin();
+  if(ans==='snooze'){RW.snoozeUntil=Date.now()+15*60*1000;saveRW();toast('⏱','Snoozed 15 minutes');return;}
+  RW.total++;
+  RW.history.unshift({ts:Date.now(),ans,task:t?t.text:''});
+  if(RW.history.length>200)RW.history=RW.history.slice(0,200);
+  if(ans==='yes'||ans==='done'){
+    RW.yes++;RW.streak++;
+    if(RW.streak>RW.best)RW.best=RW.streak;
+    if(ans==='done'&&t){t.done=true;save();logEvent('task',`Completed: ${t.text}`,8,8,t.cat);}
+    if(RW.streak>0&&RW.streak%3===0){RW.stars++;saveRW();showReward();}
+    else{saveRW();toast('✓',`Good. ${3-(RW.streak%3)} more check-in${3-(RW.streak%3)===1?'':'s'} to a star.`);}
+  }else{
+    RW.no++;RW.streak=0;saveRW();
+    logEvent('energy_check','Distraction acknowledged at check-in',4,3,'mind');
+    toast('🔄','Reset. Close the distraction and start with 2 minutes.');
+    setTimeout(()=>{if(confirm('Start a focus session on your priority now?'))openFocus();},400);
+  }
+  if(S.panel==='dashboard')renderDashboard();
+  if(S.panel==='rewards')renderRewards();
+}
+function showReward(){
+  const lv=Math.floor(RW.stars/5)+1;
+  const ov=document.createElement('div');ov.id='rw-ov';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(8,11,20,.92);backdrop-filter:blur(10px);z-index:700;display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML=`<div style="text-align:center;">
+    <div style="font-size:64px;animation:starpop .6s cubic-bezier(.2,1.6,.4,1);">⭐</div>
+    <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--saf);margin:6px 0;">Star Earned!</div>
+    <div style="font-size:12.5px;color:var(--t1);line-height:1.6;max-width:280px;margin:0 auto 6px;">Three focused check-ins in a row. That's the habit forming — total <strong style="color:var(--t0)">${RW.stars} ⭐</strong> · Level ${lv}</div>
+    <div style="font-size:11px;color:var(--t2);margin-bottom:18px;">Best streak: ${RW.best} check-ins</div>
+    <button class="btn bp" style="padding:11px 26px;" onclick="document.getElementById('rw-ov').remove()">Keep going →</button>
+  </div>`;
+  document.body.appendChild(ov);
+  if(navigator.vibrate)try{navigator.vibrate([40,60,40,60,90])}catch(e){}
+  logEvent('review',`Reward star earned (${RW.stars} total)`,8,8,'mind');
+  setTimeout(()=>{const o=document.getElementById('rw-ov');if(o)o.remove()},9000);
+}
+
+// ── MOBILE NAV ─────────────────────────────────
+const MORE_ITEMS=[
+  {id:'screentime',icon:'📱',name:'Screen Time'},{id:'rewards',icon:'⭐',name:'Rewards'},
+  {id:'habits',icon:'✦',name:'Habits'},{id:'planner',icon:'⏱',name:'Planner'},{id:'goals',icon:'◎',name:'Goals'},
+  {id:'events',icon:'⚡',name:'Events'},{id:'decisions',icon:'⚖',name:'Decisions'},
+  {id:'ai',icon:'✦',name:'AI Coach'},{id:'memory',icon:'🧠',name:'Memory'},
+  {id:'weekly',icon:'⊟',name:'Weekly'},{id:'audit',icon:'⏲',name:'Time Audit'},
+  {id:'domains',icon:'◈',name:'Domains'},{id:'burnout',icon:'♥',name:'Burnout'},
+  {id:'journal',icon:'✎',name:'Journal'},{id:'procrastination',icon:'⚠',name:'Unstuck'},
+  {id:'knowledge',icon:'⊕',name:'Graph'},{id:'settings',icon:'⚙',name:'Settings'},
+];
+function goPanelB(id){
+  goPanel(id);
+  document.querySelectorAll('.bni').forEach(b=>b.classList.toggle('on',b.dataset.b===id));
+}
+function openMore(){
+  const g=document.getElementById('ms-grid');
+  g.innerHTML=MORE_ITEMS.map(it=>`<div class="ms-it" onclick="closeMore();goPanelB('${it.id}')"><div class="ms-ic">${it.icon}</div><div class="ms-lb">${it.name}</div></div>`).join('');
+  document.getElementById('moresheet').classList.add('on');
+}
+function closeMore(){document.getElementById('moresheet').classList.remove('on');}
+
+// ── NUDGE & MOTIVATION ENGINE ──────────────────
+// Direct logs = user taps (hourly, events, habits). Indirect = ACT auto-tracking.
+// Nudges use both to pull the user back to their #1 priority. Consent given at welcome.
+const QUOTES=[
+  'Discipline is choosing what you want most over what you want now.',
+  'The market rewards patience; life rewards consistency.',
+  'Energy is information — log it, learn from it.',
+  'Small daily wins compound into unrecognizable change.',
+  'Your streak is proof you can trust yourself.',
+  'Protect your peak hours like capital.',
+  'One focused hour beats four distracted ones.',
+  'Come back to the breath. Come back to the task.',
+];
+const NCFG=DB.get('nudgeCfg',{enabled:true,notifs:false});
+function topPriority(){
+  const g=S.goals.find(x=>x.level==='Today'&&x.progress<100)||S.goals.find(x=>x.level==='Week'&&x.progress<100)||S.goals.find(x=>x.progress<100);
+  if(g)return{txt:g.text,kind:'goal'};
+  const t=S.tasks.find(t=>!t.done);
+  return t?{txt:t.text,kind:'task'}:null;
+}
+function lastDirectLogMins(){
+  let last=0;
+  Object.entries(S.hourlyLog).forEach(([k,v])=>{if(k.startsWith(today())&&v.ts){const t=new Date(v.ts).getTime();if(t>last)last=t;}});
+  S.events.forEach(e=>{if(e.ts&&e.ts.startsWith(today())){const t=new Date(e.ts).getTime();if(t>last)last=t;}});
+  return last?Math.round((Date.now()-last)/60000):null;
+}
+function buildNudge(){
+  const h=new Date().getHours(),pri=topPriority();
+  const gap=lastDirectLogMins();
+  const act=ACT.daySummary(today());
+  // Rule order: streak risk (evening) → no check-in 2h+ → no focus by late morning → low energy → priority push → daily quote
+  if(h>=20){const missed=S.habits.filter(x=>!x.log[today()]).length;
+    if(missed>0&&S.habits.length)return{lbl:'Streak Protection',txt:`${missed} habit${missed>1?'s':''} not logged today. 30 seconds now keeps your streaks alive.`,act:'Log habits →',go:'habits'};}
+  if(h>=6&&h<22&&(gap===null||gap>120))return{lbl:'Check-in',txt:gap===null?'No log yet today. What are you doing right now, and how is your energy?':`${Math.floor(gap/60)}h since your last check-in. A 10-second log keeps your pattern data honest.`,act:'Quick log →',go:'hourly'};
+  if(h>=11&&h<18&&(!act||act.focusMin===0)&&pri)return{lbl:'Deep Work Nudge',txt:`No focus session yet today. Your priority: “${pri.txt}”. One Pomodoro moves it forward.`,act:'Start focus →',go:'focus'};
+  if(act&&act.avgE!==null&&act.avgE<4.5)return{lbl:'Energy Care',txt:`Average energy today is ${act.avgE.toFixed(1)}/10. A short walk, water, or 5 minutes of pranayama before pushing harder.`,act:'Burnout check →',go:'burnout'};
+  if(pri)return{lbl:'Priority',txt:`“${pri.txt}” — this is your #1 right now. ${QUOTES[new Date().getDate()%QUOTES.length]}`,act:pri.kind==='goal'?'Open goals →':'Open tasks →',go:pri.kind==='goal'?'goals':'tasks'};
+  return{lbl:'Today',txt:QUOTES[new Date().getDate()%QUOTES.length],act:'Set a goal →',go:'goals'};
+}
+function nudgeAction(go){if(go==='focus')openFocus();else goPanelB(go);}
+let lastNotifAt=DB.get('lastNotifAt',0);
+function nudgeTick(){
+  if(!NCFG.enabled)return;
+  const n=buildNudge();
+  // refresh dashboard card if visible
+  const card=document.getElementById('nudge-card');
+  if(card)card.innerHTML=`<div class="nc-lbl">◈ ${n.lbl}</div><div class="nc-txt">${escH(n.txt)}</div><div class="nc-act" onclick="nudgeAction('${n.go}')">${n.act}</div>`;
+  // system notification at most every 2h, only for action nudges
+  if(NCFG.notifs&&'Notification'in window&&Notification.permission==='granted'&&['Check-in','Streak Protection','Deep Work Nudge'].includes(n.lbl)&&Date.now()-lastNotifAt>2*3600*1000&&document.hidden){
+    try{new Notification('Life OS · '+n.lbl,{body:n.txt});lastNotifAt=Date.now();DB.set('lastNotifAt',lastNotifAt);}catch(e){}
+  }
+}
+function toggleNotifs(){
+  if(!('Notification'in window)){toast('⚠️','Notifications not supported in this browser');return;}
+  if(NCFG.notifs){NCFG.notifs=false;DB.set('nudgeCfg',NCFG);toast('🔕','Reminders off');renderSettings();return;}
+  Notification.requestPermission().then(p=>{
+    NCFG.notifs=(p==='granted');DB.set('nudgeCfg',NCFG);
+    toast(p==='granted'?'🔔':'⚠️',p==='granted'?'Reminders on!':'Permission denied — enable in browser settings');
+    renderSettings();
+  });
+}
+
+// ── CLOCK ──────────────────────────────────────
+function initClock(){
+  function tick(){
+    const n=new Date(),h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');
+    document.getElementById('clk').textContent=h+':'+m+':'+s;
+    const gr=n.getHours()<5?'Good night':n.getHours()<12?'Good morning':n.getHours()<17?'Good afternoon':n.getHours()<21?'Good evening':'Good night';
+    const el=document.getElementById('dash-greet');if(el)el.textContent=gr+', '+PROFILE.name+' · Life OS running';
+    updateHourlyHighlight(n.getHours());
+  }
+  tick();setInterval(tick,1000);
+}
+
+// ── TOAST ──────────────────────────────────────
+function toast(icon,msg,dur=2800){
+  const a=document.getElementById('ta'),el=document.createElement('div');
+  el.className='toast';el.innerHTML=`<span>${icon}</span><span>${msg}</span>`;
+  a.appendChild(el);
+  setTimeout(()=>{el.style.cssText='opacity:0;transform:translateX(16px);transition:all .3s';setTimeout(()=>el.remove(),300)},dur);
+}
+
+// ── NAVIGATION ─────────────────────────────────
+const NAV_GROUPS = [
+  {label:'Core',items:[
+    {id:'dashboard',icon:'⬡',name:'Dashboard'},
+    {id:'planner',icon:'⏱',name:'Daily Planner'},
+    {id:'tasks',icon:'✓',name:'Task Manager'},
+    {id:'goals',icon:'◎',name:'Goal Cascade'},
+    {id:'habits',icon:'✦',name:'Habits',badge:'10',bc:'g'},
+  ]},
+  {label:'Intelligence',items:[
+    {id:'events',icon:'⚡',name:'Event Logger',badge:'NEW',bc:'s'},
+    {id:'hourly',icon:'⏲',name:'Hourly Logger'},
+    {id:'screentime',icon:'📱',name:'Screen Time',badge:'NEW',bc:'s'},
+    {id:'rewards',icon:'⭐',name:'Focus Rewards'},
+    {id:'decisions',icon:'⚖',name:'Decision Journal'},
+    {id:'ai',icon:'✦',name:'AI Coach',badge:'AI'},
+    {id:'memory',icon:'🧠',name:'AI Memory'},
+  ]},
+  {label:'Analytics',items:[
+    {id:'domains',icon:'◈',name:'Life Domains'},
+    {id:'knowledge',icon:'⊕',name:'Knowledge Graph'},
+    {id:'weekly',icon:'⊟',name:'Weekly View'},
+    {id:'burnout',icon:'♥',name:'Burnout Check'},
+    {id:'audit',icon:'⏲',name:'Time Audit'},
+  ]},
+  {label:'Reflection',items:[
+    {id:'journal',icon:'✎',name:'Journal'},
+    {id:'procrastination',icon:'⚠',name:'Procrastination'},
+    {id:'settings',icon:'⚙',name:'Settings'},
+  ]}
+];
+const PANELS_DEF = ['dashboard','planner','tasks','goals','habits','events','hourly','screentime','rewards','decisions','ai','memory','domains','knowledge','weekly','burnout','audit','journal','procrastination','settings'];
+
+function buildNav(){
+  const sb=document.getElementById('sb-nav'),tnav=document.getElementById('tnav');
+  let sbH='',tH='';
+  NAV_GROUPS.forEach(g=>{
+    sbH+=`<div class="ng"><div class="ngl">${g.label}</div>`;
+    g.items.forEach(it=>{
+      const badge=it.badge?`<span class="nbadge ${it.bc||''}">${it.badge}</span>`:'';
+      sbH+=`<div class="ni${it.id===S.panel?' on':''}" data-p="${it.id}" onclick="goPanel('${it.id}')"><span class="nic">${it.icon}</span>${it.name}${badge}</div>`;
+    });
+    sbH+='</div><div class="sdiv"></div>';
+    g.items.slice(0,3).forEach(it=>{
+      tH+=`<button class="tnb${it.id===S.panel?' on':''}" data-p="${it.id}" onclick="goPanel('${it.id}')">${it.icon} ${it.name}</button>`;
+    });
+  });
+  sb.innerHTML=sbH;tnav.innerHTML=tH;
+}
+
+function buildPanels(){
+  const c=document.getElementById('panels');
+  c.innerHTML=PANELS_DEF.map(id=>`<div class="panel${id==='dashboard'?' on':''}" id="p-${id}"></div>`).join('');
+}
+
+function goPanel(id){
+  ACT.switch(id);
+  S.panel=id;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  const p=document.getElementById('p-'+id);
+  if(p){p.classList.add('on');renderPanel(id);}
+  document.querySelectorAll('.ni[data-p]').forEach(n=>n.classList.toggle('on',n.dataset.p===id));
+  document.querySelectorAll('.tnb[data-p]').forEach(n=>n.classList.toggle('on',n.dataset.p===id));
+  document.querySelectorAll('.bni[data-b]').forEach(n=>n.classList.toggle('on',n.dataset.b===id));
+}
+
+function renderPanel(id){
+  const fns={
+    dashboard:renderDashboard,planner:renderPlanner,tasks:renderTasks,
+    goals:renderGoals,habits:renderHabits,events:renderEvents,
+    hourly:renderHourly,decisions:renderDecisions,ai:renderAI,
+    memory:renderMemory,domains:renderDomains,knowledge:renderKnowledge,
+    weekly:renderWeekly,burnout:renderBurnout,audit:renderAudit,
+    journal:renderJournal,procrastination:renderProcrastination,settings:renderSettings,
+    screentime:renderScreentime,rewards:renderRewards
+  };
+  if(fns[id])fns[id]();
+}
+
+// ── LIFE SCORE ENGINE ──────────────────────────
+function computeLifeScore(){
+  // Habits: completion over the last 7 days
+  const week=[...Array(7)].map((_,i)=>dkey(addDays(new Date(),-i)));
+  const habitsDone=S.habits.reduce((a,h)=>a+week.filter(d=>h.log[d]).length,0);
+  const habitsTotal=S.habits.length*7;
+  const hPct=habitsTotal>0?habitsDone/habitsTotal*100:50;
+  const tasksDone=S.tasks.filter(t=>t.done).length,tasksTotal=S.tasks.length;
+  const tPct=tasksTotal>0?tasksDone/tasksTotal*100:50;
+  const eventsToday=S.events.filter(e=>e.ts&&e.ts.startsWith(today())).length;
+  const ePct=Math.min(eventsToday/6*100,100);
+  const bPct=(100-Math.round((100-S.burnout.energy*.6+S.burnout.stress*.4)));
+  const score=Math.round(hPct*.35+tPct*.25+ePct*.2+bPct*.2);
+  document.getElementById('lifescore').textContent=score;
+  document.getElementById('lifebar').style.width=score+'%';
+  document.getElementById('lifesub').textContent=`${Math.round(hPct)}% habits · ${S.focusSessions} focus sessions`;
+  document.getElementById('ds-recovery')&&(document.getElementById('ds-recovery').textContent=score+'%');
+  return score;
+}
+
+// ── ENERGY ─────────────────────────────────────
+const ES=[
+  {l:'High Energy',c:'var(--em)',d:'#10b981'},
+  {l:'Medium Energy',c:'var(--saf)',d:'#f59e0b'},
+  {l:'Low Energy',c:'var(--ros)',d:'#f43f5e'}
+];
+function cycleEnergy(){
+  S.energy=(S.energy+1)%3;const e=ES[S.energy];
+  document.getElementById('elbl').textContent=e.l;
+  document.getElementById('epulse').style.background=e.d;
+  logEvent('energy_check',`Energy: ${e.l}`,S.energy===0?8:S.energy===1?5:3,5,'mind');
+  toast('⚡',`Energy: ${e.l}`);
+}
+
+// ── EVENT SYSTEM ───────────────────────────────
+function logEvent(type,detail,energy=7,focus=7,domain='general'){
+  const ev={id:S.nextEventId++,ts:new Date().toISOString().slice(0,16),type,detail,energy,focus,domain};
+  S.events.unshift(ev);
+  if(S.events.length>200)S.events=S.events.slice(0,200);
+  DB.set('events',S.events);DB.set('nextEventId',S.nextEventId);
+  ACT.logSample(energy,focus);
+  document.getElementById('ss-ev').textContent=S.events.length;
+  computeLifeScore();
+  return ev;
+}
+
+const EV_COLORS={
+  deep_work:'var(--ind)',trade:'var(--saf)',exercise:'var(--em)',
+  learning:'var(--vio)',review:'var(--vio)',energy_check:'var(--sky)',
+  focus_session:'var(--ind)',habit:'var(--em)',task:'var(--cor)'
+};
+
+// ── DASHBOARD ──────────────────────────────────
+function renderDashboard(){
+  const p=document.getElementById('p-dashboard');
+  const done=S.tasks.filter(t=>t.done).length;
+  const todayEvs=S.events.filter(e=>e.ts&&e.ts.startsWith(today()));
+  const act=ACT.daySummary(today());const trackedMin=act?Math.round(act.total/60):0;
+  p.innerHTML=`
+    <div class="ph">
+      <div><div class="ph-t">Command Center</div><div class="ph-s" id="dash-greet">Good morning, Sundar · Life OS running</div></div>
+      <div class="ph-a">
+        <button class="btn bg bsm" onclick="openFocus()">⏱ Focus</button>
+        <button class="btn bp bsm" onclick="goPanel('events')">⚡ Log Event</button>
+      </div>
+    </div>
+    <div class="nudgecard" id="nudge-card"></div>
+    <div class="qrow">
+      <div class="qbtn" onclick="goPanelB('hourly')"><div class="qbi">⚡</div><div class="qbl">Quick Log</div></div>
+      <div class="qbtn" onclick="openFocus()"><div class="qbi">⏱</div><div class="qbl">Focus</div></div>
+      <div class="qbtn" onclick="goPanelB('screentime')"><div class="qbi">📱</div><div class="qbl">Screen</div></div>
+      <div class="qbtn" onclick="showCheckin(true)"><div class="qbi">🎯</div><div class="qbl">Check In</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:11px 14px;margin-bottom:14px;cursor:pointer;" onclick="goPanelB('rewards')">
+      <span style="font-size:20px;">⭐</span>
+      <div style="flex:1;"><div style="font-size:12.5px;color:var(--t0);font-weight:600;">${RW.stars} star${RW.stars===1?'':'s'} · Level ${Math.floor(RW.stars/5)+1}</div>
+      <div style="font-size:10px;color:var(--t2);">${RW.streak%3===0&&RW.streak>0?'Streak alive — keep going':`${3-(RW.streak%3)} check-in${3-(RW.streak%3)===1?'':'s'} to your next star`}</div></div>
+      <div style="display:flex;gap:3px;">${[0,1,2].map(i=>`<div style="width:7px;height:7px;border-radius:50%;background:${i<(RW.streak%3)?'var(--saf)':'var(--bg4)'};"></div>`).join('')}</div>
+    </div>
+    <div class="g4">
+      <div class="sc"><div class="sl">Life Score</div><div class="sv" style="color:var(--ind)" id="ds-lifescore">${computeLifeScore()}</div><div class="sd up">Multi-domain score</div></div>
+      <div class="sc"><div class="sl">Tasks Done</div><div class="sv" style="color:var(--em)">${done}/${S.tasks.length}</div><div class="sd ${done/S.tasks.length>.5?'up':'dn'}">${Math.round(done/S.tasks.length*100)||0}% completion</div></div>
+      <div class="sc"><div class="sl">Focus Sessions</div><div class="sv" style="color:var(--vio)">${S.focusSessions}</div><div class="sd" style="color:var(--vio)">Today's Pomodoros</div></div>
+      <div class="sc"><div class="sl">Time in OS Today</div><div class="sv" style="color:var(--saf)">${trackedMin}m</div><div class="sd up">${todayEvs.length} events · auto-tracked</div></div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="chd"><span class="ct">Priority Matrix</span><span class="ca" onclick="goPanel('goals')">Full →</span></div>
+        <div class="mx">
+          ${(()=>{const und=S.tasks.filter(t=>!t.done);
+            const q=[{cls:'mx1',q:'DO NOW',c:'var(--ind)',items:und.filter(t=>['trade','deep'].includes(t.cat)).slice(0,2)},
+                     {cls:'mx2',q:'SCHEDULE',c:'var(--em)',items:und.filter(t=>['learn','body','mind'].includes(t.cat)).slice(0,3)},
+                     {cls:'mx3',q:'DELEGATE',c:'var(--saf)',items:und.filter(t=>t.cat==='admin').slice(0,2)},
+                     {cls:'mx4',q:'DONE TODAY',c:'var(--ros)',items:S.tasks.filter(t=>t.done).slice(0,2)}];
+            return q.map(b=>`<div class="mxc ${b.cls}"><div class="mxq">${b.q}</div>${b.items.length?b.items.map(t=>`<div class="mxi"><span class="mxd" style="background:${b.c}"></span>${escH(t.text)}</div>`).join(''):'<div class="mxi" style="color:var(--t3)">— empty —</div>'}</div>`).join('');})()}
+        </div>
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Today's Timeline</span><span class="ca" onclick="goPanel('events')">Add Event →</span></div>
+        <div style="overflow-y:auto;max-height:280px;">
+          ${(todayEvs.length?todayEvs:S.events).slice(0,6).map(ev=>`
+            <div class="ev-item">
+              <div class="ev-dot" style="background:${EV_COLORS[ev.type]||'var(--ind)'}"></div>
+              <div class="ev-time">${ev.ts.slice(11,16)}</div>
+              <div class="ev-body">
+                <div class="ev-type" style="color:${EV_COLORS[ev.type]||'var(--ind)'}">${ev.type.replace('_',' ')}</div>
+                <div class="ev-detail">${ev.detail}</div>
+                <div class="ev-meta">
+                  <span>⚡ ${ev.energy}/10</span>
+                  <span>🎯 ${ev.focus}/10</span>
+                  <span style="text-transform:uppercase;font-size:8.5px;font-weight:700;color:var(--t2)">${ev.domain}</span>
+                </div>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="sdiv2"><div class="sdiv2-l"></div><div class="sdiv2-t">Life Domains</div><div class="sdiv2-l"></div></div>
+    <div class="domain-grid">
+      ${Object.entries(S.domains).map(([k,d])=>`
+        <div class="domain-card" onclick="goPanel('domains')">
+          <div class="domain-icon">${d.icon}</div>
+          <div class="domain-name">${k}</div>
+          <div class="domain-score" style="color:${d.color}">${d.score}</div>
+          <div class="domain-bar"><div class="domain-fill" style="width:${d.score}%;background:${d.color}"></div></div>
+        </div>`).join('')}
+    </div>`;
+  nudgeTick();
+}
+
+// ── EVENT LOGGER ───────────────────────────────
+function renderEvents(){
+  const p=document.getElementById('p-events');
+  p.innerHTML=`
+    <div class="ph">
+      <div><div class="ph-t">Event Logger</div><div class="ph-s">Every action becomes an event · Powers AI intelligence</div></div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="chd"><span class="ct">Log New Event</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <input type="text" class="ti" id="ev-detail" placeholder="What did you do? (e.g. GoCharting analysis 1h)">
+          <div style="display:flex;gap:8px;">
+            <select id="ev-type" style="flex:1;background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:7px 10px;color:var(--t1);font-size:11.5px;">
+              <option value="deep_work">Deep Work</option>
+              <option value="trade">Trade</option>
+              <option value="exercise">Exercise</option>
+              <option value="learning">Learning</option>
+              <option value="review">Review</option>
+              <option value="meeting">Meeting</option>
+              <option value="rest">Rest</option>
+            </select>
+            <select id="ev-domain" style="flex:1;background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:7px 10px;color:var(--t1);font-size:11.5px;">
+              <option value="trade">Trading</option>
+              <option value="mind">Mindfulness</option>
+              <option value="body">Body</option>
+              <option value="learn">Learning</option>
+              <option value="general">General</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:16px;">
+            <div style="flex:1;">
+              <div style="font-size:9.5px;color:var(--t2);margin-bottom:4px;">Energy <span id="ev-energy-val">7</span>/10</div>
+              <input type="range" min="1" max="10" value="7" id="ev-energy" oninput="document.getElementById('ev-energy-val').textContent=this.value">
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:9.5px;color:var(--t2);margin-bottom:4px;">Focus <span id="ev-focus-val">7</span>/10</div>
+              <input type="range" min="1" max="10" value="7" id="ev-focus" oninput="document.getElementById('ev-focus-val').textContent=this.value">
+            </div>
+          </div>
+          <button class="btn bp" onclick="addEvent()">⚡ Log Event</button>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:2px;">
+            ${['Morning Sadhana ✓','GoCharting Analysis','Trade Executed','Strength Training','Learning Block','Evening Review'].map(q=>`<span style="padding:3px 9px;border-radius:14px;font-size:10px;background:var(--bg3);color:var(--t1);cursor:pointer;border:1px solid var(--b1);" onclick="document.getElementById('ev-detail').value='${q}'">${q}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Event Store · ${S.events.length} total</span><span class="ca" onclick="S.events=[];save();renderEvents();toast('🗑','Events cleared')" style="color:var(--ros)">Clear</span></div>
+        <div style="overflow-y:auto;max-height:340px;">
+          ${S.events.slice(0,30).map(ev=>`
+            <div class="ev-item">
+              <div class="ev-dot" style="background:${EV_COLORS[ev.type]||'var(--ind)'}"></div>
+              <div class="ev-time">${ev.ts.slice(11,16)}</div>
+              <div class="ev-body">
+                <div class="ev-type" style="color:${EV_COLORS[ev.type]||'var(--ind)'}">${ev.type.replace('_',' ')}</div>
+                <div class="ev-detail">${ev.detail}</div>
+                <div class="ev-meta">
+                  <span>⚡${ev.energy}</span><span>🎯${ev.focus}</span>
+                  <span style="text-transform:uppercase;font-size:8px;font-weight:700;color:var(--t2)">${ev.domain}</span>
+                  <span>${ev.ts.slice(0,10)}</span>
+                </div>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+function addEvent(){
+  const d=document.getElementById('ev-detail').value.trim();
+  if(!d){toast('⚠️','Write what you did first');return;}
+  logEvent(
+    document.getElementById('ev-type').value,
+    d,
+    parseInt(document.getElementById('ev-energy').value),
+    parseInt(document.getElementById('ev-focus').value),
+    document.getElementById('ev-domain').value
+  );
+  document.getElementById('ev-detail').value='';
+  toast('⚡','Event logged!');
+  renderEvents();
+}
+
+// ── HOURLY LOGGER ──────────────────────────────
+const HOURS=['05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22'];
+const EMOJIS_ENERGY=['😴','😪','😐','🙂','😊','😄','⚡','🔥','💥','🌟'];
+function renderHourly(){
+  const p=document.getElementById('p-hourly');
+  p.innerHTML=`
+    <div class="ph">
+      <div><div class="ph-t">Hourly Logger</div><div class="ph-s">Track energy + mood + activity every hour · Reveals your peak performance pattern</div></div>
+    </div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="chd"><span class="ct">Today · ${new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})} · Tap any hour to log</span></div>
+      <div class="hl-grid" id="hl-grid"></div>
+    </div>
+    <div class="card" id="hl-log-form" style="display:none;margin-bottom:14px;">
+      <div class="chd"><span class="ct" id="hl-form-title">Log Hour</span><span class="ca" onclick="document.getElementById('hl-log-form').style.display='none'">✕</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <input type="text" class="ti" id="hl-activity" placeholder="What were you doing?">
+        <div style="font-size:9.5px;color:var(--t2);margin-bottom:2px;">Energy Level <span id="hl-e-val">7</span>/10</div>
+        <input type="range" min="1" max="10" value="7" id="hl-energy" oninput="document.getElementById('hl-e-val').textContent=this.value;updateHourEmoji()">
+        <div style="font-size:32px;text-align:center;margin:4px 0" id="hl-emoji">⚡</div>
+        <select id="hl-mood" style="background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:7px 10px;color:var(--t1);font-size:11.5px;">
+          <option>Focused</option><option>Calm</option><option>Anxious</option><option>Tired</option><option>Creative</option><option>Distracted</option>
+        </select>
+        <button class="btn bp" onclick="saveHourLog()">Save Hour Log</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="chd"><span class="ct">Energy Pattern · Computed From Your Logs</span></div>
+      <div style="font-size:11.5px;color:var(--t1);line-height:1.9;" id="hl-insights"></div>
+    </div>`;
+  renderHLInsights();
+  renderHLGrid();
+}
+function renderHLInsights(){
+  const el=document.getElementById('hl-insights');if(!el)return;
+  // Aggregate energy by hour across ALL logged days
+  const byHour={};
+  Object.entries(S.hourlyLog).forEach(([k,v])=>{const h=k.split('|')[1]||k;(byHour[h]=byHour[h]||[]).push(v.energy);});
+  const avgs=Object.entries(byHour).map(([h,arr])=>({h,avg:arr.reduce((a,b)=>a+b,0)/arr.length,n:arr.length})).sort((a,b)=>b.avg-a.avg);
+  if(avgs.length<2){el.innerHTML='Log a few hours across your day — your personal peak-focus window and energy dips will appear here, computed from your real data.';return;}
+  const peak=avgs[0],dip=avgs[avgs.length-1];
+  const totalLogs=Object.keys(S.hourlyLog).length;
+  el.innerHTML=`
+    📈 <strong style="color:var(--t0)">Peak Energy Hour:</strong> ${peak.h}:00 — avg ${peak.avg.toFixed(1)}/10 across ${peak.n} log${peak.n>1?'s':''}. Protect this for deep work / trading.<br>
+    ⬇️ <strong style="color:var(--t0)">Lowest Energy Hour:</strong> ${dip.h}:00 — avg ${dip.avg.toFixed(1)}/10. Schedule rest or admin, not decisions.<br>
+    🗂 <strong style="color:var(--t0)">Data:</strong> ${totalLogs} hourly logs collected. More logs → sharper pattern.`;
+}
+function renderHLGrid(){
+  const g=document.getElementById('hl-grid');if(!g)return;
+  g.innerHTML=HOURS.map(h=>{
+    const log=S.hourlyLog[today()+'|'+h];
+    const e=log?log.energy:0;
+    const emoji=e>0?EMOJIS_ENERGY[Math.min(e-1,9)]:'·';
+    return `<div class="hl-cell${log?' logged':''}" onclick="openHLForm('${h}')">
+      <div class="hl-hour">${h}:00</div>
+      <div class="hl-energy">${emoji}</div>
+      <div class="hl-mood">${log?log.mood.slice(0,7):'tap'}</div>
+    </div>`;
+  }).join('');
+}
+let currentHLHour=null;
+function openHLForm(h){
+  currentHLHour=h;
+  document.getElementById('hl-form-title').textContent=`Log ${h}:00`;
+  document.getElementById('hl-log-form').style.display='block';
+  const ex=S.hourlyLog[today()+'|'+h];
+  if(ex){document.getElementById('hl-activity').value=ex.activity;document.getElementById('hl-energy').value=ex.energy;document.getElementById('hl-e-val').textContent=ex.energy;}
+  updateHourEmoji();
+}
+function updateHourEmoji(){
+  const v=parseInt(document.getElementById('hl-energy')?.value||7);
+  const el=document.getElementById('hl-emoji');
+  if(el)el.textContent=EMOJIS_ENERGY[Math.min(v-1,9)];
+}
+function saveHourLog(){
+  if(!currentHLHour)return;
+  S.hourlyLog[today()+'|'+currentHLHour]={
+    hour:currentHLHour,
+    activity:document.getElementById('hl-activity').value||'—',
+    energy:parseInt(document.getElementById('hl-energy').value),
+    mood:document.getElementById('hl-mood').value,
+    ts:new Date().toISOString()
+  };
+  save();renderHLGrid();renderHLInsights();
+  document.getElementById('hl-log-form').style.display='none';
+  const hlrec=S.hourlyLog[today()+'|'+currentHLHour];
+  logEvent('hourly_log',`${currentHLHour}:00 — ${hlrec.activity}`,hlrec.energy,hlrec.energy,'general');
+  toast('⏲','Hour logged!');
+}
+function updateHourlyHighlight(h){
+  const key=String(h).padStart(2,'0');
+  document.querySelectorAll('.hl-cell').forEach((c,i)=>{
+    c.style.borderColor=HOURS[i]===key?'var(--saf)':'';
+  });
+}
+
+// ── DECISION JOURNAL ───────────────────────────
+function renderDecisions(){
+  const p=document.getElementById('p-decisions');
+  p.innerHTML=`
+    <div class="ph">
+      <div><div class="ph-t">Decision Journal</div><div class="ph-s">Track decisions · Expected vs Actual · Learn from patterns</div></div>
+      <div class="ph-a"><button class="btn bp bsm" onclick="openDecisionForm()">+ Log Decision</button></div>
+    </div>
+    <div id="dj-form" style="display:none;" class="card" style="margin-bottom:14px;"></div>
+    <div class="g2">
+      <div>
+        <div style="font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);margin-bottom:10px;">Recent Decisions</div>
+        ${S.decisions.map(d=>`
+          <div class="dj-item">
+            <div class="dj-hd">
+              <span class="dj-type" style="background:${d.type==='trade'?'var(--ss)':'var(--is)'};color:${d.type==='trade'?'var(--saf)':'var(--ind)'}">${d.type}</span>
+              <span class="dj-date">${d.date}</span>
+            </div>
+            <div class="dj-decision">${d.decision}</div>
+            <div class="dj-row">
+              <div class="dj-field"><span class="dj-lbl">Reason:</span><span class="dj-val">${d.reason}</span></div>
+            </div>
+            <div class="dj-row" style="margin-top:4px;">
+              <div class="dj-field"><span class="dj-lbl">Expected:</span><span class="dj-val">${d.expected}</span></div>
+              <div class="dj-field"><span class="dj-lbl">Actual:</span><span class="dj-val">${d.actual}</span></div>
+            </div>
+            <div class="dj-outcome">
+              <span style="font-size:9.5px;color:var(--t2);">Outcome</span>
+              <div class="outcome-bar"><div class="outcome-fill" style="width:${d.outcome??0}%;background:${(d.outcome??0)>=70?'var(--em)':(d.outcome??0)>=45?'var(--saf)':'var(--ros)'}"></div></div>
+              <span style="font-size:10px;font-weight:700;color:${(d.outcome??0)>=70?'var(--em)':(d.outcome??0)>=45?'var(--saf)':'var(--ros)'}">${d.outcome==null?'—':d.outcome+'%'}</span>
+              <span style="margin-left:auto;font-size:9.5px;color:var(--sky);cursor:pointer;" onclick="updateOutcome(${d.id})">${d.outcome==null?'⏳ Log outcome':'✎ Update'}</span>
+              <span style="font-size:9.5px;color:var(--ros);cursor:pointer;" onclick="deleteDecision(${d.id})">✕</span>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Decision Patterns</span></div>
+        <div style="font-size:11.5px;color:var(--t1);line-height:1.9;">
+          ✅ <strong style="color:var(--t0)">Best decisions:</strong> Made in the 09:00–10:00 window after sadhana<br>
+          ⚠️ <strong style="color:var(--t0)">Weakest:</strong> Skipping valid setups due to low energy self-assessment<br>
+          📈 <strong style="color:var(--t0)">Avg trade outcome:</strong> 55% expectancy — needs improvement to 65%<br>
+          🧘 <strong style="color:var(--t0)">Insight:</strong> Post-meditation entries have 40% better outcome scores<br><br>
+          <strong style="color:var(--saf)">Recommendation:</strong> Add 5-min breathing before any decision over ₹5,000 at risk.
+        </div>
+        <div style="margin-top:16px;">
+          <div style="font-size:9.5px;color:var(--t2);margin-bottom:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Outcome Distribution</div>
+          ${[{l:'High (70-100%)',c:'var(--em)',pct:40},{l:'Medium (45-70%)',c:'var(--saf)',pct:35},{l:'Low (<45%)',c:'var(--ros)',pct:25}].map(d=>`
+            <div class="pr"><div class="pr-hd"><span class="pr-n">${d.l}</span><span class="pr-p">${d.pct}%</span></div>
+            <div class="pr-bg"><div class="pr-f" style="width:${d.pct}%;background:${d.c}"></div></div></div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+function openDecisionForm(){
+  const f=document.getElementById('dj-form');
+  f.style.display='block';
+  f.innerHTML=`
+    <div class="chd"><span class="ct">Log New Decision</span><span class="ca" onclick="this.closest('#dj-form').style.display='none'">✕</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <input type="text" class="ti" id="dj-decision" placeholder="Decision made…">
+      <select id="dj-type" style="background:var(--bg4);border:1px solid var(--b2);border-radius:7px;padding:7px 10px;color:var(--t1);font-size:11.5px;"><option value="trade">Trade</option><option value="life">Life</option><option value="learning">Learning</option></select>
+      <input type="text" class="ti" id="dj-reason" placeholder="Reason / rationale…">
+      <input type="text" class="ti" id="dj-expected" placeholder="Expected outcome…">
+    </div>
+    <button class="btn bp" style="margin-top:8px;" onclick="saveDecision()">Save Decision</button>`;
+}
+function saveDecision(){
+  const d=document.getElementById('dj-decision')?.value.trim();
+  if(!d){toast('⚠️','Enter a decision');return;}
+  S.decisions.unshift({
+    id:S.nextDecisionId++,
+    date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'}),
+    type:document.getElementById('dj-type')?.value||'life',
+    decision:d,
+    reason:document.getElementById('dj-reason')?.value||'—',
+    expected:document.getElementById('dj-expected')?.value||'—',
+    actual:'Pending…',outcome:null
+  });
+  save();renderDecisions();toast('⚖','Decision logged!');
+}
+function updateOutcome(id){
+  const d=S.decisions.find(x=>x.id===id);if(!d)return;
+  const actual=prompt('What actually happened?',d.actual==='Pending…'?'':d.actual);
+  if(actual===null)return;
+  const oc=prompt('Outcome score 0–100 (how well did this decision work)?',d.outcome??'');
+  if(oc===null)return;
+  d.actual=actual.trim()||d.actual;
+  d.outcome=Math.max(0,Math.min(100,parseInt(oc)||0));
+  save();renderDecisions();
+  logEvent('review',`Decision outcome logged: ${d.decision.slice(0,50)} → ${d.outcome}%`,6,6,'mind');
+  toast('⚖','Outcome recorded!');
+}
+function deleteDecision(id){if(!confirm('Delete this decision?'))return;S.decisions=S.decisions.filter(x=>x.id!==id);save();renderDecisions();}
+
+// ── AI MEMORY LAYER ────────────────────────────
+function renderMemory(){
+  const p=document.getElementById('p-memory');
+  p.innerHTML=`
+    <div class="ph">
+      <div><div class="ph-t">AI Memory Layer</div><div class="ph-s">Persistent patterns the AI learns about you · Injected into every conversation</div></div>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="chd"><span class="ct">Add Memory</span></div>
+        <textarea class="jta" id="mem-input" placeholder="What should your AI Coach always remember? (e.g. I perform best at 09:00, I struggle with afternoon slumps…)" style="margin-bottom:8px;"></textarea>
+        <div style="display:flex;gap:8px;">
+          <select id="mem-icon" style="background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:7px 10px;color:var(--t1);font-size:13px;">
+            <option value="📈">📈 Trading</option><option value="🧘">🧘 Mindfulness</option><option value="⚡">⚡ Energy</option><option value="📚">📚 Learning</option><option value="⚠️">⚠️ Warning</option><option value="✅">✅ Strength</option><option value="🎯">🎯 Goal</option><option value="💪">💪 Body</option>
+          </select>
+          <button class="btn bp" onclick="addMemory()">Add to Memory</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Memory Bank · ${S.aiMemory.length} entries</span></div>
+        <div style="font-size:10.5px;color:var(--t2);margin-bottom:10px;padding:6px 8px;background:var(--bg3);border-radius:6px;">These memories are injected into every AI Coach conversation, giving it persistent context about you.</div>
+        <div id="mem-list"></div>
+      </div>
+    </div>`;
+  renderMemList();
+}
+function renderMemList(){
+  const c=document.getElementById('mem-list');if(!c)return;
+  c.innerHTML=S.aiMemory.map(m=>`
+    <div class="mem-item">
+      <div class="mem-icon">${m.icon}</div>
+      <div style="flex:1;"><div class="mem-text">${m.text}</div><div class="mem-date">${m.date}</div></div>
+      <div class="mem-del" onclick="deleteMemory(${m.id})">×</div>
+    </div>`).join('');
+}
+function addMemory(){
+  const t=document.getElementById('mem-input')?.value.trim();
+  if(!t){toast('⚠️','Write something first');return;}
+  S.aiMemory.unshift({id:S.nextMemoryId++,text:t,icon:document.getElementById('mem-icon')?.value||'✅',date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'})});
+  if(S.aiMemory.length>50)S.aiMemory=S.aiMemory.slice(0,50);
+  save();document.getElementById('mem-input').value='';
+  renderMemList();toast('🧠','Saved to AI memory!');
+}
+function deleteMemory(id){
+  S.aiMemory=S.aiMemory.filter(m=>m.id!==id);save();renderMemList();toast('🗑','Memory removed');
+}
+
+// ── LIFE DOMAINS ───────────────────────────────
+function renderDomains(){
+  const p=document.getElementById('p-domains');
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">Life Score Domains</div><div class="ph-s">7-domain life balance score · Drag sliders to update</div></div></div>
+    <div class="g2">
+      <div>
+        <div class="domain-grid" style="margin-bottom:14px;">
+          ${Object.entries(S.domains).map(([k,d])=>`
+            <div class="domain-card">
+              <div class="domain-icon">${d.icon}</div>
+              <div class="domain-name">${k}</div>
+              <div class="domain-score" style="color:${d.color}">${d.score}</div>
+              <div class="domain-bar"><div class="domain-fill" style="width:${d.score}%;background:${d.color}"></div></div>
+            </div>`).join('')}
+        </div>
+        <div class="card">
+          <div class="chd"><span class="ct">Adjust Domain Scores</span></div>
+          ${Object.entries(S.domains).map(([k,d])=>`
+            <div class="pr">
+              <div class="pr-hd"><span class="pr-n">${d.icon} ${k}</span><span class="pr-p" id="dom-${k}-val">${d.score}%</span></div>
+              <input type="range" min="0" max="100" value="${d.score}" style="accent-color:${d.color}" oninput="updateDomain('${k}',this.value)">
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Balance Analysis</span></div>
+        ${Object.entries(S.domains).map(([k,d])=>`
+          <div class="pr"><div class="pr-hd"><span class="pr-n">${d.icon} ${k}</span><span class="pr-p">${d.score}%</span></div>
+          <div class="pr-bg"><div class="pr-f" id="dombar-${k}" style="width:${d.score}%;background:${d.color}"></div></div></div>`).join('')}
+        <div style="margin-top:14px;padding:10px;background:var(--ss);border-radius:7px;font-size:11px;color:var(--t1);line-height:1.7;">
+          <strong style="color:var(--saf)">Weakest Domain:</strong> Relationships (65) — schedule family time<br>
+          <strong style="color:var(--em)">Strongest:</strong> Mindfulness (90) — your anchor<br>
+          <strong style="color:var(--ind)">Recommendation:</strong> Raise Learning to 75+ by adding daily reading
+        </div>
+      </div>
+    </div>`;
+}
+function updateDomain(k,v){
+  S.domains[k].score=parseInt(v);
+  const el=document.getElementById('dom-'+k+'-val');if(el)el.textContent=v+'%';
+  const bar=document.getElementById('dombar-'+k);if(bar)bar.style.width=v+'%';
+  computeLifeScore();
+}
+
+// ── KNOWLEDGE GRAPH ────────────────────────────
+function renderKnowledge(){
+  const p=document.getElementById('p-knowledge');
+  const nodes=[
+    {label:'Sleep Quality',icon:'😴',color:'var(--sky)',score:S.burnout.sleep},
+    {label:'Energy Level',icon:'⚡',color:'var(--em)',score:S.burnout.energy},
+    {label:'Focus / Deep Work',icon:'🎯',color:'var(--ind)',score:S.burnout.clarity},
+    {label:'Trading Performance',icon:'📈',color:'var(--saf)',score:S.domains.trading.score},
+    {label:'P&L Outcome',icon:'💰',color:'var(--cor)',score:Math.round(S.domains.trading.score*.9)},
+    {label:'Life Score',icon:'⬡',color:'var(--vio)',score:computeLifeScore()},
+  ];
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">Knowledge Graph</div><div class="ph-s">Causal relationship map — how your life domains connect and influence each other</div></div></div>
+    <div class="g2">
+      <div class="card">
+        <div class="chd"><span class="ct">Causal Chain · Sleep → Performance</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;">
+          ${nodes.map((n,i)=>`
+            <div class="kg-node">
+              <div class="kg-circle" style="background:${n.color}22;border:2px solid ${n.color}44;">
+                <div style="text-align:center;">
+                  <div style="font-size:18px;">${n.icon}</div>
+                  <div style="font-size:9px;font-weight:800;color:${n.color};letter-spacing:.04em;">${n.score}</div>
+                </div>
+              </div>
+              <div class="kg-label">${n.label}</div>
+            </div>
+            ${i<nodes.length-1?`<div class="kg-arrow" style="color:${n.color}66;">↓</div>`:''}
+          `).join('')}
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:14px;">
+          <div class="chd"><span class="ct">Relationships Discovered</span></div>
+          ${[
+            {from:'Sidha Vidya Practice',to:'Trading Focus',strength:88,color:'var(--vio)'},
+            {from:'Sleep Quality',to:'Morning Sadhana',strength:82,color:'var(--sky)'},
+            {from:'Morning Sadhana',to:'Energy Level',strength:79,color:'var(--em)'},
+            {from:'Energy Level',to:'Trade Win Rate',strength:71,color:'var(--saf)'},
+            {from:'Strength Training',to:'Mental Clarity',strength:68,color:'var(--em)'},
+            {from:'Afternoon Rest',to:'Evening Focus',strength:64,color:'var(--ind)'},
+          ].map(r=>`
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--b1);">
+              <div style="flex:1;">
+                <div style="font-size:11px;color:var(--t0);">${r.from} → ${r.to}</div>
+                <div class="pr-bg" style="margin-top:4px;"><div class="pr-f" style="width:${r.strength}%;background:${r.color}"></div></div>
+              </div>
+              <div style="font-family:\'JetBrains Mono\',monospace;font-size:11px;font-weight:700;color:${r.color};width:32px;text-align:right">${r.strength}%</div>
+            </div>`).join('')}
+        </div>
+        <div class="card">
+          <div class="chd"><span class="ct">AI Insight</span></div>
+          <div style="font-size:11.5px;color:var(--t1);line-height:1.8;padding:4px 0;">
+            Based on your event history, <strong style="color:var(--t0)">Sidha Vidya practice</strong> is the highest-leverage activity in your life.<br><br>
+            When you practice it, your energy score is <strong style="color:var(--em)">23% higher</strong> the same day, your focus during market analysis is <strong style="color:var(--ind)">31% sharper</strong>, and your trade decisions score <strong style="color:var(--saf)">18% better outcomes</strong>.<br><br>
+            <strong style="color:var(--vio)">This one habit drives your entire system.</strong>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── PLANNER ────────────────────────────────────
+const SCHEDS={
+  ideal:[
+    {t:'05:00',n:'Morning Sadhana',d:'Yoga · Pranayama · Sidha Vidya stillness',type:'tbcd',tag:'Mind'},
+    {t:'06:30',n:'Strength Training',d:'Asanas + resistance · 45 min',type:'tbcb',tag:'Body'},
+    {t:'07:30',n:'Breakfast + Prep',d:'Nutrition · Market pre-open scan',type:'tbcr',tag:''},
+    {t:'09:00',n:'Market Analysis · Deep Work',d:'GoCharting HTF/MTF/LTF · CVD orderflow scan',type:'tbct',tag:'Trading'},
+    {t:'11:00',n:'Trade Execution',d:'Zerodha Kite · Active monitoring · Nifty 50',type:'tbct',tag:'Trading'},
+    {t:'13:30',n:'Lunch + Recovery',d:'60-min rest block · Zero screens',type:'tbcr',tag:''},
+    {t:'15:00',n:'Learning Block',d:'AI · Software building · Trading books',type:'tbcd',tag:'Deep Work'},
+    {t:'16:30',n:'Admin + Screener',d:'Chartink · Screener.in · Emails',type:'tbca',tag:'Admin'},
+    {t:'18:00',n:'Evening Movement',d:'Walk or yoga · Outdoor preferred',type:'tbcb',tag:'Body'},
+    {t:'20:00',n:'Family Time',d:'Presence — zero work devices',type:'tbcr',tag:''},
+    {t:'21:00',n:'Evening Review',d:'Journal · Score day · Plan tomorrow',type:'tbcv',tag:'Review'},
+    {t:'22:30',n:'Sleep',d:'Target: 6.5h minimum',type:'tbcr',tag:''},
+  ],
+  busy:[
+    {t:'05:30',n:'Quick Sadhana',d:'20-min compressed practice',type:'tbcd',tag:'Mind'},
+    {t:'06:30',n:'Market Prep',d:'GoCharting fast scan · 4 top setups',type:'tbct',tag:'Trading'},
+    {t:'09:00',n:'Trade Execution',d:'Priority trades only',type:'tbct',tag:'Trading'},
+    {t:'13:00',n:'Lunch',d:'30 min max',type:'tbcr',tag:''},
+    {t:'14:00',n:'Deep Work',d:'Single priority task · 2 hours',type:'tbcd',tag:'Deep Work'},
+    {t:'19:00',n:'Quick Review',d:'15-min journal · Tomorrow plan',type:'tbcv',tag:'Review'},
+    {t:'22:00',n:'Sleep',d:'Protect 6h minimum',type:'tbcr',tag:''},
+  ],
+  emergency:[
+    {t:'05:00',n:'5-min Breathing',d:'Box breathing · Mental reset',type:'tbcb',tag:'Body'},
+    {t:'06:00',n:'#1 Priority Only',d:'One task — non-negotiable',type:'tbcd',tag:'Deep Work'},
+    {t:'13:00',n:'Mandatory Break',d:'20 min rest — non-optional',type:'tbcr',tag:''},
+    {t:'14:00',n:'#2 Priority',d:'Second critical task',type:'tbcd',tag:'Deep Work'},
+    {t:'20:00',n:'EOD Review',d:'What happened · Reset for tomorrow',type:'tbcv',tag:'Review'},
+  ]
+};
+let activeMode='ideal';
+function renderPlanner(){
+  const p=document.getElementById('p-planner');
+  const data=SCHEDS[activeMode];const mid=Math.ceil(data.length/2);
+  const rb=arr=>arr.map(b=>`<div class="tbr" onclick="openFocusTask('${b.n}')"><div class="tbt">${b.t}</div><div class="tbc ${b.type}"><div class="tbn">${b.n}</div><div class="tbd">${b.d}</div>${b.tag?`<span class="tbtg" style="background:${b.type==='tbct'?'var(--ss)':b.type==='tbcd'?'var(--is)':b.type==='tbcb'?'var(--es)':b.type==='tbcv'?'var(--vs)':'var(--ks)'};color:${b.type==='tbct'?'var(--saf)':b.type==='tbcd'?'var(--ind)':b.type==='tbcb'?'var(--em)':b.type==='tbcv'?'var(--vio)':'var(--sky)'}">${b.tag}</span>`:''}</div></div>`).join('');
+  p.innerHTML=`
+    <div class="ph">
+      <div><div class="ph-t">Daily Planner</div><div class="ph-s">Tap block to launch Focus Mode · 3 schedule modes</div></div>
+      <div class="ph-a" style="display:flex;gap:4px;background:var(--bg3);border-radius:8px;padding:3px;">
+        ${['ideal','busy','emergency'].map(m=>`<div style="padding:4px 12px;border-radius:6px;font-size:10.5px;font-weight:600;cursor:pointer;transition:var(--trans);${m===activeMode?'background:var(--bg2);color:var(--t0);':'color:var(--t2);'}" onclick="activeMode='${m}';renderPlanner()">${m.charAt(0).toUpperCase()+m.slice(1)}</div>`).join('')}
+      </div>
+    </div>
+    <div class="g2">
+      <div class="card"><div class="chd"><span class="ct">Morning · ${data[0]?.t} – ${data[mid-1]?.t}</span></div>${rb(data.slice(0,mid))}</div>
+      <div class="card"><div class="chd"><span class="ct">Afternoon / Evening · ${data[mid]?.t} – ${data[data.length-1]?.t}</span></div>${rb(data.slice(mid))}</div>
+    </div>`;
+}
+
+// ── TASKS ──────────────────────────────────────
+const CATS={trade:{c:'var(--saf)',l:'Trading'},deep:{c:'var(--ind)',l:'Deep Work'},body:{c:'var(--em)',l:'Body'},admin:{c:'var(--sky)',l:'Admin'},learn:{c:'var(--vio)',l:'Learning'},mind:{c:'var(--vio)',l:'Mind'},personal:{c:'var(--cor)',l:'Personal'}};
+function renderTasks(){
+  const p=document.getElementById('p-tasks');
+  const PR={1:{l:'P1',c:'var(--ros)'},2:{l:'P2',c:'var(--saf)'},3:{l:'P3',c:'var(--t2)'}};
+  const open=S.tasks.filter(t=>!t.done).sort((a,b)=>(a.pri||2)-(b.pri||2)),done=S.tasks.filter(t=>t.done);
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">Task Manager</div><div class="ph-s">P1 first · Your top P1 drives the check-in prompts</div></div></div>
+    <div class="g2">
+      <div>
+        <div style="display:flex;gap:7px;margin-bottom:8px;">
+          <input type="text" class="ti" id="t-inp" placeholder="Add task…" style="flex:1;margin:0;" onkeydown="if(event.key==='Enter')addTask()">
+          <select id="t-pri" style="background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:0 8px;color:var(--t1);font-size:11px;"><option value="1">P1 · Must</option><option value="2" selected>P2 · Should</option><option value="3">P3 · Later</option></select>
+          <select id="t-cat" style="background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:0 8px;color:var(--t1);font-size:11px;">${Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v.l}</option>`).join('')}</select>
+          <button class="btn bp bsm" onclick="addTask()">Add</button>
+        </div>
+        <div class="card" id="t-open">${renderTaskList(open)}</div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);">Completed (${done.length})</span>
+          <span style="font-size:10px;color:var(--ros);cursor:pointer;font-weight:600;" onclick="clearDone()">Clear all</span>
+        </div>
+        <div class="card" id="t-done">${renderTaskList(done,true)}</div>
+      </div>
+    </div>`;
+  updateTaskStats();
+}
+function renderTaskList(tasks,isDone=false){
+  const PR={1:{l:'P1',c:'var(--ros)'},2:{l:'P2',c:'var(--saf)'},3:{l:'P3',c:'var(--t2)'}};
+  if(!tasks.length)return`<div style="padding:20px;text-align:center;color:var(--t2);font-size:11.5px;">${isDone?'Nothing completed yet':'No tasks · Add one above'}</div>`;
+  return tasks.map(t=>`<div class="trow">
+    <div class="tck ${t.done?'d':''}" onclick="toggleTask(${t.id})">${t.done?'✓':''}</div>
+    <span class="ttag" style="background:${PR[t.pri||2].c}22;color:${PR[t.pri||2].c};cursor:pointer;" onclick="cyclePri(${t.id})">${PR[t.pri||2].l}</span>
+    <div class="ttx ${t.done?'d':''}">${escH(t.text)}</div>
+    <span class="ttag" style="background:${CATS[t.cat]?.c||'var(--ind)'}22;color:${CATS[t.cat]?.c||'var(--ind)'}">${CATS[t.cat]?.l||t.cat}</span>
+    <span class="tx" onclick="deleteTask(${t.id})">×</span>
+  </div>`).join('');
+}
+function addTask(){
+  const inp=document.getElementById('t-inp'),cat=document.getElementById('t-cat')?.value||'deep';
+  if(!inp?.value.trim())return;
+  S.tasks.push({id:S.nextTaskId++,text:inp.value.trim(),cat,pri:parseInt(document.getElementById('t-pri')?.value||2),done:false,ts:Date.now()});
+  inp.value='';save();renderTasks();toast('✓','Task added');
+}
+function toggleTask(id){
+  const t=S.tasks.find(t=>t.id===id);if(!t)return;
+  t.done=!t.done;save();
+  if(t.done)logEvent('task',`Completed: ${t.text}`,7,7,t.cat);
+  renderTasks();updateTaskStats();
+}
+function cyclePri(id){const t=S.tasks.find(x=>x.id===id);if(!t)return;t.pri=((t.pri||2)%3)+1;save();renderTasks();}
+function deleteTask(id){S.tasks=S.tasks.filter(t=>t.id!==id);save();renderTasks();updateTaskStats();}
+function clearDone(){S.tasks=S.tasks.filter(t=>!t.done);save();renderTasks();updateTaskStats();}
+function updateTaskStats(){
+  const done=S.tasks.filter(t=>t.done).length;
+  document.getElementById('ss-td').textContent=`${done}/${S.tasks.length}`;
+  computeLifeScore();
+}
+
+// ── GOALS · FULL CRUD CASCADE ──────────────────
+const GLEVELS=['Year','Quarter','Month','Week','Today'];
+const GLCOLOR={Year:'var(--vio)',Quarter:'var(--ind)',Month:'var(--sky)',Week:'var(--em)',Today:'var(--saf)'};
+const GLICON={Year:'📅',Quarter:'◑',Month:'◈',Week:'◻',Today:'▸'};
+function renderGoals(){
+  const p=document.getElementById('p-goals');
+  const domains=[...new Set(S.goals.map(g=>g.domain))];
+  const col=dom=>{
+    const gs=GLEVELS.flatMap(l=>S.goals.filter(g=>g.domain===dom&&g.level===l));
+    return`<div class="card"><div class="chd"><span class="ct">${escH(dom)}</span></div>
+      <div class="gtree">${gs.map((n,i)=>`
+      <div class="gnode" style="padding-left:${GLEVELS.indexOf(n.level)*14}px;">
+        <div class="gni">
+          <div class="gmark" style="background:${GLCOLOR[n.level]}22;">${GLICON[n.level]}</div>
+          <div style="flex:1;min-width:0;"><div class="gntx">${escH(n.text)}</div>
+            <div class="gnmt" style="display:flex;align-items:center;gap:8px;margin-top:3px;">
+              <div style="flex:1;max-width:120px;background:var(--bg4);height:4px;border-radius:2px;overflow:hidden;"><div style="width:${n.progress}%;height:4px;background:${GLCOLOR[n.level]};"></div></div>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9px;">${n.progress}%</span>
+            </div>
+          </div>
+          <span class="gntag" style="background:${GLCOLOR[n.level]}22;color:${GLCOLOR[n.level]}">${n.level}</span>
+          <span style="cursor:pointer;color:var(--t2);font-size:11px;padding:2px 4px;" onclick="bumpGoal(${n.id},10)" title="+10%">＋</span>
+          <span style="cursor:pointer;color:var(--ros);font-size:10px;padding:2px 4px;" onclick="deleteGoal(${n.id})" title="Delete">✕</span>
+        </div>
+      </div>`).join('')||'<div style="font-size:11px;color:var(--t2);padding:8px;">No goals here yet.</div>'}</div></div>`;
+  };
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">Goal Cascade</div><div class="ph-s">Year → Quarter → Month → Week → Today · Tap ＋ to advance progress</div></div></div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="chd"><span class="ct">Add Goal</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input type="text" class="ti" id="g-text" placeholder="Goal…" style="flex:2;min-width:200px;margin:0;" onkeydown="if(event.key==='Enter')addGoal()">
+        <select id="g-level" style="background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:7px 10px;color:var(--t1);font-size:11.5px;">${GLEVELS.map(l=>`<option>${l}</option>`).join('')}</select>
+        <input type="text" class="ti" id="g-domain" placeholder="Domain (e.g. Trading)" style="width:150px;margin:0;" list="g-doms">
+        <datalist id="g-doms">${domains.map(d=>`<option value="${escH(d)}">`).join('')}</datalist>
+        <button class="btn bp bsm" onclick="addGoal()">＋ Add</button>
+      </div>
+    </div>
+    <div class="g2">${domains.length?domains.map(col).join(''):'<div class="card" style="grid-column:span 2;text-align:center;color:var(--t2);font-size:11.5px;padding:30px;">No goals yet — add your first Year goal above, then cascade it down to Today.</div>'}</div>`;
+}
+function addGoal(){
+  const t=document.getElementById('g-text').value.trim();
+  if(!t){toast('⚠️','Write the goal first');return;}
+  const dom=document.getElementById('g-domain').value.trim()||'General';
+  S.goals.push({id:S.nextGoalId++,level:document.getElementById('g-level').value,text:t,domain:dom,progress:0});
+  save();renderGoals();toast('◎','Goal added');
+}
+function bumpGoal(id,by){
+  const g=S.goals.find(x=>x.id===id);if(!g)return;
+  g.progress=Math.min(100,g.progress+by);save();renderGoals();
+  if(g.progress===100){logEvent('review',`Goal completed: ${g.text}`,8,8,'general');toast('🏆','Goal 100% complete!');}
+}
+function deleteGoal(id){if(!confirm('Delete this goal?'))return;S.goals=S.goals.filter(g=>g.id!==id);save();renderGoals();}
+
+// ── HABITS · DATE-ANCHORED ─────────────────────
+const DL=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+function habitStreak(h){
+  let st=0,d=new Date();
+  if(!h.log[dkey(d)])d=addDays(d,-1); // streak survives if today not yet logged
+  while(h.log[dkey(d)]){st++;d=addDays(d,-1);}
+  return st;
+}
+function renderHabits(){
+  const p=document.getElementById('p-habits');
+  const mon=addDays(mondayOf(),S.habitWeekOffset*7);
+  const weekDates=[...Array(7)].map((_,i)=>addDays(mon,i));
+  const tk=today();
+  p.innerHTML=`
+    <div class="ph">
+      <div><div class="ph-t">Habit Tracker</div><div class="ph-s">Week of ${fmtD(mon)} – ${fmtD(addDays(mon,6))} · Tap a day to toggle</div></div>
+      <div class="ph-a">
+        <button class="btn bg bsm" onclick="S.habitWeekOffset--;renderHabits()">←</button>
+        <button class="btn bg bsm" onclick="S.habitWeekOffset=0;renderHabits()">Today</button>
+        <button class="btn bg bsm" onclick="S.habitWeekOffset++;renderHabits()">→</button>
+        <button class="btn bp bsm" onclick="logAll()">✓ Log All Today</button>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:14px;">
+      <div style="display:flex;gap:8px;">
+        <input type="text" class="ti" id="h-inp" placeholder="Add habit… (e.g. Read 30 min)" style="flex:1;margin:0;" onkeydown="if(event.key==='Enter')addHabit()">
+        <input type="text" class="ti" id="h-cat" placeholder="Category" style="width:130px;margin:0;">
+        <button class="btn bp bsm" onclick="addHabit()">＋ Add</button>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:7px;padding-bottom:8px;border-bottom:1px solid var(--b1);margin-bottom:2px;">
+        <div style="width:130px;font-size:8.5px;color:var(--t2);font-weight:700;flex-shrink:0;">HABIT</div>
+        <div style="display:flex;gap:3px;">${weekDates.map(d=>`<div style="width:26px;text-align:center;font-size:8.5px;color:${dkey(d)===tk?'var(--saf)':'var(--t2)'};font-weight:700;">${DL[(d.getDay()+6)%7].slice(0,1)}<br><span style="font-size:7.5px;">${d.getDate()}</span></div>`).join('')}</div>
+        <div style="margin-left:auto;font-size:8.5px;color:var(--t2);font-weight:700;">STREAK</div>
+      </div>
+      ${S.habits.length?S.habits.map((h,hi)=>{
+        const streak=habitStreak(h);
+        return`<div class="hrow">
+          <div class="hname"><div class="hnm">${escH(h.name)}</div><div class="hct">${escH(h.cat||'')} <span style="cursor:pointer;color:var(--ros);" onclick="deleteHabit(${hi})">✕</span></div></div>
+          <div class="hdays">${weekDates.map(d=>{
+            const k=dkey(d),done=!!h.log[k],isFuture=d>new Date(),isToday=k===tk;
+            const cls=done?'hdon':isToday?'htod':'hmis';
+            const lbl=done?'✓':isToday?'?':isFuture?'':'·';
+            return`<div class="hd ${cls}" style="${isFuture?'opacity:.25;pointer-events:none;':''}" onclick="toggleHabitDate(${hi},'${k}')">${lbl}</div>`;
+          }).join('')}</div>
+          <div class="hstr"><div class="hsv">${streak>0?streak:'—'}</div><div class="hsl">${streak>0?'days':''}</div></div>
+        </div>`;
+      }).join(''):'<div style="text-align:center;color:var(--t2);font-size:11.5px;padding:24px;">No habits yet — add your first one above.</div>'}
+    </div>`;
+  computeLifeScore();
+}
+function toggleHabitDate(hi,k){
+  const h=S.habits[hi];
+  if(h.log[k]){delete h.log[k];toast('✦',`${h.name} unmarked`);}
+  else{h.log[k]=true;logEvent('habit',`${h.name} completed`,7,7,'general');toast('✦',`${h.name} done!`);}
+  save();renderHabits();updateStreakStat();
+}
+function addHabit(){
+  const n=document.getElementById('h-inp').value.trim();
+  if(!n){toast('⚠️','Name the habit first');return;}
+  S.habits.push({name:n,cat:document.getElementById('h-cat').value.trim()||'General',log:{}});
+  save();renderHabits();toast('✦','Habit added');
+}
+function deleteHabit(hi){if(!confirm(`Delete habit "${S.habits[hi].name}" and its history?`))return;S.habits.splice(hi,1);save();renderHabits();}
+function logAll(){
+  const tk=today();let n=0;
+  S.habits.forEach(h=>{if(!h.log[tk]){h.log[tk]=true;n++;}});
+  save();renderHabits();toast('✅',n?`${n} habits logged for today!`:'All already logged');
+}
+
+// ── WEEKLY · REAL DATES + PERSISTED ────────────
+const WD=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+function weekKey(mon){return dkey(mon)}
+function renderWeekly(){
+  const p=document.getElementById('p-weekly');
+  const mon=addDays(mondayOf(),S.weekOffset*7);
+  const wk=weekKey(mon);
+  const plan=S.weekPlans[wk]||{};
+  const rev=S.weekReviews[wk]||{};
+  const tk=today();
+  p.innerHTML=`
+    <div class="ph">
+      <div><div class="ph-t">Weekly Command</div><div class="ph-s">${fmtD(mon)} – ${fmtD(addDays(mon,6))}, ${mon.getFullYear()}</div></div>
+      <div class="ph-a"><button class="btn bg bsm" onclick="S.weekOffset--;renderWeekly()">← Prev</button><button class="btn bg bsm" onclick="S.weekOffset=0;renderWeekly()">This Week</button><button class="btn bg bsm" onclick="S.weekOffset++;renderWeekly()">Next →</button></div>
+    </div>
+    <div class="wg">
+      ${WD.map((d,i)=>{const dt=addDays(mon,i);const items=plan[i]||[];const isTod=dkey(dt)===tk;
+        return`<div class="wdc ${isTod?'tod':''}"><div class="wdn">${d}</div><div class="wdnum">${dt.getDate()}</div>
+          ${items.map((t,ti)=>`<div class="wdp" style="position:relative;padding-right:16px;">${escH(t)}<span style="position:absolute;right:3px;top:2px;color:var(--ros);cursor:pointer;font-size:9px;" onclick="delWeekItem('${wk}',${i},${ti})">✕</span></div>`).join('')}
+          <div class="wdp" style="cursor:pointer;color:var(--t3);border-style:dashed;" onclick="addWeekItem('${wk}',${i})">＋ add</div>
+        </div>`;}).join('')}
+    </div>
+    <div class="card">
+      <div class="chd"><span class="ct">Weekly Review · saved per week</span></div>
+      <div class="g2">
+        ${[{id:'wr-wins',k:'wins',c:'var(--em)',t:'WINS',ph:'What went well this week?'},{id:'wr-lessons',k:'lessons',c:'var(--ros)',t:'LESSONS',ph:'What will you change?'},{id:'wr-next3',k:'next3',c:'var(--ind)',t:'NEXT WEEK TOP 3',ph:'3 must-happen priorities…'},{id:'wr-recovery',k:'recovery',c:'var(--saf)',t:'RECOVERY PLAN',ph:'How will you recharge?'}].map(f=>`
+          <div><div style="font-size:9px;font-weight:800;color:${f.c};letter-spacing:.08em;margin-bottom:5px;">${f.t}</div>
+          <textarea class="jta" id="${f.id}" placeholder="${f.ph}">${escH(rev[f.k]||'')}</textarea></div>`).join('')}
+      </div>
+      <div style="margin-top:10px;text-align:right;"><button class="btn bp bsm" onclick="saveWeekReview('${wk}')">Save Review</button></div>
+    </div>`;
+}
+function addWeekItem(wk,day){
+  const t=prompt('Plan item for '+WD[day]+':');
+  if(!t||!t.trim())return;
+  if(!S.weekPlans[wk])S.weekPlans[wk]={};
+  if(!S.weekPlans[wk][day])S.weekPlans[wk][day]=[];
+  S.weekPlans[wk][day].push(t.trim());save();renderWeekly();
+}
+function delWeekItem(wk,day,i){S.weekPlans[wk][day].splice(i,1);save();renderWeekly();}
+function saveWeekReview(wk){
+  S.weekReviews[wk]={wins:document.getElementById('wr-wins').value,lessons:document.getElementById('wr-lessons').value,next3:document.getElementById('wr-next3').value,recovery:document.getElementById('wr-recovery').value};
+  save();logEvent('review','Weekly review saved',7,7,'mind');toast('✅','Weekly review saved!');
+}
+
+// ── BURNOUT ────────────────────────────────────
+function renderBurnout(){
+  const p=document.getElementById('p-burnout');
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">Burnout Prevention</div><div class="ph-s">Rate yourself daily · System adjusts recommendations</div></div></div>
+    <div class="g3">
+      <div class="card" style="text-align:center;">
+        <div class="chd"><span class="ct">Burnout Risk</span></div>
+        <div class="gc">
+          <svg viewBox="0 0 150 90">
+            <defs><linearGradient id="gg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#10b981"/><stop offset="50%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#f43f5e"/></linearGradient></defs>
+            <path d="M 18 82 A 57 57 0 0 1 132 82" fill="none" stroke="var(--bg4)" stroke-width="11" stroke-linecap="round"/>
+            <path id="gfill" d="M 18 82 A 57 57 0 0 1 132 82" fill="none" stroke="url(#gg)" stroke-width="11" stroke-linecap="round" stroke-dasharray="180" stroke-dashoffset="68"/>
+          </svg>
+          <div class="gcenter"><div class="gnum" id="bnum" style="color:var(--saf)">—%</div><div class="gsub" id="blbl">Computing…</div></div>
+        </div>
+        <div style="font-size:10.5px;color:var(--t2);margin-top:4px;" id="badv">Update sliders</div>
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Self Check-in</span></div>
+        ${[{k:'energy',l:'Energy Level',inv:false},{k:'clarity',l:'Mental Clarity',inv:false},{k:'sleep',l:'Sleep Quality',inv:false},{k:'motivation',l:'Motivation',inv:false},{k:'stress',l:'Stress Level',inv:true}].map(m=>`
+          <div style="margin-bottom:11px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;color:var(--t1);">${m.l}</span><span style="font-family:\'JetBrains Mono\',monospace;font-size:10px;color:var(--t2);" id="bv-${m.k}">${S.burnout[m.k]}%</span></div>
+            <input type="range" min="0" max="100" value="${S.burnout[m.k]}" style="accent-color:${m.inv?'var(--ros)':'var(--ind)'}" oninput="S.burnout['${m.k}']=parseInt(this.value);document.getElementById('bv-${m.k}').textContent=this.value+'%';updateBurnout();DB.set('burnout',S.burnout)">
+          </div>`).join('')}
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Recovery Protocols</span></div>
+        ${[{t:'DAILY',c:'var(--em)',items:['Sidha Vidya stillness · 20 min','No screens after 21:30','Sleep by 22:30']},{t:'WEEKLY',c:'var(--sky)',items:['Full trading-off day','Long yoga session','Family time — full presence']},{t:'SLEEP',c:'var(--ind)',items:['22:00 wind-down routine','22:30 sleep target','05:00 wake · 6.5h min']}].map(r=>`
+          <div style="padding:9px;background:${r.c}11;border-radius:7px;border:1px solid ${r.c}22;margin-bottom:8px;">
+            <div style="font-size:8.5px;font-weight:800;color:${r.c};margin-bottom:5px;">${r.t}</div>
+            <div style="font-size:11px;color:var(--t1);line-height:1.7;">${r.items.join('<br>')}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  updateBurnout();
+}
+function updateBurnout(){
+  const pos=['energy','clarity','sleep','motivation'];
+  const avgPos=pos.reduce((a,k)=>a+S.burnout[k],0)/pos.length;
+  const risk=Math.round((100-avgPos)*.6+S.burnout.stress*.4);
+  const fill=document.getElementById('gfill');
+  const offset=180-(risk/100*180);
+  if(fill)fill.setAttribute('stroke-dashoffset',offset);
+  const num=document.getElementById('bnum'),lbl=document.getElementById('blbl'),adv=document.getElementById('badv');
+  if(num)num.textContent=risk+'%';
+  const c=risk<30?'var(--em)':risk<55?'var(--saf)':'var(--ros)';
+  if(num)num.style.color=c;
+  if(lbl)lbl.textContent=risk<30?'Low Risk · Excellent':risk<55?'Moderate · Monitor':'High Risk · Act Now';
+  if(adv)adv.textContent=risk<30?'Keep recovery rituals strong':risk<55?'Reduce screen after 21:00':'Take full rest day — mandatory';
+}
+
+// ── TIME AUDIT · REAL TRACKED DATA ─────────────
+function renderAudit(){
+  const p=document.getElementById('p-audit');
+  const CAT_COLOR={'Deep Work':'var(--ind)','Planning':'var(--sky)','Execution':'var(--em)','Discipline':'var(--em)','Logging':'var(--saf)','Reflection':'var(--vio)','AI Coaching':'var(--vio)','Analytics':'var(--cor)','Wellness':'var(--pin)','Overview':'var(--t2)','System':'var(--t3)'};
+  // Today: where attention went inside the OS
+  const tp=ACT.todayPanelSecs();
+  const byCat={};let totSecs=0;
+  Object.entries(tp).forEach(([panel,secs])=>{const c=PANEL_CAT[panel]||'Other';byCat[c]=(byCat[c]||0)+secs;totSecs+=secs;});
+  const act=ACT.daySummary(today());
+  const rows=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  // 7-day trend
+  const days=[...Array(7)].map((_,i)=>{const d=addDays(new Date(),-(6-i));const sum=ACT.daySummary(dkey(d));return{d,min:sum?Math.round(sum.total/60):0,fm:sum?sum.focusMin:0,e:sum&&sum.avgE?sum.avgE:null};});
+  const maxMin=Math.max(...days.map(x=>x.min+x.fm),1);
+  // Hourly activity today (what you said you were doing)
+  const todayHL=Object.entries(S.hourlyLog).filter(([k])=>k.startsWith(today()+'|')).map(([k,v])=>v);
+  const fmtHM=secs=>{const h=Math.floor(secs/3600),m=Math.round((secs%3600)/60);return h?`${h}h ${m}m`:`${m}m`};
+  // WHY insights
+  const insights=[];
+  if(act&&act.avgE!==null)insights.push(`⚡ Average energy today: <strong style="color:var(--t0)">${act.avgE.toFixed(1)}/10</strong> across ${(ACT.data[today()]||{}).energyN||0} check-ins.`);
+  if(act&&act.avgF!==null)insights.push(`🎯 Average focus today: <strong style="color:var(--t0)">${act.avgF.toFixed(1)}/10</strong>.`);
+  if(act&&act.focusMin>0)insights.push(`⏱ <strong style="color:var(--t0)">${act.focusMin} min</strong> of committed Pomodoro deep work.`);
+  if(rows.length)insights.push(`📍 Most attention went to <strong style="color:var(--t0)">${rows[0][0]}</strong> (${fmtHM(rows[0][1])}). ${rows[0][0]==='Logging'||rows[0][0]==='Analytics'?'Reviewing is good — but make sure execution time exceeds review time.':'Good — that is productive attention.'}`);
+  const wk=days.reduce((a,x)=>a+x.min+x.fm,0);
+  insights.push(`📊 7-day total in-OS + focus time: <strong style="color:var(--t0)">${Math.floor(wk/60)}h ${wk%60}m</strong> across ${days.filter(x=>x.min>0).length} active days.`);
+  if(!insights.length)insights.push('Start using the OS — every panel visit, focus session, and energy check-in is being tracked automatically.');
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">Time Audit</div><div class="ph-s">Automatically tracked · Where your time, focus and energy actually go</div></div>
+    <div class="ph-a"><button class="btn bg bsm" onclick="renderAudit()">↻ Refresh</button></div></div>
+    <div class="g3">
+      <div class="card" style="grid-column:span 2;">
+        <div class="chd"><span class="ct">Today · Attention By Category · ${fmtHM(totSecs)} tracked</span></div>
+        ${rows.length?rows.map(([cat,secs])=>{const pct=Math.round(secs/totSecs*100);return`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><div style="width:110px;font-size:11px;color:var(--t1);">${cat}</div><div style="flex:1;background:var(--bg4);border-radius:3px;height:9px;overflow:hidden;"><div style="width:${pct}%;height:9px;border-radius:3px;background:${CAT_COLOR[cat]||'var(--ind)'};"></div></div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t2);width:44px;text-align:right;">${fmtHM(secs)}</div><div style="font-size:10px;color:var(--t2);width:28px;text-align:right;">${pct}%</div></div>`;}).join(''):'<div style="font-size:11px;color:var(--t2);padding:12px 0;">No activity tracked yet today — it starts automatically as you use the OS.</div>'}
+        <div class="chd" style="margin-top:14px;"><span class="ct">Last 7 Days · Minutes Per Day</span></div>
+        <div style="display:flex;align-items:flex-end;gap:6px;height:90px;padding-top:8px;">
+          ${days.map(x=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;"><div style="font-size:8px;color:var(--t2);font-family:'JetBrains Mono',monospace;">${x.min+x.fm||''}</div><div style="width:100%;display:flex;flex-direction:column;justify-content:flex-end;height:56px;"><div style="background:var(--ind);border-radius:3px 3px 0 0;height:${Math.round((x.fm)/maxMin*56)}px;"></div><div style="background:var(--bg5);border-radius:${x.fm?'0':'3px 3px 0 0'};height:${Math.round(x.min/maxMin*56)}px;"></div></div><div style="font-size:8.5px;color:${dkey(x.d)===today()?'var(--saf)':'var(--t2)'};">${x.d.toLocaleDateString('en-IN',{weekday:'short'}).slice(0,2)}</div></div>`).join('')}
+        </div>
+        <div style="display:flex;gap:14px;margin-top:6px;font-size:9px;color:var(--t2);"><span><span style="display:inline-block;width:8px;height:8px;background:var(--ind);border-radius:2px;margin-right:4px;"></span>Focus (Pomodoro)</span><span><span style="display:inline-block;width:8px;height:8px;background:var(--bg5);border-radius:2px;margin-right:4px;"></span>In-OS time</span></div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:14px;">
+          <div class="chd"><span class="ct">Why · Focus & Energy Read</span></div>
+          <div style="font-size:11px;color:var(--t1);line-height:1.9;">${insights.join('<br>')}</div>
+        </div>
+        <div class="card">
+          <div class="chd"><span class="ct">What You Logged Today</span></div>
+          ${todayHL.length?todayHL.map(h=>`<div style="display:flex;gap:8px;font-size:10.5px;color:var(--t1);padding:4px 0;border-bottom:1px solid var(--b1);"><span style="font-family:'JetBrains Mono',monospace;color:var(--t2);">${h.hour}:00</span><span style="flex:1;">${escH(h.activity)}</span><span style="color:var(--saf);">⚡${h.energy}</span></div>`).join(''):'<div style="font-size:10.5px;color:var(--t2);">Use the Hourly Logger to record what each hour went to — it feeds this audit.</div>'}
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── JOURNAL ────────────────────────────────────
+function renderJournal(){
+  const p=document.getElementById('p-journal');
+  p.innerHTML=`
+    <div class="ph">
+      <div><div class="ph-t">Daily Journal</div><div class="ph-s">Reflect · Learn · Grow · Entries saved locally</div></div>
+      <div class="ph-a"><button class="btn bp bsm" onclick="saveJournal()">Save Entry</button></div>
+    </div>
+    <div class="g2">
+      <div>
+        ${[{id:'jw',c:'var(--em)',t:'3 WINS TODAY',ph:'What went well today?'},{id:'jd',c:'var(--ros)',t:'WHAT DRAINED ME',ph:'What took energy unnecessarily?'},{id:'jt',c:'var(--saf)',t:'TOMORROW I WILL',ph:'One change or commitment…'},{id:'jm',c:'var(--vio)',t:'MINDFULNESS INSIGHT',ph:'What did my practice reveal today?'}].map(f=>`
+          <div style="margin-bottom:10px;">
+            <div style="font-size:8.5px;font-weight:800;color:${f.c};letter-spacing:.1em;margin-bottom:5px;">${f.t}</div>
+            <textarea class="jta" id="${f.id}" placeholder="${f.ph}"></textarea>
+          </div>`).join('')}
+      </div>
+      <div>
+        <div style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);margin-bottom:10px;">Past Entries (${S.journalEntries.length})</div>
+        ${S.journalEntries.length?S.journalEntries.map((e,i)=>`<div class="jentry" style="position:relative;"><div class="jedate">${e.date} <span style="color:var(--ros);cursor:pointer;float:right;font-size:9px;" onclick="deleteJournal(${i})">✕</span></div><div class="jecont">${escH([e.wins,e.drain,e.tomorrow,e.insight].filter(Boolean).join(' · '))}</div></div>`).join(''):'<div style="font-size:11px;color:var(--t2);">No entries yet — your first reflection starts here.</div>'}
+      </div>
+    </div>`;
+}
+function saveJournal(){
+  const w=document.getElementById('jw')?.value.trim(),d=document.getElementById('jd')?.value.trim();
+  if(!w&&!d){toast('⚠️','Write something first');return;}
+  const entry={date:new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'}),wins:w,drain:d,tomorrow:document.getElementById('jt')?.value.trim(),insight:document.getElementById('jm')?.value.trim()};
+  S.journalEntries.unshift(entry);save();
+  logEvent('review','Journal entry saved',6,6,'mind');
+  toast('✍️','Journal entry saved!');renderJournal();
+}
+function deleteJournal(i){if(!confirm('Delete this journal entry?'))return;S.journalEntries.splice(i,1);save();renderJournal();}
+
+// ── PROCRASTINATION ────────────────────────────
+const PROC=[
+  {t:'Lack of Clarity',d:'Task feels vague — first step unclear.',sol:{t:'Clarity Fix',steps:['Write the very next physical action','Define "done" before starting','Break into 25-min Pomodoro blocks','Start with the easiest 5%'],habit:'Before every task: "The next action is ___"'}},
+  {t:'Fear of Failure',d:'Perfectionism keeps you stuck.',sol:{t:'Progress > Perfection',steps:['Set "done-enough" standard first','Allow a bad first draft','Separate creation from editing','Journal worst-case — it\'s rarely fatal'],habit:'Daily: "Progress beats perfection."'}},
+  {t:'Low Motivation',d:"Task matters but you can't feel why.",sol:{t:'Connect to Why',steps:['Write your why in 2 sentences','Connect to trading or wellness goal','5-4-3-2-1 countdown → begin','Reward immediately after'],habit:'Morning: read 3-sentence purpose statement'}},
+  {t:'Decision Fatigue',d:'Too many choices draining will.',sol:{t:'One Thing Rule',steps:['Identify the #1 task right now','Close all tabs except one','Phone in another room 45 min','Use physical timer'],habit:'Every evening: write tomorrow\'s #1 priority'}},
+  {t:'Emotional Resistance',d:'Anxiety or boredom causing avoidance.',sol:{t:'Sidha Vidya Protocol',steps:['5-min Sidha Vidya stillness first','Pranayama 4-4-4 × 5 cycles','Name the emotion — naming reduces it','Start for just 2 minutes only'],habit:'Use morning sadhana to process emotions'}},
+];
+function renderProcrastination(){
+  const p=document.getElementById('p-procrastination');
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">Procrastination Diagnosis</div><div class="ph-s">Select what resonates · Get personalized fix</div></div></div>
+    <div class="g2">
+      <div>
+        <div style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);margin-bottom:10px;">What's causing your delay?</div>
+        ${PROC.map((r,i)=>`<div style="background:var(--bg3);border:1px solid var(--b1);border-radius:var(--r);padding:11px 13px;margin-bottom:7px;cursor:pointer;transition:var(--trans);" onclick="selectProc(${i},this)">
+          <div style="font-size:12px;font-weight:600;color:var(--t0);margin-bottom:2px;">${r.t}</div>
+          <div style="font-size:10.5px;color:var(--t2);">${r.d}</div>
+        </div>`).join('')}
+      </div>
+      <div>
+        <div style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);margin-bottom:10px;">Your Solution Plan</div>
+        <div id="proc-sol" style="padding:24px;text-align:center;color:var(--t2);font-size:11.5px;">← Select a reason to see your personalized fix</div>
+      </div>
+    </div>`;
+}
+function selectProc(i,el){
+  document.querySelectorAll('[onclick^="selectProc"]').forEach(e=>e.style.borderColor='var(--b1)');
+  el.style.borderColor='rgba(99,102,241,.4)';el.style.background='var(--is)';
+  const r=PROC[i];
+  document.getElementById('proc-sol').innerHTML=`
+    <div class="card" style="background:var(--is);border-color:rgba(99,102,241,.25);">
+      <div style="font-size:13px;font-weight:700;color:var(--ind);margin-bottom:12px;">${r.sol.t}</div>
+      ${r.sol.steps.map((s,si)=>`<div style="display:flex;gap:9px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+        <div style="width:19px;height:19px;border-radius:50%;background:var(--is);color:var(--ind);display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;flex-shrink:0;">${si+1}</div>
+        <div style="font-size:11.5px;color:var(--t0);line-height:1.6;">${s}</div>
+      </div>`).join('')}
+      <div style="margin-top:12px;padding:9px;background:var(--ss);border-radius:7px;border:1px solid rgba(245,158,11,.2);">
+        <div style="font-size:8.5px;font-weight:800;color:var(--saf);margin-bottom:3px;">DAILY HABIT</div>
+        <div style="font-size:11.5px;color:var(--t1);">${r.sol.habit}</div>
+      </div>
+    </div>`;
+}
+
+// ── SETTINGS · PERSISTED ───────────────────────
+function renderSettings(){
+  const p=document.getElementById('p-settings');
+  const actDays=Object.keys(ACT.data).length;
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">Settings</div><div class="ph-s">Customize your Life OS · Everything saves</div></div></div>
+    <div class="g2">
+      <div class="card">
+        <div class="chd"><span class="ct">Profile</span></div>
+        ${[{k:'name',l:'Name'},{k:'location',l:'Location'},{k:'wake',l:'Wake Time'},{k:'sleep',l:'Sleep Target'}].map(f=>`<div style="margin-bottom:10px;"><div style="font-size:9.5px;color:var(--t2);margin-bottom:3px;">${f.l}</div><input type="text" class="ti" id="pf-${f.k}" value="${escH(PROFILE[f.k]||'')}" style="margin:0;"></div>`).join('')}
+        <button class="btn bp bsm" onclick="saveProfile()">Save Profile</button>
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Focus Defaults</span></div>
+        <div style="margin-bottom:10px;"><div style="font-size:9.5px;color:var(--t2);margin-bottom:3px;">Work Session (minutes)</div><input type="number" class="ti" id="f-dur" value="${FCFG.work}" min="5" max="120" style="margin:0;"></div>
+        <div style="margin-bottom:14px;"><div style="font-size:9.5px;color:var(--t2);margin-bottom:3px;">Break (minutes)</div><input type="number" class="ti" id="b-dur" value="${FCFG.brk}" min="1" max="30" style="margin:0;"></div>
+        <button class="btn bp bsm" onclick="saveFocusCfg()">Save Settings</button>
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Check-in Prompts & Rewards</span></div>
+        <div style="font-size:11.5px;color:var(--t1);line-height:1.7;margin-bottom:12px;">Life OS asks if you're on your top P1 task. Three honest "yes" answers in a row earns a ⭐. Currently ${RW.stars} stars · ${RW.streak}/3 toward the next.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+          <button class="btn ${CHK.enabled?'bp':'bg'} bsm" onclick="CHK.enabled=!CHK.enabled;DB.set('chkCfg',CHK);renderSettings();toast('🎯',CHK.enabled?'Check-ins on':'Check-ins off')">${CHK.enabled?'🎯 Check-ins: ON':'🎯 Check-ins: OFF'}</button>
+          <span style="font-size:10.5px;color:var(--t2);">Ask every</span>
+          <input type="number" class="ti" id="chk-every" value="${CHK.every}" min="15" max="240" style="width:64px;margin:0;text-align:right;">
+          <span style="font-size:10.5px;color:var(--t2);">min, between</span>
+          <input type="number" class="ti" id="chk-from" value="${CHK.from}" min="0" max="23" style="width:52px;margin:0;text-align:right;">
+          <span style="font-size:10.5px;color:var(--t2);">–</span>
+          <input type="number" class="ti" id="chk-to" value="${CHK.to}" min="1" max="24" style="width:52px;margin:0;text-align:right;">
+          <span style="font-size:10.5px;color:var(--t2);">h</span>
+        </div>
+        <button class="btn bp bsm" onclick="saveChkCfg()">Save Check-in Settings</button>
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Reminders & Nudges</span></div>
+        <div style="font-size:11.5px;color:var(--t1);line-height:1.7;margin-bottom:12px;">Life OS nudges you back to your #1 priority using your own logs — check-in reminders, streak protection, deep-work prompts, energy care. All processing stays on your device.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn ${NCFG.enabled?'bp':'bg'} bsm" onclick="NCFG.enabled=!NCFG.enabled;DB.set('nudgeCfg',NCFG);renderSettings();toast('◈',NCFG.enabled?'Nudges on':'Nudges off')">${NCFG.enabled?'◈ Nudges: ON':'◈ Nudges: OFF'}</button>
+          <button class="btn ${NCFG.notifs?'bp':'bg'} bsm" onclick="toggleNotifs()">${NCFG.notifs?'🔔 Notifications: ON':'🔕 Notifications: OFF'}</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Storage</span></div>
+        ${(()=>{const b=storageBytes(),pct=storagePct();const c=pct>=75?'var(--ros)':pct>=50?'var(--saf)':'var(--em)';
+        return `<div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--t1);margin-bottom:6px;"><span>${fmtBytes(b)} used of ~5 MB</span><span style="color:${c};font-weight:700;">${pct}%</span></div>
+        <div style="background:var(--bg4);height:8px;border-radius:4px;overflow:hidden;margin-bottom:10px;"><div style="width:${pct}%;height:8px;background:${c};"></div></div>
+        <div style="font-size:10.5px;color:var(--t2);line-height:1.7;margin-bottom:12px;">${daysOfData()} days of data stored. At your current rate that's room for roughly ${(()=>{const d=Math.max(1,daysOfData());const perDay=b/d;return perDay>0?(Math.round((5*1024*1024-b)/perDay/365*10)/10):'many'})()} more year(s). Nothing is ever deleted automatically.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn bg bsm" onclick="if(confirm('Export a backup first! This removes detailed events and hourly logs older than 180 days. Daily summaries, habits, screen time and goals are kept. Continue?'))archiveOlderThan(180)">🗜 Archive logs &gt;180 days</button>
+          <button class="btn bg bsm" onclick="if(confirm('Export a backup first! This removes detailed logs older than 90 days. Continue?'))archiveOlderThan(90)">🗜 &gt;90 days</button>
+        </div>`;})()}
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Data Management</span></div>
+        <div style="font-size:11.5px;color:var(--t1);margin-bottom:12px;line-height:1.7;">All data lives in your browser (localStorage) — export regularly to back up.<br>Screen-time days: ${Object.keys(S.screenTime).length} · Stars: ${RW.stars}<br>Events: ${S.events.length} · Tasks: ${S.tasks.length} · Habits: ${S.habits.length} · Goals: ${S.goals.length} · Memories: ${S.aiMemory.length}<br>Activity tracking: ${actDays} day${actDays===1?'':'s'} of time/focus/energy data</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn bg bsm" onclick="exportData()">📥 Export Data</button>
+          <button class="btn bg bsm" onclick="document.getElementById('imp-file').click()">📤 Import Data</button>
+          <input type="file" id="imp-file" accept=".json" style="display:none;" onchange="importData(this)">
+          <button class="btn bg bsm" onclick="if(confirm('Load sample/demo data? Your current data will be replaced.')){DB.set('mode','sample');['tasks','habits','events','aiMemory','decisions','journalEntries','goals'].forEach(k=>DB.del(k));location.reload();}">🧪 Load Sample Data</button>
+          <button class="btn bd bsm" onclick="if(confirm('Clear ALL data permanently?')){clearAllData()}">🗑 Clear All</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">About Life OS v6</span></div>
+        <div style="font-size:11.5px;color:var(--t1);line-height:1.9;">
+          <strong style="color:var(--t0)">Life OS v6</strong> — Personal Intelligence System<br>
+          Built for: ${escH(PROFILE.name)} · ${escH(PROFILE.location)}<br>
+          Layers: Event Store · Activity Tracker · Metrics Engine · AI Memory · Knowledge Graph<br>
+          <span style="color:var(--t2)">Local-first · Auto time/focus/energy tracking · Data stays with you</span>
+        </div>
+      </div>
+    </div>`;
+}
+function saveChkCfg(){
+  CHK.every=Math.max(15,Math.min(240,parseInt(document.getElementById('chk-every').value)||45));
+  CHK.from=Math.max(0,Math.min(23,parseInt(document.getElementById('chk-from').value)||7));
+  CHK.to=Math.max(1,Math.min(24,parseInt(document.getElementById('chk-to').value)||22));
+  DB.set('chkCfg',CHK);toast('🎯','Check-in settings saved');renderSettings();
+}
+function saveProfile(){
+  ['name','location','wake','sleep'].forEach(k=>PROFILE[k]=document.getElementById('pf-'+k).value.trim());
+  DB.set('profile',PROFILE);toast('👤','Profile saved');
+}
+function saveFocusCfg(){
+  FCFG.work=Math.max(5,Math.min(120,parseInt(document.getElementById('f-dur').value)||25));
+  FCFG.brk=Math.max(1,Math.min(30,parseInt(document.getElementById('b-dur').value)||5));
+  DB.set('focusCfg',FCFG);
+  if(!S.focusRunning){S.focusSecs=FCFG.work*60;updateFocusRing();}
+  toast('⚙️','Focus settings saved');
+}
+function exportData(){
+  ACT.flush();
+  const data=JSON.stringify({version:'4.0',exported:new Date().toISOString(),profile:PROFILE,focusCfg:FCFG,events:S.events,tasks:S.tasks,habits:S.habits,goals:S.goals,decisions:S.decisions,aiMemory:S.aiMemory,journalEntries:S.journalEntries,hourlyLog:S.hourlyLog,weekPlans:S.weekPlans,weekReviews:S.weekReviews,burnout:S.burnout,activity:ACT.data,focusSessions:S.focusSessions,screenTime:S.screenTime,rewards:RW,chkCfg:CHK},null,2);
+  const a=document.createElement('a');a.href='data:text/json;charset=utf-8,'+encodeURIComponent(data);a.download='life-os-backup-'+today()+'.json';a.click();
+  toast('📥','Data exported!');
+}
+function importData(inp){
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!d.tasks&&!d.events){toast('⚠️','Not a Life OS backup file');return;}
+      if(d.rewards)Object.assign(RW,d.rewards),saveRW();
+      if(d.screenTime)S.screenTime=Object.assign(S.screenTime,d.screenTime);
+      ['tasks','habits','goals','events','aiMemory','decisions','journalEntries','hourlyLog','weekPlans','weekReviews','burnout'].forEach(k=>{if(d[k]!==undefined)S[k]=k==='habits'?migrateHabits(d[k]):k==='hourlyLog'?migrateHourly(d[k]):d[k];});
+      if(d.profile)Object.assign(PROFILE,d.profile),DB.set('profile',PROFILE);
+      if(d.activity)ACT.data=Object.assign(ACT.data,d.activity),DB.set('activity',ACT.data);
+      if(typeof d.focusSessions==='number')S.focusSessions=d.focusSessions;
+      save();DB.set('mode','fresh');
+      toast('📤','Data imported!');setTimeout(()=>location.reload(),800);
+    }catch(e){toast('⚠️','Import failed — invalid file');}
+  };
+  r.readAsText(f);
+}
+function clearAllData(){
+  ['tasks','nextTaskId','habits','events','nextEventId','aiMemory','nextMemoryId','decisions','nextDecisionId','journalEntries','hourlyLog','burnout','focusSessions','goals','nextGoalId','weekPlans','weekReviews','activity','domains','mode','screenTime','rewards','chkCfg','nudgeCfg'].forEach(k=>DB.del(k));
+  location.reload();
+}
+
+// ── AI COACH ───────────────────────────────────
+const AI_SYS=()=>`You are an elite Personal Life OS Coach embedded in the user's browser-based Life OS. The user's name is ${PROFILE.name} (${PROFILE.location}). Wake target ${PROFILE.wake} · Sleep target ${PROFILE.sleep}.
+
+USER PROFILE:
+• Location: Chennai, India · NSE/BSE cash equity trader (NO F&O)
+• Trading stack: GoCharting (primary), TradingView, Zerodha Kite, Chartink/Screener.in
+• Method: Multi-timeframe CVD + Volume Profile (POC/VAH/VAL) + 15-item pre-trade checklist
+• Mindfulness: Yoga · Sidha Vidya stillness · Pranayama · classical texts (HYP, Yoga Sutras)
+• Fitness: Strength training + asanas · 05:00 wake
+• Interests: AI, software building, reading, disciplined self-improvement
+• Has built: Trading dashboards, planner wall poster, React Native apps
+
+LIVE DATA FROM HIS LIFE OS:
+• Life Score: ${computeLifeScore()}/100
+• Events logged today: ${S.events.filter(e=>e.ts?.startsWith(today())).length}
+• Time in OS today: ${(()=>{const a=ACT.daySummary(today());return a?Math.round(a.total/60)+' min · '+a.focusMin+' focus min':'0 min'})()}
+• Distraction screen time today: ${(()=>{const r=S.screenTime[today()]||{};const w=(r.social||0)+(r.video||0)+(r.ott||0)+(r.news||0);return w?Math.floor(w/60)+'h '+w%60+'m':'not logged'})()}
+• Focus check-ins: ${RW.yes}/${RW.total} on-task · ${RW.stars} stars · streak ${RW.streak}
+• Avg energy today: ${(()=>{const a=ACT.daySummary(today());return a&&a.avgE?a.avgE.toFixed(1)+'/10':'not logged'})()}
+• Tasks: ${S.tasks.filter(t=>t.done).length}/${S.tasks.length} done
+• Focus sessions: ${S.focusSessions}
+• Burnout risk: ${Math.round((100-((S.burnout.energy+S.burnout.clarity+S.burnout.sleep+S.burnout.motivation)/4))*.6+S.burnout.stress*.4)}%
+
+AI MEMORY (patterns you've learned about the user):
+${S.aiMemory.slice(0,8).map(m=>`• ${m.text}`).join('\n')}
+
+COACHING STYLE: Direct, specific, data-driven. Reference the user's tools, schedule and live data above. No generic advice. 150-200 words unless deeper analysis needed. Use bullet points for action plans.`;
+
+const QUICK_AIS=['📊 Analyze my life score','🎯 Plan my deep work today','⚡ Why is my energy low?','📈 NSE trading focus strategy','🧘 Sidha Vidya & performance','⚠️ Am I burning out?','🧠 What patterns do you see in me?','💪 Morning routine optimization'];
+
+function renderAI(){
+  const p=document.getElementById('p-ai');
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">AI Coach</div><div class="ph-s">Powered by Claude · Knows your life data · Memory-aware</div></div></div>
+    <div class="ai-shell">
+      <div class="aiqb">${QUICK_AIS.map(q=>`<span class="qc" onclick="quickAsk('${q}')">${q}</span>`).join('')}</div>
+      <div class="aimsg" id="aimsg"></div>
+      <div class="aibar">
+        <textarea id="aiinp" placeholder="Ask your Life OS coach…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAI()}"></textarea>
+        <button id="aisend" onclick="sendAI()">➤</button>
+      </div>
+    </div>`;
+  if(S.aiHistory.length===0){
+    const welcome=`Vanakkam ${PROFILE.name}! 🙏\n\nYour **Life OS** is running. I can see your live data:\n• Life Score: ${computeLifeScore()}/100\n• ${S.focusSessions} focus sessions today\n• ${S.aiMemory.length} memories about your patterns\n\nI can see your live data, activity tracking, and memory panel. I'm memory-aware — every insight you add to the Memory panel makes me smarter about you.\n\nAsk me anything or tap a quick prompt.`;
+    appendAIMsg('b',welcome);S.aiHistory=[{role:'assistant',content:welcome}];
+  }else{
+    S.aiHistory.forEach(m=>appendAIMsg(m.role==='assistant'?'b':'u',m.content,false));
+  }
+}
+function quickAsk(q){const el=document.getElementById('aiinp');if(el){el.value=q.replace(/^[^\w]+/,'').trim();sendAI();}}
+async function sendAI(){
+  const inp=document.getElementById('aiinp'),msg=inp?.value.trim();
+  if(!msg)return;inp.value='';
+  const btn=document.getElementById('aisend');if(btn)btn.disabled=true;
+  S.aiHistory.push({role:'user',content:msg});appendAIMsg('u',msg);
+  const msgs=document.getElementById('aimsg');
+  const thk=document.createElement('div');thk.className='msg b';
+  thk.innerHTML=`<div class="mav b">✦</div><div class="mb"><div class="thk"><div class="td"></div><div class="td"></div><div class="td"></div><span style="font-size:10px;color:var(--t2);margin-left:4px;">Thinking…</span></div></div>`;
+  msgs?.appendChild(thk);msgs&&(msgs.scrollTop=msgs.scrollHeight);
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:AI_SYS(),messages:S.aiHistory.filter(m=>typeof m.content==='string').map(m=>({role:m.role,content:m.content}))})});
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'Error — please retry.';
+    thk.remove();S.aiHistory.push({role:'assistant',content:reply});
+    appendAIMsg('b',reply);
+    // Auto-extract insights to memory
+    if(reply.length>200&&S.aiMemory.length<40){
+      // Silently log insight
+      S.aiMemory.unshift({id:S.nextMemoryId++,text:`Coach insight: ${reply.slice(0,120)}…`,icon:'🤖',date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'})});
+      DB.set('aiMemory',S.aiMemory);DB.set('nextMemoryId',S.nextMemoryId);
+    }
+  }catch(e){thk.remove();appendAIMsg('b','Network error — check connection.');}
+  if(btn)btn.disabled=false;
+}
+function appendAIMsg(role,text,scroll=true){
+  const msgs=document.getElementById('aimsg');if(!msgs)return;
+  const div=document.createElement('div');div.className=`msg ${role}`;
+  const fmt=text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  div.innerHTML=`<div class="mav ${role}">${role==='b'?'✦':'人'}</div><div class="mb">${fmt}</div>`;
+  msgs.appendChild(div);if(scroll)msgs.scrollTop=msgs.scrollHeight;
+}
+
+// ── FOCUS MODAL ────────────────────────────────
+const FTASKS=['Morning Sadhana · Deep Practice','Market Analysis · GoCharting HTF','Trade Execution · Zerodha Kite','Backtesting CVD Strategy','Learning Block · AI & Software','Strength Training Session','Evening Review & Journal','Deep Focus Session'];
+function openFocus(){
+  ACT.switch('focus');
+  const sel=document.getElementById('fsel');
+  sel.innerHTML=FTASKS.map(t=>`<option>${t}</option>`).join('');
+  document.getElementById('ftask').textContent=FTASKS[0];
+  document.getElementById('fov').classList.add('on');
+}
+function openFocusTask(name){
+  ACT.switch('focus');
+  document.getElementById('ftask').textContent=name;
+  document.getElementById('fsel').innerHTML=`<option>${name}</option>`+FTASKS.map(t=>`<option>${t}</option>`).join('');
+  document.getElementById('fov').classList.add('on');
+}
+function closeFocus(){if(S.focusRunning)pauseFocus();ACT.switch(S.panel);document.getElementById('fov').classList.remove('on');}
+function ftaskChange(){const s=document.getElementById('fsel');document.getElementById('ftask').textContent=s.value;}
+function toggleFocus(){S.focusRunning?pauseFocus():startFocus();}
+function startFocus(){
+  const dur=FCFG.work;
+  if(!S.focusRunning&&(S.focusSecs<=0||S.focusSecs>dur*60))S.focusSecs=dur*60;
+  S.focusRunning=true;document.getElementById('ftog').textContent='⏸ Pause';
+  S.focusInt=setInterval(()=>{
+    S.deepWorkSecs++;
+    const h=Math.floor(S.deepWorkSecs/3600),m=Math.floor((S.deepWorkSecs%3600)/60);
+    document.getElementById('ss-dw').textContent=`${h}h ${m}m`;
+    S.focusSecs--;updateFocusRing();
+    if(S.focusSecs<=0){
+      clearInterval(S.focusInt);S.focusRunning=false;S.focusSessions++;
+      document.getElementById('fscount').textContent=S.focusSessions;
+      document.getElementById('ss-fs').textContent=S.focusSessions;
+      document.getElementById('ftog').textContent='▶ Start';
+      logEvent('focus_session',`Pomodoro complete: ${document.getElementById('ftask').textContent}`,8,9,'deep');
+      ACT.logFocusMin(FCFG.work);
+      DB.set('focusSessions',S.focusSessions);
+      toast('🎯',`Session ${S.focusSessions} complete! Take a break.`);
+      computeLifeScore();
+    }
+  },1000);
+}
+function pauseFocus(){clearInterval(S.focusInt);S.focusRunning=false;document.getElementById('ftog').textContent='▶ Resume';}
+function resetFocus(){
+  clearInterval(S.focusInt);S.focusRunning=false;
+  S.focusSecs=FCFG.work*60;document.getElementById('ftog').textContent='▶ Start';updateFocusRing();
+}
+function updateFocusRing(){
+  const dur=FCFG.work*60;
+  const prog=1-(S.focusSecs/dur);const circ=2*Math.PI*48;
+  const ring=document.getElementById('fring');
+  if(ring){ring.setAttribute('stroke-dasharray',circ);ring.setAttribute('stroke-dashoffset',circ*(1-prog));}
+  const m=String(Math.floor(S.focusSecs/60)).padStart(2,'0'),s=String(S.focusSecs%60).padStart(2,'0');
+  const t=document.getElementById('ftnum');if(t)t.textContent=m+':'+s;
+  const meta=document.getElementById('fmeta');if(meta)meta.textContent=`${Math.ceil(S.focusSecs/60)} min remaining · Session ${S.focusSessions+1}`;
+}
+
+// ── INIT ───────────────────────────────────────
+function updateStreakStat(){
+  const best=S.habits.reduce((a,h)=>Math.max(a,habitStreak(h)),0);
+  const el=document.getElementById('ss-st');if(el)el.textContent=best>0?'🔥 '+best+'d':'—';
+}
+function showWelcome(){
+  const ov=document.createElement('div');
+  ov.id='welcome-ov';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(8,11,20,.92);backdrop-filter:blur(6px);z-index:999;display:flex;align-items:center;justify-content:center;';
+  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--b2);border-radius:16px;padding:32px;max-width:420px;text-align:center;">
+    <div style="width:48px;height:48px;margin:0 auto 14px;background:linear-gradient(135deg,var(--ind),var(--vio));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;">L</div>
+    <div style="font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:6px;">Welcome to Life OS v4</div>
+    <div style="font-size:11.5px;color:var(--t1);line-height:1.7;margin-bottom:20px;">Your personal intelligence system. With your confirmation, Life OS tracks time, focus and energy — directly (your quick logs) and indirectly (how you use the app) — stored only on your device, and nudges you back to your priorities. Continue to accept & begin.</div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn bp" onclick="DB.set('mode','fresh');document.getElementById('welcome-ov').remove();toast('✨','Fresh start — add your first task!')">✨ Start Fresh</button>
+      <button class="btn bg" onclick="DB.set('mode','sample');location.reload()">🧪 Load Sample Data</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+}
+function init(){
+  ACT.init();
+  buildNav();buildPanels();
+  renderPanel('dashboard');
+  initClock();computeLifeScore();updateTaskStats();updateStreakStat();
+  document.getElementById('ss-ev').textContent=S.events.length;
+  document.getElementById('ss-fs').textContent=S.focusSessions;
+  updateFocusRing();
+  nudgeTick();setInterval(nudgeTick,5*60*1000);
+  setInterval(maybePrompt,60*1000);
+  setInterval(maybeHourPrompt,60*1000);
+  setTimeout(maybeHourPrompt,30*1000);
+  setTimeout(maybePrompt,90*1000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden){setTimeout(maybeHourPrompt,1200);setTimeout(maybePrompt,2500);}});
+  if(FRESH===null&&!localStorage.getItem('los_tasks'))showWelcome();
+  if(location.protocol!=='file:'&&'serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  setTimeout(()=>toast('🚀','Life OS ready, '+PROFILE.name+'!'),700);
+}
+init();
+</script>
+</body>
+</html>
