@@ -37,7 +37,7 @@ html,body{height:100%;height:100dvh;overflow:hidden;overscroll-behavior:none;-we
 body{font-family:'Inter',sans-serif;background:var(--bg0);color:var(--t0);display:flex;flex-direction:column;font-size:13px}
 button{font-family:inherit;cursor:pointer;border:none;outline:none}
 input,textarea,select{font-family:inherit;outline:none}
-textarea,input[type=text],input[type=number]{user-select:text}
+textarea,input,select{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default;touch-action:manipulation}
 ::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:4px}
@@ -559,7 +559,7 @@ const escH=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/
 // ── ACTIVITY TRACKING ENGINE ───────────────────
 // Tracks WHERE attention goes (panel/module time), WHAT you do (hourly+events),
 // and the FOCUS/ENERGY behind it — all local-first, exportable.
-const PANEL_CAT={screentime:'Wellness',rewards:'Discipline',dashboard:'Overview',planner:'Planning',tasks:'Execution',goals:'Planning',habits:'Discipline',events:'Logging',hourly:'Logging',decisions:'Reflection',ai:'AI Coaching',memory:'AI Coaching',domains:'Analytics',knowledge:'Analytics',weekly:'Planning',burnout:'Wellness',audit:'Analytics',journal:'Reflection',procrastination:'Wellness',settings:'System',focus:'Deep Work'};
+const PANEL_CAT={sleep:'Wellness',screentime:'Wellness',rewards:'Discipline',dashboard:'Overview',planner:'Planning',tasks:'Execution',goals:'Planning',habits:'Discipline',events:'Logging',hourly:'Logging',decisions:'Reflection',ai:'AI Coaching',memory:'AI Coaching',domains:'Analytics',knowledge:'Analytics',weekly:'Planning',burnout:'Wellness',audit:'Analytics',journal:'Reflection',procrastination:'Wellness',settings:'System',focus:'Deep Work'};
 const ACT={
   data:DB.get('activity',{}),
   cur:'dashboard',curStart:Date.now(),
@@ -692,6 +692,7 @@ const S = {
   weekReviews: DB.get('weekReviews',{}),// {weekKey:{wins,lessons,next3,recovery}}
   hourlyLog: migrateHourly(DB.get('hourlyLog',{})),
   screenTime: DB.get('screenTime',{}),
+  sleep: DB.get('sleep',{}),
   burnout: DB.get('burnout',{energy:65,clarity:72,sleep:78,motivation:68,stress:35}),
   weekOffset:0, habitWeekOffset:0,
   aiHistory:[],
@@ -716,7 +717,7 @@ function save(){
   DB.set('focusSessions',S.focusSessions);
   DB.set('goals',S.goals);DB.set('nextGoalId',S.nextGoalId);
   DB.set('weekPlans',S.weekPlans);DB.set('weekReviews',S.weekReviews);
-  DB.set('domains',S.domains);DB.set('screenTime',S.screenTime);
+  DB.set('domains',S.domains);DB.set('screenTime',S.screenTime);DB.set('sleep',S.sleep);
   checkStorage();
 }
 
@@ -842,6 +843,144 @@ function renderRewards(){
 }
 
 
+
+
+// ── ACTIVITY PRESETS (urban routine defaults + your own history) ──
+const ACT_PRESETS=['Office work','Meeting','Emails','Commute','Deep work','Study','Exercise','Cooking','Eating','Family time','Household chores','Errands','Social media','Watching videos','Rest / nap','Sleep','Reading','Trading'];
+function recentActivities(n=6){
+  const seen=[];
+  Object.entries(S.hourlyLog).sort((a,b)=>b[0].localeCompare(a[0])).forEach(([,v])=>{
+    if(v.activity&&v.activity!=='—'&&!seen.includes(v.activity)&&seen.length<n)seen.push(v.activity);
+  });
+  return seen;
+}
+function activityChips(targetId){
+  const recent=recentActivities(6);
+  const list=recent.concat(ACT_PRESETS.filter(a=>!recent.includes(a))).slice(0,14);
+  return `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">`+
+    list.map(a=>`<span onclick="document.getElementById('${targetId}').value=${JSON.stringify(a).replace(/"/g,'&quot;')}" style="padding:5px 10px;border-radius:14px;background:var(--bg3);border:1px solid var(--b1);font-size:10.5px;color:var(--t1);cursor:pointer;">${escH(a)}</span>`).join('')+
+    `</div>`;
+}
+
+// ── SLEEP LOG & AUDIT ──────────────────────────
+// Sleep is the strongest predictor of next-day energy — logged nightly,
+// then correlated against the energy data the app already collects.
+function renderSleep(){
+  const p=document.getElementById('p-sleep');
+  const tk=today(),cur=S.sleep[tk]||{};
+  const days=[...Array(14)].map((_,i)=>{const d=addDays(new Date(),-(13-i));const r=S.sleep[dkey(d)]||{};
+    return{d,h:r.hours||0,q:r.quality||0};});
+  const logged=days.filter(x=>x.h>0);
+  const avgH=logged.length?(logged.reduce((a,x)=>a+x.h,0)/logged.length):0;
+  const avgQ=logged.length?(logged.reduce((a,x)=>a+x.q,0)/logged.length):0;
+  const maxH=Math.max(...days.map(x=>x.h),9);
+  const target=parseFloat(PROFILE.sleepTarget||7);
+  const debt=logged.length?logged.reduce((a,x)=>a+Math.max(0,target-x.h),0):0;
+  // Correlation: sleep hours vs NEXT day average energy
+  const pairs=[];
+  Object.entries(S.sleep).forEach(([k,v])=>{
+    if(!v.hours)return;
+    const next=ACT.daySummary(k); // sleep logged on waking day → same day's energy
+    if(next&&next.avgE!==null)pairs.push({h:v.hours,e:next.avgE});
+  });
+  let insight='Log sleep for a few days — once energy check-ins line up, your personal sleep-to-energy relationship appears here.';
+  if(pairs.length>=4){
+    const good=pairs.filter(x=>x.h>=target),poor=pairs.filter(x=>x.h<target);
+    if(good.length&&poor.length){
+      const ge=good.reduce((a,x)=>a+x.e,0)/good.length, pe=poor.reduce((a,x)=>a+x.e,0)/poor.length;
+      const diff=((ge-pe)/Math.max(pe,0.1)*100).toFixed(0);
+      insight=`😴 On <strong style="color:var(--t0)">${target}h+</strong> nights your average energy is <strong style="color:var(--em)">${ge.toFixed(1)}/10</strong>. On short nights it drops to <strong style="color:var(--ros)">${pe.toFixed(1)}/10</strong> — a <strong style="color:var(--t0)">${diff>0?'+':''}${diff}%</strong> difference. ${diff>10?'Sleep is your single biggest energy lever.':'Your energy holds up reasonably either way.'}`;
+    }else insight=`Averaging <strong style="color:var(--t0)">${avgH.toFixed(1)}h</strong>. Log a mix of short and full nights to reveal the correlation.`;
+  }
+  const QL={1:'Terrible',2:'Poor',3:'OK',4:'Good',5:'Excellent'};
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">Sleep Log</div><div class="ph-s">Log on waking · Sleep drives tomorrow's focus and energy</div></div></div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="chd"><span class="ct">Last Night · ${new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})}</span></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+        <div style="flex:1;min-width:110px;"><div style="font-size:9.5px;color:var(--t2);margin-bottom:3px;">Bed time</div>
+          <input type="time" class="ti" id="sl-bed" value="${cur.bed||PROFILE.sleep||'22:30'}" style="margin:0;"></div>
+        <div style="flex:1;min-width:110px;"><div style="font-size:9.5px;color:var(--t2);margin-bottom:3px;">Wake time</div>
+          <input type="time" class="ti" id="sl-wake" value="${cur.wake||PROFILE.wake||'05:00'}" style="margin:0;"></div>
+        <div style="flex:1;min-width:100px;"><div style="font-size:9.5px;color:var(--t2);margin-bottom:3px;">Hours slept</div>
+          <input type="number" step="0.25" min="0" max="16" class="ti" id="sl-hours" value="${cur.hours||''}" placeholder="auto" style="margin:0;"></div>
+      </div>
+      <div style="font-size:9.5px;color:var(--t2);margin-bottom:5px;">Quality</div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;" id="sl-q">
+        ${[1,2,3,4,5].map(q=>`<div onclick="pickSleepQ(${q})" data-q="${q}" style="flex:1;min-width:58px;text-align:center;padding:9px 4px;border-radius:9px;cursor:pointer;font-size:10.5px;font-weight:600;border:1px solid ${cur.quality===q?'var(--ind)':'var(--b1)'};background:${cur.quality===q?'var(--is)':'var(--bg3)'};color:${cur.quality===q?'var(--ind)':'var(--t2)'};">${['😫','😕','😐','🙂','😴'][q-1]}<br>${QL[q]}</div>`).join('')}
+      </div>
+      <div style="font-size:9.5px;color:var(--t2);margin-bottom:4px;">Notes (optional)</div>
+      <input type="text" class="ti" id="sl-note" value="${escH(cur.note||'')}" placeholder="Woke at 3am · late dinner · screen before bed…" style="margin:0 0 12px;">
+      <button class="btn bp" style="width:100%;" onclick="saveSleep()">Save Sleep Log</button>
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div class="chd"><span class="ct">14-Day Sleep</span></div>
+        ${logged.length?`
+        <div style="display:flex;align-items:flex-end;gap:4px;height:94px;padding-top:6px;">
+          ${days.map(x=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;">
+            <div style="font-size:7.5px;color:var(--t2);font-family:'JetBrains Mono',monospace;">${x.h||''}</div>
+            <div style="width:100%;height:62px;display:flex;flex-direction:column;justify-content:flex-end;">
+              <div style="height:${Math.round(x.h/maxH*62)}px;border-radius:3px 3px 0 0;background:${x.h>=target?'var(--em)':x.h>=target-1.5?'var(--saf)':'var(--ros)'};"></div></div>
+            <div style="font-size:7.5px;color:${dkey(x.d)===tk?'var(--saf)':'var(--t3)'};">${x.d.getDate()}</div>
+          </div>`).join('')}
+        </div>
+        <div style="font-size:11px;color:var(--t1);line-height:1.8;margin-top:10px;padding-top:9px;border-top:1px solid var(--b1);">
+          Average: <strong style="color:var(--t0)">${avgH.toFixed(1)}h</strong> · Quality ${avgQ.toFixed(1)}/5<br>
+          Sleep debt vs ${target}h target: <strong style="color:${debt>7?'var(--ros)':'var(--saf)'}">${debt.toFixed(1)}h</strong> over ${logged.length} nights
+        </div>`:'<div style="font-size:11.5px;color:var(--t2);padding:14px 0;">No sleep logged yet. Log tonight and a pattern builds within a week.</div>'}
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Sleep → Energy</span></div>
+        <div style="font-size:11.5px;color:var(--t1);line-height:1.8;">${insight}</div>
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--b1);font-size:9.5px;color:var(--t2);">Target hours</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:5px;">
+          <input type="number" step="0.5" min="4" max="12" class="ti" id="sl-target" value="${target}" style="width:78px;margin:0;">
+          <button class="btn bg bsm" onclick="saveSleepTarget()">Set target</button>
+        </div>
+      </div>
+    </div>`;
+}
+function pickSleepQ(q){
+  const tk=today();
+  const bed=document.getElementById('sl-bed'),wake=document.getElementById('sl-wake'),
+        hrs=document.getElementById('sl-hours'),note=document.getElementById('sl-note');
+  S.sleep[tk]=Object.assign({},S.sleep[tk],{quality:q},
+    bed?{bed:bed.value,wake:wake.value,note:note.value}:{});
+  if(hrs&&hrs.value)S.sleep[tk].hours=parseFloat(hrs.value);
+  DB.set('sleep',S.sleep);
+  // Update the buttons in place — no re-render, so nothing typed is lost
+  document.querySelectorAll('#sl-q [data-q]').forEach(el=>{
+    const on=+el.dataset.q===q;
+    el.style.border='1px solid '+(on?'var(--ind)':'var(--b1)');
+    el.style.background=on?'var(--is)':'var(--bg3)';
+    el.style.color=on?'var(--ind)':'var(--t2)';
+  });
+}
+function hoursBetween(bed,wake){
+  if(!bed||!wake)return 0;
+  const [bh,bm]=bed.split(':').map(Number),[wh,wm]=wake.split(':').map(Number);
+  let mins=(wh*60+wm)-(bh*60+bm);
+  if(mins<=0)mins+=24*60;               // crossed midnight
+  return Math.round(mins/15)*15/60;
+}
+function saveSleep(){
+  const tk=today();
+  const bed=document.getElementById('sl-bed').value,wake=document.getElementById('sl-wake').value;
+  let hours=parseFloat(document.getElementById('sl-hours').value);
+  if(!hours||isNaN(hours))hours=hoursBetween(bed,wake);
+  if(!hours){toast('⚠️','Enter hours, or both bed and wake times');return;}
+  S.sleep[tk]=Object.assign({},S.sleep[tk],{bed,wake,hours:Math.min(16,hours),note:document.getElementById('sl-note').value.trim()});
+  DB.set('sleep',S.sleep);
+  const q=S.sleep[tk].quality||3;
+  logEvent('energy_check',`Sleep: ${hours}h · quality ${q}/5`,q*2,q*2,'general');
+  toast('😴',`${hours}h logged`);renderSleep();
+}
+function saveSleepTarget(){
+  PROFILE.sleepTarget=Math.max(4,Math.min(12,parseFloat(document.getElementById('sl-target').value)||7));
+  DB.set('profile',PROFILE);toast('🎯','Sleep target set');renderSleep();
+}
+
 // ── STORAGE MANAGEMENT ─────────────────────────
 const LS_LIMIT=5*1024*1024; // conservative browser floor (~5MB)
 function storageBytes(){
@@ -887,6 +1026,7 @@ function checkStorage(){
 const HP={last:DB.get('lastHourPrompt','')};
 function maybeHourPrompt(){
   if(!CHK.enabled||inQuiet())return;
+  if(isTyping())return;
   if(document.getElementById('chk-ov')||document.getElementById('hp-ov')||document.getElementById('rw-ov'))return;
   const now=new Date(),prevH=new Date(now.getTime()-3600*1000);
   const hk=String(prevH.getHours()).padStart(2,'0');
@@ -903,7 +1043,8 @@ function showHourPrompt(hk,slot){
   ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--b2);border-radius:18px;padding:22px 20px;max-width:360px;width:100%;">
     <div style="text-align:center;font-size:24px;margin-bottom:6px;">⏱</div>
     <div style="text-align:center;font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--sky);margin-bottom:10px;">HOUR ${hk}:00 — WHAT DID YOU DO?</div>
-    <input type="text" class="ti" id="hp-act" placeholder="e.g. Backtesting, scrolling Instagram, meeting…" style="margin:0 0 12px;" onkeydown="if(event.key==='Enter')saveHourPrompt('${slot}','${hk}')">
+    <input type="text" class="ti" id="hp-act" placeholder="What were you doing?" style="margin:0 0 9px;" onkeydown="if(event.key==='Enter')saveHourPrompt('${slot}','${hk}')">
+    ${activityChips('hp-act')}
     <div style="font-size:10px;color:var(--t2);margin-bottom:4px;">Energy during that hour</div>
     <input type="range" id="hp-en" min="1" max="10" value="6" style="width:100%;margin-bottom:6px;" oninput="document.getElementById('hp-env').textContent=this.value">
     <div style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--saf);margin-bottom:14px;"><span id="hp-env">6</span>/10</div>
@@ -939,6 +1080,7 @@ function topPriorityTask(){
 function inQuiet(){const h=new Date().getHours();return h<CHK.from||h>=CHK.to;}
 function maybePrompt(){
   if(!CHK.enabled||inQuiet())return;
+  if(isTyping())return;
   if(document.getElementById('chk-ov'))return;
   if(Date.now()<RW.snoozeUntil)return;
   if(Date.now()-RW.lastPrompt < CHK.every*60*1000)return;
@@ -1044,7 +1186,7 @@ function closeSidebarDrawer(){
 // Rotating a phone changed the matched media query and left stale layout state
 // (sidebar + bottom bar both visible, header clipped under the status bar).
 // Re-sync classes and re-render the active panel on every viewport change.
-let rzT=null;
+let rzT=null,lastVW=window.innerWidth,lastLandscape=window.innerWidth>window.innerHeight;
 function syncLayout(){
   if(isMobileLayout()){
     document.body.classList.remove('sb-off');   // drawer mode owns visibility
@@ -1055,18 +1197,29 @@ function syncLayout(){
   document.documentElement.style.setProperty('--vh',window.innerHeight*0.01+'px');
   setTogIcon();
 }
+function isTyping(){
+  const a=document.activeElement;
+  return !!a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'||a.tagName==='SELECT'||a.isContentEditable);
+}
 function onViewportChange(){
   clearTimeout(rzT);
   rzT=setTimeout(()=>{
+    const vw=window.innerWidth,landscape=vw>window.innerHeight;
+    const widthChanged=Math.abs(vw-lastVW)>40;
+    const rotated=landscape!==lastLandscape;
+    // Height-only changes = soft keyboard opening/closing or browser chrome
+    // collapsing. Never re-render for those; it would kill the keyboard.
+    if(!widthChanged&&!rotated)return;
+    if(isTyping())return;
+    lastVW=vw;lastLandscape=landscape;
     syncLayout();
     try{renderPanel(S.panel);}catch(e){}
-    window.scrollTo(0,0);
-  },180);
+  },220);
 }
 
 // ── MOBILE NAV ─────────────────────────────────
 const MORE_ITEMS=[
-  {id:'screentime',icon:'📱',name:'Screen Time'},{id:'rewards',icon:'⭐',name:'Rewards'},
+  {id:'screentime',icon:'📱',name:'Screen Time'},{id:'sleep',icon:'😴',name:'Sleep'},{id:'rewards',icon:'⭐',name:'Rewards'},
   {id:'habits',icon:'✦',name:'Habits'},{id:'planner',icon:'⏱',name:'Planner'},{id:'goals',icon:'◎',name:'Goals'},
   {id:'events',icon:'⚡',name:'Events'},{id:'decisions',icon:'⚖',name:'Decisions'},
   {id:'ai',icon:'✦',name:'AI Coach'},{id:'memory',icon:'🧠',name:'Memory'},
@@ -1181,6 +1334,7 @@ const NAV_GROUPS = [
     {id:'events',icon:'⚡',name:'Event Logger',badge:'NEW',bc:'s'},
     {id:'hourly',icon:'⏲',name:'Hourly Logger'},
     {id:'screentime',icon:'📱',name:'Screen Time',badge:'NEW',bc:'s'},
+    {id:'sleep',icon:'😴',name:'Sleep Log',badge:'NEW',bc:'s'},
     {id:'rewards',icon:'⭐',name:'Focus Rewards'},
     {id:'decisions',icon:'⚖',name:'Decision Journal'},
     {id:'ai',icon:'✦',name:'AI Coach',badge:'AI'},
@@ -1199,7 +1353,7 @@ const NAV_GROUPS = [
     {id:'settings',icon:'⚙',name:'Settings'},
   ]}
 ];
-const PANELS_DEF = ['dashboard','planner','tasks','goals','habits','events','hourly','screentime','rewards','decisions','ai','memory','domains','knowledge','weekly','burnout','audit','journal','procrastination','settings'];
+const PANELS_DEF = ['dashboard','planner','tasks','goals','habits','events','hourly','screentime','sleep','rewards','decisions','ai','memory','domains','knowledge','weekly','burnout','audit','journal','procrastination','settings'];
 
 function buildNav(){
   const sb=document.getElementById('sb-nav'),tnav=document.getElementById('tnav');
@@ -1243,7 +1397,7 @@ function renderPanel(id){
     memory:renderMemory,domains:renderDomains,knowledge:renderKnowledge,
     weekly:renderWeekly,burnout:renderBurnout,audit:renderAudit,
     journal:renderJournal,procrastination:renderProcrastination,settings:renderSettings,
-    screentime:renderScreentime,rewards:renderRewards
+    screentime:renderScreentime,rewards:renderRewards,sleep:renderSleep
   };
   if(fns[id])fns[id]();
 }
@@ -1477,6 +1631,7 @@ function renderHourly(){
       <div class="chd"><span class="ct" id="hl-form-title">Log Hour</span><span class="ca" onclick="document.getElementById('hl-log-form').style.display='none'">✕</span></div>
       <div style="display:flex;flex-direction:column;gap:8px;">
         <input type="text" class="ti" id="hl-activity" placeholder="What were you doing?">
+        <div id="hl-chips"></div>
         <div style="font-size:9.5px;color:var(--t2);margin-bottom:2px;">Energy Level <span id="hl-e-val">7</span>/10</div>
         <input type="range" min="1" max="10" value="7" id="hl-energy" oninput="document.getElementById('hl-e-val').textContent=this.value;updateHourEmoji()">
         <div style="font-size:32px;text-align:center;margin:4px 0" id="hl-emoji">⚡</div>
@@ -1523,6 +1678,8 @@ function renderHLGrid(){
 let currentHLHour=null;
 function openHLForm(h){
   currentHLHour=h;
+  const cw=document.getElementById('hl-chips');
+  if(cw)cw.innerHTML=activityChips('hl-activity');
   document.getElementById('hl-form-title').textContent=`Log ${h}:00`;
   document.getElementById('hl-log-form').style.display='block';
   const ex=S.hourlyLog[today()+'|'+h];
@@ -1806,47 +1963,91 @@ function renderKnowledge(){
 
 // ── PLANNER ────────────────────────────────────
 const SCHEDS={
-  ideal:[
-    {t:'05:00',n:'Morning Sadhana',d:'Yoga · Pranayama · Sidha Vidya stillness',type:'tbcd',tag:'Mind'},
+  workday:[
+    {t:'06:30',n:'Wake + Freshen Up',d:'Water · light stretch · no phone first 15 min',type:'tbcb',tag:'Body'},
+    {t:'07:00',n:'Exercise / Walk',d:'Gym, yoga, or 30-min walk',type:'tbcb',tag:'Body'},
+    {t:'08:00',n:'Breakfast + Family',d:'Eat properly · plan the day in 5 min',type:'tbcr',tag:''},
+    {t:'09:00',n:'Commute',d:'Podcast or audiobook instead of scrolling',type:'tbca',tag:'Admin'},
+    {t:'10:00',n:'Deep Work Block 1',d:'Hardest task first · phone on silent',type:'tbcd',tag:'Deep Work'},
+    {t:'12:00',n:'Meetings / Calls',d:'Batch them here, protect the morning',type:'tbca',tag:'Admin'},
+    {t:'13:30',n:'Lunch + Reset',d:'Away from the desk · short walk',type:'tbcr',tag:''},
+    {t:'14:30',n:'Deep Work Block 2',d:'Second priority task',type:'tbcd',tag:'Deep Work'},
+    {t:'16:30',n:'Email & Admin',d:'Inbox, messages, small tasks batched',type:'tbca',tag:'Admin'},
+    {t:'18:00',n:'Commute Home',d:'Mental shutdown · close the workday',type:'tbca',tag:'Admin'},
+    {t:'19:30',n:'Dinner + Family',d:'Devices away · real presence',type:'tbcr',tag:''},
+    {t:'21:00',n:'Learning / Hobby',d:'Reading, course, side project',type:'tbcd',tag:'Learning'},
+    {t:'22:00',n:'Wind Down',d:'No screens · journal · plan tomorrow',type:'tbcv',tag:'Review'},
+    {t:'22:45',n:'Sleep',d:'Target: 7h+',type:'tbcr',tag:''},
+  ],
+  wfh:[
+    {t:'06:30',n:'Wake + Movement',d:'Do not start the day in bed with the phone',type:'tbcb',tag:'Body'},
+    {t:'07:30',n:'Exercise',d:'45 min — the commute time you saved',type:'tbcb',tag:'Body'},
+    {t:'08:30',n:'Breakfast + Setup',d:'Dress for work · define today\'s #1',type:'tbcr',tag:''},
+    {t:'09:30',n:'Deep Work Block 1',d:'Notifications off · door closed',type:'tbcd',tag:'Deep Work'},
+    {t:'11:30',n:'Calls & Standups',d:'Batch all video calls together',type:'tbca',tag:'Admin'},
+    {t:'13:00',n:'Lunch + Step Outside',d:'Leave the house — sunlight matters',type:'tbcr',tag:''},
+    {t:'14:00',n:'Deep Work Block 2',d:'Second priority · 90-min sprint',type:'tbcd',tag:'Deep Work'},
+    {t:'16:00',n:'Admin & Email',d:'Clear the queue',type:'tbca',tag:'Admin'},
+    {t:'18:00',n:'Hard Stop',d:'Shut the laptop — WFH needs a boundary',type:'tbcv',tag:'Review'},
+    {t:'19:00',n:'Family / Social',d:'Cook, talk, go out',type:'tbcr',tag:''},
+    {t:'21:30',n:'Learning / Reading',d:'Screens dimmed',type:'tbcd',tag:'Learning'},
+    {t:'22:30',n:'Sleep',d:'Consistent time beats total hours',type:'tbcr',tag:''},
+  ],
+  trading:[
+    {t:'05:00',n:'Morning Sadhana',d:'Yoga · pranayama · stillness practice',type:'tbcd',tag:'Mind'},
     {t:'06:30',n:'Strength Training',d:'Asanas + resistance · 45 min',type:'tbcb',tag:'Body'},
-    {t:'07:30',n:'Breakfast + Prep',d:'Nutrition · Market pre-open scan',type:'tbcr',tag:''},
-    {t:'09:00',n:'Market Analysis · Deep Work',d:'GoCharting HTF/MTF/LTF · CVD orderflow scan',type:'tbct',tag:'Trading'},
-    {t:'11:00',n:'Trade Execution',d:'Zerodha Kite · Active monitoring · Nifty 50',type:'tbct',tag:'Trading'},
-    {t:'13:30',n:'Lunch + Recovery',d:'60-min rest block · Zero screens',type:'tbcr',tag:''},
-    {t:'15:00',n:'Learning Block',d:'AI · Software building · Trading books',type:'tbcd',tag:'Deep Work'},
-    {t:'16:30',n:'Admin + Screener',d:'Chartink · Screener.in · Emails',type:'tbca',tag:'Admin'},
-    {t:'18:00',n:'Evening Movement',d:'Walk or yoga · Outdoor preferred',type:'tbcb',tag:'Body'},
+    {t:'07:30',n:'Breakfast + Prep',d:'Nutrition · pre-open market scan',type:'tbcr',tag:''},
+    {t:'09:00',n:'Market Analysis',d:'HTF/MTF/LTF · orderflow scan',type:'tbct',tag:'Trading'},
+    {t:'11:00',n:'Trade Execution',d:'Active monitoring · checklist first',type:'tbct',tag:'Trading'},
+    {t:'13:30',n:'Lunch + Recovery',d:'60-min rest block · zero screens',type:'tbcr',tag:''},
+    {t:'15:00',n:'Learning Block',d:'Study · system building',type:'tbcd',tag:'Deep Work'},
+    {t:'16:30',n:'Admin + Screener',d:'Scans · emails · journal trades',type:'tbca',tag:'Admin'},
+    {t:'18:00',n:'Evening Movement',d:'Walk or yoga · outdoor preferred',type:'tbcb',tag:'Body'},
     {t:'20:00',n:'Family Time',d:'Presence — zero work devices',type:'tbcr',tag:''},
-    {t:'21:00',n:'Evening Review',d:'Journal · Score day · Plan tomorrow',type:'tbcv',tag:'Review'},
-    {t:'22:30',n:'Sleep',d:'Target: 6.5h minimum',type:'tbcr',tag:''},
+    {t:'21:00',n:'Evening Review',d:'Journal · score day · plan tomorrow',type:'tbcv',tag:'Review'},
+    {t:'22:30',n:'Sleep',d:'Target: 7h minimum',type:'tbcr',tag:''},
+  ],
+  student:[
+    {t:'06:00',n:'Wake + Freshen Up',d:'Bed made · water · no phone',type:'tbcb',tag:'Body'},
+    {t:'06:45',n:'Study Block 1',d:'Hardest subject while fresh',type:'tbcd',tag:'Learning'},
+    {t:'08:30',n:'Breakfast + Travel',d:'Revise notes on the way',type:'tbcr',tag:''},
+    {t:'10:00',n:'Classes / College',d:'Front row · notes by hand',type:'tbcd',tag:'Learning'},
+    {t:'13:30',n:'Lunch + Break',d:'Real break — not scrolling',type:'tbcr',tag:''},
+    {t:'15:00',n:'Study Block 2',d:'Practice problems · active recall',type:'tbcd',tag:'Learning'},
+    {t:'17:00',n:'Sport / Exercise',d:'Move the body daily',type:'tbcb',tag:'Body'},
+    {t:'19:00',n:'Dinner + Family',d:'Devices down',type:'tbcr',tag:''},
+    {t:'20:00',n:'Revision Block',d:'Review today · preview tomorrow',type:'tbcd',tag:'Learning'},
+    {t:'21:30',n:'Wind Down',d:'Plan tomorrow · phone out of the room',type:'tbcv',tag:'Review'},
+    {t:'22:30',n:'Sleep',d:'Target: 8h — memory consolidates in sleep',type:'tbcr',tag:''},
   ],
   busy:[
-    {t:'05:30',n:'Quick Sadhana',d:'20-min compressed practice',type:'tbcd',tag:'Mind'},
-    {t:'06:30',n:'Market Prep',d:'GoCharting fast scan · 4 top setups',type:'tbct',tag:'Trading'},
-    {t:'09:00',n:'Trade Execution',d:'Priority trades only',type:'tbct',tag:'Trading'},
+    {t:'05:30',n:'Quick Practice',d:'20-min compressed routine',type:'tbcd',tag:'Mind'},
+    {t:'06:30',n:'Day Prep',d:'Identify the ONE thing that matters',type:'tbca',tag:'Admin'},
+    {t:'09:00',n:'Priority Work',d:'Highest-value task only',type:'tbcd',tag:'Deep Work'},
     {t:'13:00',n:'Lunch',d:'30 min max',type:'tbcr',tag:''},
     {t:'14:00',n:'Deep Work',d:'Single priority task · 2 hours',type:'tbcd',tag:'Deep Work'},
-    {t:'19:00',n:'Quick Review',d:'15-min journal · Tomorrow plan',type:'tbcv',tag:'Review'},
+    {t:'19:00',n:'Quick Review',d:'15-min journal · tomorrow plan',type:'tbcv',tag:'Review'},
     {t:'22:00',n:'Sleep',d:'Protect 6h minimum',type:'tbcr',tag:''},
   ],
   emergency:[
-    {t:'05:00',n:'5-min Breathing',d:'Box breathing · Mental reset',type:'tbcb',tag:'Body'},
+    {t:'05:00',n:'5-min Breathing',d:'Box breathing · mental reset',type:'tbcb',tag:'Body'},
     {t:'06:00',n:'#1 Priority Only',d:'One task — non-negotiable',type:'tbcd',tag:'Deep Work'},
     {t:'13:00',n:'Mandatory Break',d:'20 min rest — non-optional',type:'tbcr',tag:''},
     {t:'14:00',n:'#2 Priority',d:'Second critical task',type:'tbcd',tag:'Deep Work'},
-    {t:'20:00',n:'EOD Review',d:'What happened · Reset for tomorrow',type:'tbcv',tag:'Review'},
+    {t:'20:00',n:'EOD Review',d:'What happened · reset for tomorrow',type:'tbcv',tag:'Review'},
   ]
 };
-let activeMode='ideal';
+const SCHED_LABELS={workday:'Office',wfh:'WFH',trading:'Trading',student:'Student',busy:'Busy',emergency:'Survival'};
+let activeMode=DB.get('schedMode','workday');
 function renderPlanner(){
   const p=document.getElementById('p-planner');
   const data=SCHEDS[activeMode];const mid=Math.ceil(data.length/2);
   const rb=arr=>arr.map(b=>`<div class="tbr" onclick="openFocusTask('${b.n}')"><div class="tbt">${b.t}</div><div class="tbc ${b.type}"><div class="tbn">${b.n}</div><div class="tbd">${b.d}</div>${b.tag?`<span class="tbtg" style="background:${b.type==='tbct'?'var(--ss)':b.type==='tbcd'?'var(--is)':b.type==='tbcb'?'var(--es)':b.type==='tbcv'?'var(--vs)':'var(--ks)'};color:${b.type==='tbct'?'var(--saf)':b.type==='tbcd'?'var(--ind)':b.type==='tbcb'?'var(--em)':b.type==='tbcv'?'var(--vio)':'var(--sky)'}">${b.tag}</span>`:''}</div></div>`).join('');
   p.innerHTML=`
     <div class="ph">
-      <div><div class="ph-t">Daily Planner</div><div class="ph-s">Tap block to launch Focus Mode · 3 schedule modes</div></div>
-      <div class="ph-a" style="display:flex;gap:4px;background:var(--bg3);border-radius:8px;padding:3px;">
-        ${['ideal','busy','emergency'].map(m=>`<div style="padding:4px 12px;border-radius:6px;font-size:10.5px;font-weight:600;cursor:pointer;transition:var(--trans);${m===activeMode?'background:var(--bg2);color:var(--t0);':'color:var(--t2);'}" onclick="activeMode='${m}';renderPlanner()">${m.charAt(0).toUpperCase()+m.slice(1)}</div>`).join('')}
+      <div><div class="ph-t">Daily Planner</div><div class="ph-s">Tap any block to launch Focus Mode · pick the routine that matches your life</div></div>
+      <div class="ph-a" style="display:flex;gap:3px;background:var(--bg3);border-radius:8px;padding:3px;overflow-x:auto;max-width:100%;">
+        ${Object.keys(SCHEDS).map(m=>`<div style="padding:4px 10px;border-radius:6px;font-size:10.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:var(--trans);${m===activeMode?'background:var(--bg2);color:var(--t0);':'color:var(--t2);'}" onclick="activeMode='${m}';DB.set('schedMode',activeMode);renderPlanner()">${SCHED_LABELS[m]}</div>`).join('')}
       </div>
     </div>
     <div class="g2">
@@ -1856,7 +2057,7 @@ function renderPlanner(){
 }
 
 // ── TASKS ──────────────────────────────────────
-const CATS={trade:{c:'var(--saf)',l:'Trading'},deep:{c:'var(--ind)',l:'Deep Work'},body:{c:'var(--em)',l:'Body'},admin:{c:'var(--sky)',l:'Admin'},learn:{c:'var(--vio)',l:'Learning'},mind:{c:'var(--vio)',l:'Mind'},personal:{c:'var(--cor)',l:'Personal'}};
+const CATS={deep:{c:'var(--ind)',l:'Deep Work'},work:{c:'var(--sky)',l:'Work/Office'},trade:{c:'var(--saf)',l:'Trading'},admin:{c:'var(--sky)',l:'Admin/Errands'},body:{c:'var(--em)',l:'Health/Fitness'},learn:{c:'var(--vio)',l:'Learning'},mind:{c:'var(--vio)',l:'Mind/Practice'},family:{c:'var(--pin)',l:'Family/Social'},home:{c:'var(--cor)',l:'Home/Chores'},money:{c:'var(--em)',l:'Finance'},personal:{c:'var(--cor)',l:'Personal'}};
 function renderTasks(){
   const p=document.getElementById('p-tasks');
   const PR={1:{l:'P1',c:'var(--ros)'},2:{l:'P2',c:'var(--saf)'},3:{l:'P3',c:'var(--t2)'}};
@@ -2357,7 +2558,7 @@ function saveFocusCfg(){
 }
 function exportData(){
   ACT.flush();
-  const data=JSON.stringify({version:'4.0',exported:new Date().toISOString(),profile:PROFILE,focusCfg:FCFG,events:S.events,tasks:S.tasks,habits:S.habits,goals:S.goals,decisions:S.decisions,aiMemory:S.aiMemory,journalEntries:S.journalEntries,hourlyLog:S.hourlyLog,weekPlans:S.weekPlans,weekReviews:S.weekReviews,burnout:S.burnout,activity:ACT.data,focusSessions:S.focusSessions,screenTime:S.screenTime,rewards:RW,chkCfg:CHK},null,2);
+  const data=JSON.stringify({version:'4.0',exported:new Date().toISOString(),profile:PROFILE,focusCfg:FCFG,events:S.events,tasks:S.tasks,habits:S.habits,goals:S.goals,decisions:S.decisions,aiMemory:S.aiMemory,journalEntries:S.journalEntries,hourlyLog:S.hourlyLog,weekPlans:S.weekPlans,weekReviews:S.weekReviews,burnout:S.burnout,activity:ACT.data,focusSessions:S.focusSessions,screenTime:S.screenTime,rewards:RW,chkCfg:CHK,ftasks:FTASKS,sleep:S.sleep},null,2);
   const a=document.createElement('a');a.href='data:text/json;charset=utf-8,'+encodeURIComponent(data);a.download='life-os-backup-'+today()+'.json';a.click();
   toast('📥','Data exported!');
 }
@@ -2369,6 +2570,8 @@ function importData(inp){
       const d=JSON.parse(r.result);
       if(!d.tasks&&!d.events){toast('⚠️','Not a Life OS backup file');return;}
       if(d.rewards)Object.assign(RW,d.rewards),saveRW();
+      if(d.ftasks)FTASKS=d.ftasks,saveFTasks();
+      if(d.sleep)S.sleep=Object.assign(S.sleep||{},d.sleep);
       if(d.screenTime)S.screenTime=Object.assign(S.screenTime,d.screenTime);
       ['tasks','habits','goals','events','aiMemory','decisions','journalEntries','hourlyLog','weekPlans','weekReviews','burnout'].forEach(k=>{if(d[k]!==undefined)S[k]=k==='habits'?migrateHabits(d[k]):k==='hourlyLog'?migrateHourly(d[k]):d[k];});
       if(d.profile)Object.assign(PROFILE,d.profile),DB.set('profile',PROFILE);
@@ -2381,7 +2584,7 @@ function importData(inp){
   r.readAsText(f);
 }
 function clearAllData(){
-  ['tasks','nextTaskId','habits','events','nextEventId','aiMemory','nextMemoryId','decisions','nextDecisionId','journalEntries','hourlyLog','burnout','focusSessions','goals','nextGoalId','weekPlans','weekReviews','activity','domains','mode','screenTime','rewards','chkCfg','nudgeCfg'].forEach(k=>DB.del(k));
+  ['tasks','nextTaskId','habits','events','nextEventId','aiMemory','nextMemoryId','decisions','nextDecisionId','journalEntries','hourlyLog','burnout','focusSessions','goals','nextGoalId','weekPlans','weekReviews','activity','domains','mode','screenTime','rewards','chkCfg','nudgeCfg','ftasks','sleep','lastHourPrompt'].forEach(k=>DB.del(k));
   location.reload();
 }
 
@@ -2401,6 +2604,7 @@ LIVE DATA FROM HIS LIFE OS:
 • Life Score: ${computeLifeScore()}/100
 • Events logged today: ${S.events.filter(e=>e.ts?.startsWith(today())).length}
 • Time in OS today: ${(()=>{const a=ACT.daySummary(today());return a?Math.round(a.total/60)+' min · '+a.focusMin+' focus min':'0 min'})()}
+• Last night's sleep: ${(()=>{const r=S.sleep[today()];return r&&r.hours?r.hours+'h (quality '+(r.quality||'?')+'/5)':'not logged'})()}
 • Distraction screen time today: ${(()=>{const r=S.screenTime[today()]||{};const w=(r.social||0)+(r.video||0)+(r.ott||0)+(r.news||0);return w?Math.floor(w/60)+'h '+w%60+'m':'not logged'})()}
 • Focus check-ins: ${RW.yes}/${RW.total} on-task · ${RW.stars} stars · streak ${RW.streak}
 • Avg energy today: ${(()=>{const a=ACT.daySummary(today());return a&&a.avgE?a.avgE.toFixed(1)+'/10':'not logged'})()}
@@ -2468,22 +2672,59 @@ function appendAIMsg(role,text,scroll=true){
 }
 
 // ── FOCUS MODAL ────────────────────────────────
-const FTASKS=['Morning Sadhana · Deep Practice','Market Analysis · GoCharting HTF','Trade Execution · Zerodha Kite','Backtesting CVD Strategy','Learning Block · AI & Software','Strength Training Session','Evening Review & Journal','Deep Focus Session'];
+// User-editable focus activities. Defaults are generic; edit freely in Focus Mode.
+const FTASKS_DEFAULT=['Deep Focus Session','Priority Work Block','Study / Learning','Admin & Email','Reading','Exercise / Training','Planning & Review','Creative Work'];
+let FTASKS=DB.get('ftasks',null)||FTASKS_DEFAULT.slice();
+function saveFTasks(){DB.set('ftasks',FTASKS);}
+function fillFSel(current){
+  const sel=document.getElementById('fsel');if(!sel)return;
+  const list=(current&&!FTASKS.includes(current))?[current].concat(FTASKS):FTASKS;
+  sel.innerHTML=list.map(t=>`<option${t===current?' selected':''}>${escH(t)}</option>`).join('')
+    +'<option value="__add">＋ Add new activity…</option>'
+    +(FTASKS.length?'<option value="__manage">✎ Rename / delete…</option>':'');
+}
+function addFTask(){
+  const n=prompt('Name your focus activity:');
+  const cur=document.getElementById('ftask').textContent;
+  if(n&&n.trim()){FTASKS.push(n.trim());saveFTasks();fillFSel(n.trim());
+    document.getElementById('ftask').textContent=n.trim();toast('＋','Activity added');}
+  else fillFSel(cur);
+}
+function manageFTasks(){
+  const cur=document.getElementById('ftask').textContent;
+  const idx=prompt('Which activity? Enter its number:\n\n'+FTASKS.map((t,i)=>`${i+1}. ${t}`).join('\n'));
+  const i=parseInt(idx)-1;
+  if(isNaN(i)||i<0||i>=FTASKS.length){fillFSel(cur);return;}
+  const action=prompt(`"${FTASKS[i]}"\n\nType a NEW NAME to rename it, or type DELETE to remove it:`,FTASKS[i]);
+  if(action===null){fillFSel(cur);return;}
+  if(action.trim().toUpperCase()==='DELETE'){
+    const removed=FTASKS.splice(i,1)[0];saveFTasks();toast('🗑',`"${removed}" removed`);
+  }else if(action.trim()){FTASKS[i]=action.trim();saveFTasks();toast('✎','Renamed');}
+  const next=FTASKS[0]||'Deep Focus Session';
+  fillFSel(next);document.getElementById('ftask').textContent=next;
+}
 function openFocus(){
   ACT.switch('focus');
-  const sel=document.getElementById('fsel');
-  sel.innerHTML=FTASKS.map(t=>`<option>${t}</option>`).join('');
-  document.getElementById('ftask').textContent=FTASKS[0];
+  // Prefer the user's top open task, else first saved activity
+  const top=(typeof topPriorityTask==='function')?topPriorityTask():null;
+  const name=top?top.text:(FTASKS[0]||'Deep Focus Session');
+  fillFSel(name);
+  document.getElementById('ftask').textContent=name;
   document.getElementById('fov').classList.add('on');
 }
 function openFocusTask(name){
   ACT.switch('focus');
   document.getElementById('ftask').textContent=name;
-  document.getElementById('fsel').innerHTML=`<option>${name}</option>`+FTASKS.map(t=>`<option>${t}</option>`).join('');
+  fillFSel(name);
   document.getElementById('fov').classList.add('on');
 }
 function closeFocus(){if(S.focusRunning)pauseFocus();ACT.switch(S.panel);document.getElementById('fov').classList.remove('on');}
-function ftaskChange(){const s=document.getElementById('fsel');document.getElementById('ftask').textContent=s.value;}
+function ftaskChange(){
+  const s=document.getElementById('fsel');
+  if(s.value==='__add'){addFTask();return;}
+  if(s.value==='__manage'){manageFTasks();return;}
+  document.getElementById('ftask').textContent=s.value;
+}
 function toggleFocus(){S.focusRunning?pauseFocus():startFocus();}
 function startFocus(){
   const dur=FCFG.work;
@@ -2544,6 +2785,10 @@ function showWelcome(){
 }
 function init(){
   ACT.init();
+  document.addEventListener('focusin',e=>{
+    if(e.target&&['INPUT','TEXTAREA'].includes(e.target.tagName))
+      setTimeout(()=>{try{e.target.scrollIntoView({block:'center',behavior:'smooth'})}catch(x){}},280);
+  });
   buildNav();buildPanels();
   renderPanel('dashboard');
   initClock();computeLifeScore();updateTaskStats();updateStreakStat();
