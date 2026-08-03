@@ -58,8 +58,49 @@ textarea,input,select{-webkit-user-select:text;user-select:text;-webkit-touch-ca
 .qbl{font-size:9px;font-weight:600;color:var(--t1)}
 
 
+
+.micb{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;flex-shrink:0;
+  border-radius:9px;background:var(--bg3);border:1px solid var(--b1);font-size:15px;cursor:pointer;transition:var(--trans);user-select:none}
+.micb:active{transform:scale(.9)}
+.micb.rec{background:var(--rs);border-color:var(--ros);animation:micpulse 1.1s infinite}
+@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(244,63,94,.5)}50%{box-shadow:0 0 0 7px rgba(244,63,94,0)}}
+.inrow{display:flex;gap:7px;align-items:center}
+.inrow .ti{flex:1;margin:0}
+#fab{display:none}
+@media (max-width:1024px), (orientation:landscape) and (max-height:600px){
+  #fab{display:flex;position:fixed;right:16px;bottom:calc(74px + env(safe-area-inset-bottom));width:54px;height:54px;
+    border-radius:50%;background:linear-gradient(135deg,var(--ind),var(--vio));align-items:center;justify-content:center;
+    font-size:22px;z-index:290;cursor:pointer;box-shadow:0 6px 20px rgba(99,102,241,.45);border:none}
+  #fab:active{transform:scale(.92)}
+}
+/* ══ LIGHT THEME ══ Applied via data-theme="light" on <html> */
+html[data-theme="light"]{
+  --bg0:#f6f7fb; --bg1:#ffffff; --bg2:#ffffff; --bg3:#f0f2f8;
+  --bg4:#e4e8f2; --bg5:#d4dae8; --rim:#c8cfe0;
+  --ind:#4f46e5; --vio:#7c3aed; --saf:#c2740a;
+  --em:#059669; --sky:#0284c7; --ros:#e11d48;
+  --cor:#ea580c; --pin:#db2777;
+  --is:rgba(79,70,229,.09); --vs:rgba(124,58,237,.08);
+  --ss:rgba(194,116,10,.10); --es:rgba(5,150,105,.09);
+  --ks:rgba(2,132,199,.09); --rs:rgba(225,29,72,.09);
+  --t0:#0f1424; --t1:#4a5372; --t2:#7d87a3; --t3:#aab2c6;
+  --b1:rgba(15,20,36,.075); --b2:rgba(15,20,36,.13); --b3:rgba(15,20,36,.2);
+}
+html[data-theme="light"] body{background:var(--bg0)}
+html[data-theme="light"] .card,html[data-theme="light"] .sc{box-shadow:0 1px 3px rgba(15,20,36,.05)}
+html[data-theme="light"] #top,html[data-theme="light"] #sb{background:#ffffff}
+html[data-theme="light"] #bnav{background:rgba(255,255,255,.97)}
+html[data-theme="light"] .msheet{background:#ffffff}
+html[data-theme="light"] #sbdrop,html[data-theme="light"] #chk-ov,
+html[data-theme="light"] #hp-ov,html[data-theme="light"] #rw-ov,
+html[data-theme="light"] #welcome-ov,html[data-theme="light"] #moresheet.on{background:rgba(15,20,36,.45)}
+html[data-theme="light"] .logo{color:#fff}
+html[data-theme="light"] .bni.on{color:var(--ind)}
+
 /* ── TOPBAR ── */
 #top{height:calc(48px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top);background:var(--bg1);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right));gap:10px;flex-shrink:0;z-index:100}
+#thtog{width:32px;height:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:8px;background:var(--bg3);border:1px solid var(--b1);font-size:13px;cursor:pointer;transition:var(--trans)}
+#thtog:active{transform:scale(.92)}
 #sbtog{width:32px;height:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:8px;background:var(--bg3);border:1px solid var(--b1);color:var(--t1);font-size:15px;cursor:pointer;transition:var(--trans)}
 #sbtog:hover{background:var(--bg4);color:var(--t0)}
 #sbtog:active{transform:scale(.92)}
@@ -445,9 +486,10 @@ body.sb-off #sb{display:none!important}
 <!-- TOPBAR -->
 <div id="top">
   <div id="sbtog" onclick="toggleSidebar()" title="Show/hide menu">☰</div>
+  <div id="thtog" onclick="cycleTheme()" title="Switch theme">🌙</div>
   <div class="logo">L</div>
   <div class="brand">Life OS</div>
-  <span class="ver">v6</span>
+  <span class="ver">v10</span>
   <div class="sp"></div>
   <div class="tnav" id="tnav"></div>
   <div class="tright">
@@ -515,6 +557,8 @@ body.sb-off #sb{display:none!important}
   </div>
 </div>
 
+<div id="fab" onclick="openCaptureVoice()" title="Speak to capture">🎤</div>
+
 <!-- BOTTOM NAV (mobile) -->
 <div id="bnav">
   <div class="bni on" data-b="dashboard" onclick="goPanelB('dashboard')"><span class="bni-ic">⬡</span><span class="bni-lb">Home</span></div>
@@ -559,7 +603,7 @@ const escH=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/
 // ── ACTIVITY TRACKING ENGINE ───────────────────
 // Tracks WHERE attention goes (panel/module time), WHAT you do (hourly+events),
 // and the FOCUS/ENERGY behind it — all local-first, exportable.
-const PANEL_CAT={sleep:'Wellness',screentime:'Wellness',rewards:'Discipline',dashboard:'Overview',planner:'Planning',tasks:'Execution',goals:'Planning',habits:'Discipline',events:'Logging',hourly:'Logging',decisions:'Reflection',ai:'AI Coaching',memory:'AI Coaching',domains:'Analytics',knowledge:'Analytics',weekly:'Planning',burnout:'Wellness',audit:'Analytics',journal:'Reflection',procrastination:'Wellness',settings:'System',focus:'Deep Work'};
+const PANEL_CAT={expenses:'Logging',feedback:'System',insights:'Analytics',capture:'Logging',sleep:'Wellness',screentime:'Wellness',rewards:'Discipline',dashboard:'Overview',planner:'Planning',tasks:'Execution',goals:'Planning',habits:'Discipline',events:'Logging',hourly:'Logging',decisions:'Reflection',ai:'AI Coaching',memory:'AI Coaching',domains:'Analytics',knowledge:'Analytics',weekly:'Planning',burnout:'Wellness',audit:'Analytics',journal:'Reflection',procrastination:'Wellness',settings:'System',focus:'Deep Work'};
 const ACT={
   data:DB.get('activity',{}),
   cur:'dashboard',curStart:Date.now(),
@@ -693,6 +737,9 @@ const S = {
   hourlyLog: migrateHourly(DB.get('hourlyLog',{})),
   screenTime: DB.get('screenTime',{}),
   sleep: DB.get('sleep',{}),
+  reminders: DB.get('reminders',[]),
+  recurring: DB.get('recurring',[]),
+  expenses: DB.get('expenses',[]),
   burnout: DB.get('burnout',{energy:65,clarity:72,sleep:78,motivation:68,stress:35}),
   weekOffset:0, habitWeekOffset:0,
   aiHistory:[],
@@ -717,7 +764,7 @@ function save(){
   DB.set('focusSessions',S.focusSessions);
   DB.set('goals',S.goals);DB.set('nextGoalId',S.nextGoalId);
   DB.set('weekPlans',S.weekPlans);DB.set('weekReviews',S.weekReviews);
-  DB.set('domains',S.domains);DB.set('screenTime',S.screenTime);DB.set('sleep',S.sleep);
+  DB.set('domains',S.domains);DB.set('screenTime',S.screenTime);DB.set('sleep',S.sleep);DB.set('reminders',S.reminders);DB.set('recurring',S.recurring);DB.set('expenses',S.expenses);
   checkStorage();
 }
 
@@ -845,6 +892,1169 @@ function renderRewards(){
 
 
 
+
+
+// ── HOURLY LOGGER CONFIG (own settings, separate from check-ins) ──
+const HRCFG=DB.get('hourCfg',{enabled:true,from:7,to:22,every:1});
+// ── NIGHTLY JOURNAL REMINDER ───────────────────
+const JRCFG=DB.get('journalCfg',{enabled:true,hour:22});
+function journalDoneToday(){
+  const label=new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  return S.journalEntries.some(e=>e.dk===today()||e.date===label)||DB.get('journalPrompted','')===today();
+}
+function maybeJournalPrompt(){
+  if(!JRCFG.enabled||isTyping())return;
+  if(document.getElementById('jr-ov')||document.getElementById('chk-ov')||document.getElementById('hp-ov'))return;
+  const now=new Date();
+  if(now.getHours()<JRCFG.hour)return;          // not yet time
+  if(journalDoneToday())return;                  // already written or dismissed
+  showJournalPrompt();
+}
+function showJournalPrompt(){
+  const act=ACT.daySummary(today());
+  const done=S.tasks.filter(t=>t.done).length;
+  const st=S.screenTime[today()]||{};
+  const waste=(st.social||0)+(st.video||0)+(st.ott||0)+(st.news||0);
+  const recap=[
+    done?`${done} task${done>1?'s':''} completed`:null,
+    act&&act.focusMin?`${act.focusMin} min deep focus`:null,
+    RW.stars?`${RW.stars} ⭐ total`:null,
+    waste?`${Math.floor(waste/60)}h ${waste%60}m on distraction`:null,
+  ].filter(Boolean).join(' · ');
+  const ov=document.createElement('div');ov.id='jr-ov';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(8,11,20,.9);backdrop-filter:blur(8px);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--b2);border-radius:18px;padding:24px 20px;max-width:380px;width:100%;text-align:center;">
+    <div style="font-size:26px;margin-bottom:8px;">🌙</div>
+    <div style="font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--vio);margin-bottom:8px;">NIGHTLY REFLECTION</div>
+    <div style="font-size:14px;color:var(--t0);line-height:1.55;">How did today actually go?</div>
+    ${recap?`<div style="margin-top:10px;padding:9px 12px;background:var(--bg3);border-radius:9px;font-size:11px;color:var(--t1);line-height:1.5;">${recap}</div>`:''}
+    <div style="font-size:11.5px;color:var(--t2);line-height:1.6;margin-top:10px;">Two minutes now turns a day into data you can learn from.</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:18px;">
+      <button class="btn bp" style="padding:12px;" onclick="openJournalFromPrompt()">✍️ Write tonight's journal</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn bg" style="flex:1;padding:11px;" onclick="snoozeJournal()">⏱ In 30 min</button>
+        <button class="btn bg" style="flex:1;padding:11px;" onclick="dismissJournal()">Skip tonight</button>
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  if(navigator.vibrate)try{navigator.vibrate([50,60,50])}catch(e){}
+  if(NCFG.notifs&&'Notification'in window&&Notification.permission==='granted'&&document.hidden){
+    try{new Notification('Life OS · Nightly Reflection',{body:'How did today go? Two minutes to journal.'});}catch(e){}
+  }
+}
+function closeJournalPrompt(){const o=document.getElementById('jr-ov');if(o)o.remove();}
+function openJournalFromPrompt(){closeJournalPrompt();goPanelB('journal');setTimeout(()=>{const el=document.getElementById('jw');if(el)el.focus();},350);}
+function snoozeJournal(){closeJournalPrompt();JRCFG.snoozeUntil=Date.now()+30*60*1000;setTimeout(()=>{if(!journalDoneToday())maybeJournalPrompt()},30*60*1000);toast('⏱','Reminder in 30 minutes');}
+function dismissJournal(){closeJournalPrompt();DB.set('journalPrompted',today());toast('🌙','Skipped — see you tomorrow');}
+
+
+
+
+
+
+
+
+
+
+// ── ONBOARDING (60 seconds, for people who aren't you) ──
+let obStep=0,obData={name:'',routine:'workday',wake:'06:30',first:''};
+function showOnboarding(){
+  const ov=document.createElement('div');ov.id='ob-ov';
+  ov.style.cssText='position:fixed;inset:0;background:var(--bg0);z-index:900;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;';
+  document.body.appendChild(ov);obStep=0;renderOB();
+}
+function renderOB(){
+  const ov=document.getElementById('ob-ov');if(!ov)return;
+  const dots=[0,1,2,3].map(i=>`<div style="width:${i===obStep?18:6}px;height:6px;border-radius:3px;background:${i<=obStep?'var(--ind)':'var(--bg4)'};transition:var(--trans);"></div>`).join('');
+  const wrap=inner=>`<div style="max-width:400px;width:100%;">
+    <div style="display:flex;gap:5px;justify-content:center;margin-bottom:22px;">${dots}</div>${inner}</div>`;
+  const steps=[
+    `<div style="text-align:center;">
+      <div style="width:56px;height:56px;margin:0 auto 16px;background:linear-gradient(135deg,var(--ind),var(--vio));border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;">L</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:25px;color:var(--t0);margin-bottom:10px;">Life OS</div>
+      <div style="font-size:12.5px;color:var(--t1);line-height:1.75;margin-bottom:8px;">Speak your day. It organises, reminds, and shows you what actually drives your good days.</div>
+      <div style="font-size:11px;color:var(--t2);line-height:1.7;margin-bottom:20px;">Everything stays on your phone. No account, no server, no ads, free.</div>
+      <input type="text" class="ti" id="ob-name" placeholder="What should I call you?" value="${escH(obData.name)}" style="margin-bottom:12px;text-align:center;">
+      <button class="btn bp" style="width:100%;padding:13px;" onclick="obNext()">Get started →</button>
+    </div>`,
+    `<div>
+      <div style="font-size:19px;color:var(--t0);margin-bottom:6px;font-family:'DM Serif Display',serif;">Which describes your days?</div>
+      <div style="font-size:11.5px;color:var(--t2);margin-bottom:16px;">Sets your default planner. Changeable any time.</div>
+      ${[{k:'workday',t:'Office job',d:'Commute, meetings, evenings with family'},{k:'wfh',t:'Work from home',d:'No commute, needs a hard stop'},{k:'student',t:'Student',d:'Classes, study blocks, exams'},{k:'trading',t:'Trader / self-employed',d:'Market hours, own schedule'},{k:'busy',t:'Always busy',d:'Compressed, high pressure'}].map(o=>
+        `<div onclick="obData.routine='${o.k}';renderOB()" style="padding:13px;border-radius:11px;margin-bottom:8px;cursor:pointer;border:1px solid ${obData.routine===o.k?'var(--ind)':'var(--b1)'};background:${obData.routine===o.k?'var(--is)':'var(--bg2)'};">
+          <div style="font-size:12.5px;font-weight:600;color:var(--t0);">${o.t}</div>
+          <div style="font-size:10.5px;color:var(--t2);margin-top:2px;">${o.d}</div></div>`).join('')}
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="btn bg" style="flex:1;padding:12px;" onclick="obBack()">Back</button>
+        <button class="btn bp" style="flex:2;padding:12px;" onclick="obNext()">Continue →</button></div>
+    </div>`,
+    `<div>
+      <div style="font-size:19px;color:var(--t0);margin-bottom:6px;font-family:'DM Serif Display',serif;">When does your day start?</div>
+      <div style="font-size:11.5px;color:var(--t2);margin-bottom:16px;">Your morning briefing arrives around then.</div>
+      <input type="time" class="ti" id="ob-wake" value="${obData.wake}" style="margin-bottom:16px;font-size:17px;text-align:center;">
+      <div style="background:var(--bg2);border:1px solid var(--b1);border-radius:11px;padding:13px;margin-bottom:14px;">
+        <div style="font-size:12px;color:var(--t0);font-weight:600;margin-bottom:4px;">🔔 Gentle reminders</div>
+        <div style="font-size:11px;color:var(--t1);line-height:1.65;margin-bottom:9px;">Life OS can nudge you hourly to log what you did, and each night to journal. You can switch these off any time in Settings.</div>
+        <button class="btn bg bsm" onclick="obEnableNotifs(this)">Enable notifications</button>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn bg" style="flex:1;padding:12px;" onclick="obBack()">Back</button>
+        <button class="btn bp" style="flex:2;padding:12px;" onclick="obNext()">Continue →</button></div>
+    </div>`,
+    `<div>
+      <div style="font-size:19px;color:var(--t0);margin-bottom:6px;font-family:'DM Serif Display',serif;">Try it now</div>
+      <div style="font-size:11.5px;color:var(--t2);line-height:1.7;margin-bottom:14px;">Type or ${VOICE_OK?'tap the mic and ':''}say everything on your mind — times and reminders included. Life OS sorts it out.</div>
+      <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;">
+        <textarea class="jta" id="ob-first" style="min-height:96px;flex:1;" placeholder="gym at 6am set reminder&#10;call mom at 7pm&#10;buy groceries tomorrow">${escH(obData.first)}</textarea>
+        ${VOICE_OK?micBtn('ob-first',{continuous:true}):''}
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn bg" style="flex:1;padding:12px;" onclick="obBack()">Back</button>
+        <button class="btn bp" style="flex:2;padding:12px;" onclick="obFinish()">Finish →</button></div>
+      <div style="text-align:center;margin-top:10px;"><span style="font-size:11px;color:var(--t2);cursor:pointer;" onclick="obFinish(true)">Skip for now</span></div>
+    </div>`
+  ];
+  ov.innerHTML=wrap(steps[obStep]);
+}
+function obCollect(){
+  const n=document.getElementById('ob-name');if(n)obData.name=n.value.trim();
+  const w=document.getElementById('ob-wake');if(w)obData.wake=w.value;
+  const f=document.getElementById('ob-first');if(f)obData.first=f.value;
+}
+function obNext(){obCollect();if(obStep<3){obStep++;renderOB();}}
+function obBack(){obCollect();if(obStep>0){obStep--;renderOB();}}
+function obEnableNotifs(btn){
+  if(!('Notification'in window)){btn.textContent='Not supported here';return;}
+  Notification.requestPermission().then(pm=>{
+    NCFG.notifs=(pm==='granted');DB.set('nudgeCfg',NCFG);
+    btn.textContent=pm==='granted'?'✓ Notifications on':'Blocked — enable in browser settings';
+    btn.className='btn '+(pm==='granted'?'bp':'bg')+' bsm';
+  });
+}
+async function obFinish(skip){
+  obCollect();
+  if(obData.name)PROFILE.name=obData.name;
+  PROFILE.wake=obData.wake||PROFILE.wake;
+  DB.set('profile',PROFILE);
+  activeMode=obData.routine;DB.set('schedMode',activeMode);
+  DB.set('mode','fresh');
+  stopDictation();
+  const text=skip?'':obData.first.trim();
+  const ov=document.getElementById('ob-ov');if(ov)ov.remove();
+  if(text){
+    let parsed=await smartParse(text);
+    if(!parsed)parsed=parseBrainDump(text);
+    capParsed=parsed;autoSaveCapture(false);
+    goPanelB('tasks');
+  }else{
+    renderPanel('dashboard');
+  }
+  toast('👋',`Welcome${PROFILE.name?', '+PROFILE.name:''}! Tap 🎤 any time to capture.`);
+  DB.set('briefShown',today());   // don't fire the briefing immediately after setup
+}
+
+// ── FEEDBACK / FRICTION LOG (for your testers) ──
+function renderFeedback(){
+  const p=document.getElementById('p-feedback');
+  const fb=DB.get('feedback',[]);
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">Feedback</div><div class="ph-s">Something confusing, broken, or missing? Note it here — it stays on your device until you share it</div></div></div>
+    <div class="card" style="margin-bottom:14px;">
+      <div style="display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap;">
+        ${['🐞 Bug','😕 Confusing','💡 Idea','❤️ Liked'].map(t=>`<span onclick="fbType='${t}';renderFeedback()" style="padding:7px 12px;border-radius:16px;font-size:11px;cursor:pointer;border:1px solid ${fbType===t?'var(--ind)':'var(--b1)'};background:${fbType===t?'var(--is)':'var(--bg3)'};color:${fbType===t?'var(--ind)':'var(--t1)'};">${t}</span>`).join('')}
+      </div>
+      <div class="inrow" style="margin-bottom:9px;">
+        <input type="text" class="ti" id="fb-in" placeholder="What happened, in your words…" onkeydown="if(event.key==='Enter')addFeedback()">
+        ${micBtn('fb-in')}
+      </div>
+      <button class="btn bp" style="width:100%;" onclick="addFeedback()">Add note</button>
+    </div>
+    <div class="card">
+      <div class="chd"><span class="ct">Your notes (${fb.length})</span>
+      ${fb.length?`<span class="ca" onclick="shareFeedback()">📤 Share all</span>`:''}</div>
+      ${fb.length?fb.map((f,i)=>`<div style="display:flex;gap:9px;padding:9px 0;border-bottom:1px solid var(--b1);font-size:11.5px;">
+        <span>${f.type.split(' ')[0]}</span>
+        <div style="flex:1;"><div style="color:var(--t1);line-height:1.5;">${escH(f.text)}</div>
+        <div style="font-size:9.5px;color:var(--t3);margin-top:2px;">${f.date} · ${escH(f.panel)}</div></div>
+        <span style="color:var(--ros);cursor:pointer;" onclick="delFeedback(${i})">✕</span>
+      </div>`).join(''):'<div style="font-size:11.5px;color:var(--t2);padding:10px 0;">No notes yet. Even small annoyances are worth writing down — they are the most valuable thing a tester can give.</div>'}
+    </div>`;
+}
+let fbType='🐞 Bug';
+function addFeedback(){
+  const el=document.getElementById('fb-in');
+  const t=el.value.trim();
+  if(!t){toast('⚠️','Describe it first');return;}
+  const fb=DB.get('feedback',[]);
+  fb.unshift({type:fbType,text:t,panel:S.lastPanel||'—',date:new Date().toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})});
+  DB.set('feedback',fb);el.value='';renderFeedback();toast('🙏','Thank you — noted');
+}
+function delFeedback(i){const fb=DB.get('feedback',[]);fb.splice(i,1);DB.set('feedback',fb);renderFeedback();}
+function shareFeedback(){
+  const fb=DB.get('feedback',[]);
+  const txt='Life OS feedback\n\n'+fb.map(f=>`${f.type} — ${f.text}  (${f.date}, ${f.panel})`).join('\n');
+  if(navigator.share){navigator.share({title:'Life OS feedback',text:txt}).catch(()=>{});}
+  else if(navigator.clipboard){navigator.clipboard.writeText(txt);toast('📋','Copied — paste it to Sundar');}
+  else{const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(txt);a.download='life-os-feedback.txt';a.click();}
+}
+function shareApp(){
+  const url=location.origin+location.pathname;
+  const txt=`Try Life OS — speak your day, it organises everything and shows what drives your good days. Free, no account, works offline: ${url}\n\nOn Android: open in Chrome → menu → Add to Home screen.\nOn iPhone: open in Safari → Share → Add to Home Screen.`;
+  if(navigator.share)navigator.share({title:'Life OS',text:txt,url}).catch(()=>{});
+  else if(navigator.clipboard){navigator.clipboard.writeText(txt);toast('📋','Invite copied — paste it to a friend');}
+}
+
+
+// ── EXPENSES ───────────────────────────────────
+const EXP_CATS=[{k:'food',w:['lunch','dinner','breakfast','food','restaurant','swiggy','zomato','tea','coffee','snack','hotel']},
+  {k:'grocery',w:['grocery','groceries','vegetable','supermarket','instamart','blinkit','zepto','milk','oil','provision']},
+  {k:'transport',w:['petrol','diesel','fuel','uber','ola','auto','bus','train','ticket','fare','cab','parking','metro']},
+  {k:'health',w:['medicine','doctor','hospital','pharmacy','tablet','test','scan','clinic']},
+  {k:'bills',w:['bill','recharge','electricity','water','internet','rent','emi','insurance','gas','mobile']},
+  {k:'education',w:['school','fees','fee','class','tuition','course','book']},
+  {k:'shopping',w:['clothes','shirt','shoes','amazon','flipkart','myntra','gift','shopping']}];
+const EXP_LABEL={food:'Food',grocery:'Groceries',transport:'Transport',health:'Health',bills:'Bills',education:'Education',shopping:'Shopping',other:'Other'};
+function expCat(text){const l=text.toLowerCase();for(const c of EXP_CATS)if(c.w.some(w=>l.includes(w)))return c.k;return 'other';}
+function addExpense(text,amount,day){
+  S.expenses.unshift({id:Date.now()+Math.random(),text:text,amount:amount,cat:expCat(text),day:day||today(),ts:Date.now()});
+  DB.set('expenses',S.expenses);
+}
+function renderExpenses(){
+  const p=document.getElementById('p-expenses');
+  const tk=today(),mon=tk.slice(0,7);
+  const todayE=S.expenses.filter(e=>e.day===tk);
+  const monthE=S.expenses.filter(e=>e.day.startsWith(mon));
+  const sum=a=>a.reduce((x,e)=>x+e.amount,0);
+  const byCat={};monthE.forEach(e=>byCat[e.cat]=(byCat[e.cat]||0)+e.amount);
+  const rows=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  const monthTotal=sum(monthE);
+  const days=[...Array(7)].map((_,i)=>{const d=addDays(new Date(),-(6-i));const k=dkey(d);
+    return{d:d,v:sum(S.expenses.filter(e=>e.day===k))};});
+  const maxV=Math.max(...days.map(x=>x.v),1);
+  const fmt=n=>'\u20b9'+Math.round(n).toLocaleString('en-IN');
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">Expenses</div><div class="ph-s">Just say "spent 700 on groceries" — it lands here automatically</div></div></div>
+    <div class="g4" style="grid-template-columns:1fr 1fr;">
+      <div class="sc"><div class="sl">Today</div><div class="sv" style="color:var(--saf);font-size:26px;">${fmt(sum(todayE))}</div><div class="sd">${todayE.length} entr${todayE.length===1?'y':'ies'}</div></div>
+      <div class="sc"><div class="sl">This Month</div><div class="sv" style="color:var(--ind);font-size:26px;">${fmt(monthTotal)}</div><div class="sd">${monthE.length} entries</div></div>
+    </div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="chd"><span class="ct">Add</span></div>
+      <div class="inrow"><input type="text" class="ti" id="ex-in" placeholder="e.g. spent 450 on groceries" onkeydown="if(event.key==='Enter')quickExpense()">${micBtn('ex-in')}<button class="btn bp bsm" onclick="quickExpense()">Add</button></div>
+    </div>
+    ${monthE.length?`<div class="card" style="margin-bottom:14px;">
+      <div class="chd"><span class="ct">Last 7 Days</span></div>
+      <div style="display:flex;align-items:flex-end;gap:6px;height:80px;padding-top:6px;">
+        ${days.map(x=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <div style="font-size:8px;color:var(--t2);font-family:'JetBrains Mono',monospace;">${x.v?Math.round(x.v):''}</div>
+          <div style="width:100%;height:52px;display:flex;flex-direction:column;justify-content:flex-end;"><div style="height:${Math.round(x.v/maxV*52)}px;background:var(--saf);border-radius:3px 3px 0 0;"></div></div>
+          <div style="font-size:8.5px;color:${dkey(x.d)===tk?'var(--saf)':'var(--t2)'};">${x.d.toLocaleDateString('en-IN',{weekday:'short'}).slice(0,2)}</div></div>`).join('')}
+      </div>
+      <div class="chd" style="margin-top:14px;"><span class="ct">This month by category</span></div>
+      ${rows.map(([c,v])=>`<div style="display:flex;align-items:center;gap:9px;margin-bottom:7px;">
+        <div style="width:82px;font-size:11px;color:var(--t1);">${EXP_LABEL[c]}</div>
+        <div style="flex:1;background:var(--bg4);height:8px;border-radius:4px;overflow:hidden;"><div style="width:${Math.round(v/monthTotal*100)}%;height:8px;background:var(--saf);"></div></div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--t1);width:64px;text-align:right;">${fmt(v)}</div></div>`).join('')}
+    </div>`:''}
+    <div class="card">
+      <div class="chd"><span class="ct">Recent</span></div>
+      ${S.expenses.length?S.expenses.slice(0,25).map((e,i)=>`<div style="display:flex;gap:9px;align-items:center;padding:8px 0;border-bottom:1px solid var(--b1);font-size:11.5px;">
+        <span class="ttag" style="background:var(--ss);color:var(--saf);">${EXP_LABEL[e.cat]}</span>
+        <span style="flex:1;color:var(--t1);">${escH(e.text)}</span>
+        <span style="font-family:'JetBrains Mono',monospace;color:var(--t0);">${fmt(e.amount)}</span>
+        <span style="color:var(--ros);cursor:pointer;" onclick="delExpense(${i})">\u2715</span></div>`).join('')
+        :'<div style="font-size:11.5px;color:var(--t2);padding:10px 0;">No expenses yet. Say "spent 700 rupees on vegetables" in Quick Capture and it lands here.</div>'}
+    </div>`;
+}
+function quickExpense(){
+  const el=document.getElementById('ex-in');const t=el.value.trim();
+  if(!t){toast('\u26a0\ufe0f','Type or say the amount');return;}
+  const amt=parseAmount(t);
+  if(!amt){toast('\u26a0\ufe0f','Include an amount, e.g. "450 on groceries"');return;}
+  addExpense(cleanExpenseText(t)||t,amt);el.value='';renderExpenses();toast('\u20b9','Expense added');
+}
+function delExpense(i){S.expenses.splice(i,1);DB.set('expenses',S.expenses);renderExpenses();}
+
+// ── INSIGHT ENGINE (100% local, zero cost) ─────
+// Correlates the data you already log. This is the "AI feeling" without an API:
+// real arithmetic on real behaviour, phrased plainly.
+function dayStats(k){
+  const act=ACT.daySummary(k);
+  const st=S.screenTime[k]||{};
+  const sl=S.sleep[k]||{};
+  const distract=(st.social||0)+(st.video||0)+(st.ott||0)+(st.news||0);
+  const habitsDone=S.habits.filter(h=>h.log[k]).length;
+  const tasksDone=S.events.filter(e=>e.type==='task'&&e.ts&&e.ts.startsWith(k)).length;
+  return{
+    k,energy:act&&act.avgE!==null?act.avgE:null,focusMin:act?act.focusMin:0,
+    distract,sleepH:sl.hours||null,sleepQ:sl.quality||null,habitsDone,tasksDone,
+    hasData:!!(act||distract||sl.hours||habitsDone||tasksDone)
+  };
+}
+function lastDays(n){
+  return [...Array(n)].map((_,i)=>dayStats(dkey(addDays(new Date(),-(n-1-i))))).filter(d=>d.hasData);
+}
+function splitCompare(days,pred,metric){
+  const A=days.filter(d=>pred(d)&&d[metric]!==null&&d[metric]!==undefined);
+  const B=days.filter(d=>!pred(d)&&d[metric]!==null&&d[metric]!==undefined);
+  if(A.length<2||B.length<2)return null;
+  const avg=a=>a.reduce((x,d)=>x+d[metric],0)/a.length;
+  const a=avg(A),b=avg(B);
+  if(b===0&&a===0)return null;
+  const pct=b===0?100:Math.round((a-b)/Math.abs(b)*100);
+  return{a,b,pct,nA:A.length,nB:B.length};
+}
+function buildInsights(){
+  const days=lastDays(30);
+  const out=[];
+  if(days.length<3)return out;
+  // Sleep → energy
+  const target=parseFloat(PROFILE.sleepTarget||7);
+  let r=splitCompare(days.filter(d=>d.sleepH!==null),d=>d.sleepH>=target,'energy');
+  if(r&&Math.abs(r.pct)>=5)out.push({icon:'😴',title:'Sleep drives your energy',
+    text:`On ${target}h+ nights your energy averages <b>${r.a.toFixed(1)}/10</b>; on shorter nights <b>${r.b.toFixed(1)}/10</b> — <b>${r.pct>0?'+':''}${r.pct}%</b>.`,
+    action:r.pct>0?`Protect ${target} hours. It is your cheapest performance gain.`:'',n:r.nA+r.nB});
+  // Sleep → focus minutes
+  r=splitCompare(days.filter(d=>d.sleepH!==null),d=>d.sleepH>=target,'focusMin');
+  if(r&&r.pct>=15)out.push({icon:'🎯',title:'Sleep buys you deep work',
+    text:`Well-slept days average <b>${Math.round(r.a)} min</b> of deep focus vs <b>${Math.round(r.b)} min</b> — <b>+${r.pct}%</b>.`,n:r.nA+r.nB});
+  // Habits → energy
+  r=splitCompare(days,d=>d.habitsDone>=Math.max(1,Math.ceil(S.habits.length*0.6)),'energy');
+  if(r&&Math.abs(r.pct)>=5)out.push({icon:'✦',title:'Your routine shows up in your energy',
+    text:`Days you keep most habits: energy <b>${r.a.toFixed(1)}/10</b> vs <b>${r.b.toFixed(1)}/10</b> when you don't — <b>${r.pct>0?'+':''}${r.pct}%</b>.`,n:r.nA+r.nB});
+  // Distraction → tasks done
+  const withScreen=days.filter(d=>d.distract>0);
+  r=splitCompare(withScreen,d=>d.distract<=120,'tasksDone');
+  if(r&&Math.abs(r.pct)>=10)out.push({icon:'📱',title:'Phone time costs you completions',
+    text:`Under 2h distraction: <b>${r.a.toFixed(1)} tasks</b> done. Over 2h: <b>${r.b.toFixed(1)}</b> — <b>${r.pct>0?'+':''}${r.pct}%</b>.`,
+    action:r.pct>0?'Cutting 30 min of scrolling is worth more than an extra hour awake.':'',n:r.nA+r.nB});
+  // Peak hour
+  const byHour={};
+  Object.entries(S.hourlyLog).forEach(([k,v])=>{const h=(k.split('|')[1]||'');if(h)(byHour[h]=byHour[h]||[]).push(v.energy);});
+  const hrs=Object.entries(byHour).filter(([,a])=>a.length>=2)
+    .map(([h,a])=>({h,avg:a.reduce((x,y)=>x+y,0)/a.length,n:a.length})).sort((a,b)=>b.avg-a.avg);
+  if(hrs.length>=3){
+    const p=hrs[0],w=hrs[hrs.length-1];
+    out.push({icon:'⚡',title:'Your peak and your dip',
+      text:`Strongest at <b>${p.h}:00</b> (${p.avg.toFixed(1)}/10), weakest at <b>${w.h}:00</b> (${w.avg.toFixed(1)}/10).`,
+      action:`Put your hardest work at ${p.h}:00 and admin or rest at ${w.h}:00.`,n:hrs.reduce((a,x)=>a+x.n,0)});
+  }
+  // Best weekday
+  const byDow={};
+  days.forEach(d=>{const dw=new Date(d.k+'T00:00:00').getDay();(byDow[dw]=byDow[dw]||[]).push(d.tasksDone);});
+  const dws=Object.entries(byDow).filter(([,a])=>a.length>=2)
+    .map(([dw,a])=>({dw:+dw,avg:a.reduce((x,y)=>x+y,0)/a.length})).sort((a,b)=>b.avg-a.avg);
+  if(dws.length>=4&&dws[0].avg>0){
+    const N=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    out.push({icon:'📅',title:'Your strongest day',
+      text:`<b>${N[dws[0].dw]}</b> is your most productive day (${dws[0].avg.toFixed(1)} tasks); <b>${N[dws[dws.length-1].dw]}</b> your quietest.`,
+      action:`Schedule the week's hardest task on ${N[dws[0].dw]}.`,n:days.length});
+  }
+  // Consistency streak
+  const logged=days.length;
+  out.push({icon:'📊',title:'Your data so far',
+    text:`<b>${logged} day${logged>1?'s':''}</b> logged. ${logged<7?'A week of data unlocks the strongest patterns.':logged<21?'Three weeks unlocks weekday and sleep patterns.':'Enough history for reliable patterns.'}`,n:logged});
+  return out;
+}
+function renderInsights(){
+  const p=document.getElementById('p-insights');
+  const list=buildInsights();
+  const days=lastDays(30).length;
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">Insights</div><div class="ph-s">Patterns computed from your own logs · updates as you use the app</div></div>
+    <div class="ph-a"><button class="btn bg bsm" onclick="renderInsights()">↻ Refresh</button></div></div>
+    ${list.length<2?`<div class="card" style="text-align:center;padding:26px;">
+      <div style="font-size:30px;margin-bottom:8px;">🌱</div>
+      <div style="font-size:13px;color:var(--t0);margin-bottom:6px;">Building your patterns</div>
+      <div style="font-size:11.5px;color:var(--t1);line-height:1.7;max-width:320px;margin:0 auto;">${days} day${days===1?'':'s'} logged. Keep logging sleep, hourly energy and screen time — after about a week Life OS can tell you what actually drives your good days.</div>
+    </div>`:''}
+    ${list.map(i=>`<div class="card" style="margin-bottom:12px;">
+      <div style="display:flex;gap:11px;">
+        <div style="font-size:20px;">${i.icon}</div>
+        <div style="flex:1;">
+          <div style="font-size:12.5px;font-weight:700;color:var(--t0);margin-bottom:4px;">${i.title}</div>
+          <div style="font-size:11.5px;color:var(--t1);line-height:1.7;">${i.text}</div>
+          ${i.action?`<div style="font-size:11px;color:var(--saf);line-height:1.6;margin-top:6px;">→ ${escH(i.action)}</div>`:''}
+          <div style="font-size:9px;color:var(--t3);margin-top:6px;">based on ${i.n} data point${i.n>1?'s':''}</div>
+        </div>
+      </div>
+    </div>`).join('')}`;
+}
+
+// ── MORNING BRIEFING (Chief of Staff moment) ───
+const BRF=DB.get('briefCfg',{enabled:true,voice:false});
+function buildBriefingData(){
+  const tk=today();
+  const timed=S.tasks.filter(t=>!t.done&&t.due).sort((a,b)=>a.due.localeCompare(b.due));
+  const p1=S.tasks.filter(t=>!t.done&&(t.pri||2)===1);
+  const untimed=S.tasks.filter(t=>!t.done&&!t.due);
+  const y=dkey(addDays(new Date(),-1));
+  const yAct=ACT.daySummary(y);
+  const ySleep=S.sleep[tk]||S.sleep[y]||null;
+  const doneY=S.events.filter(e=>e.type==='task'&&e.ts&&e.ts.startsWith(y)).length;
+  return{timed,p1,untimed,yAct,ySleep,doneY};
+}
+function briefingText(){
+  const b=buildBriefingData();
+  const name=PROFILE.name||'there';
+  const parts=[`Good morning, ${name}.`];
+  if(b.ySleep&&b.ySleep.hours)parts.push(`You slept ${b.ySleep.hours} hours.`);
+  const total=b.timed.length+b.untimed.length;
+  if(total===0)parts.push('Nothing scheduled yet — speak your plan into Capture and I will organise it.');
+  else{
+    parts.push(`${total} task${total>1?'s':''} today.`);
+    if(b.timed.length){
+      const first=b.timed[0];
+      parts.push(`First up: ${first.text} at ${first.due}.`);
+      if(b.timed.length>1)parts.push(`Then ${b.timed.slice(1,3).map(t=>`${t.text} at ${t.due}`).join(', ')}${b.timed.length>3?` and ${b.timed.length-3} more`:''}.`);
+    }
+    if(b.p1.length)parts.push(`Your top priority: ${b.p1[0].text}.`);
+  }
+  try{const ins=buildInsights().filter(x=>x.action);if(ins.length)parts.push(ins[0].action);}catch(e){}
+  if(b.doneY)parts.push(`Yesterday you completed ${b.doneY} task${b.doneY>1?'s':''}${b.yAct&&b.yAct.focusMin?` with ${b.yAct.focusMin} minutes of deep focus`:''}. Keep the chain going.`);
+  return parts.join(' ');
+}
+function speak(text){
+  try{
+    if(!('speechSynthesis'in window))return;
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang='en-IN';u.rate=1.02;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function maybeBriefing(){
+  if(!BRF.enabled)return;
+  const tk=today();
+  if(DB.get('briefShown','')===tk)return;
+  const wakeH=parseInt((PROFILE.wake||'06:00').split(':')[0])||6;
+  if(new Date().getHours()<Math.max(5,wakeH-1))return;
+  DB.set('briefShown',tk);
+  showBriefing();
+}
+function showBriefing(){
+  const b=buildBriefingData();
+  const txt=briefingText();
+  const ov=document.createElement('div');ov.id='brf-ov';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(8,11,20,.92);backdrop-filter:blur(10px);z-index:620;display:flex;align-items:center;justify-content:center;padding:18px;';
+  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--b2);border-radius:18px;padding:24px 20px;max-width:400px;width:100%;max-height:82vh;overflow-y:auto;">
+    <div style="text-align:center;font-size:26px;margin-bottom:6px;">☀️</div>
+    <div style="text-align:center;font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--saf);margin-bottom:10px;">MORNING BRIEFING · ${new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'short'})}</div>
+    <div style="font-size:13px;color:var(--t0);line-height:1.65;">${escH(txt)}</div>
+    ${b.timed.length?`<div style="margin-top:12px;border-top:1px solid var(--b1);padding-top:10px;">
+      ${b.timed.slice(0,6).map(t=>`<div style="display:flex;gap:9px;font-size:11.5px;padding:5px 0;color:var(--t1);"><span style="font-family:'JetBrains Mono',monospace;color:var(--sky);width:44px;">${t.due}</span><span style="flex:1;">${escH(t.text)}</span>${S.reminders.some(r=>r.taskId===t.id&&!r.fired)?'<span>⏰</span>':''}</div>`).join('')}
+    </div>`:''}
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn bp" style="flex:2;padding:11px;" onclick="document.getElementById('brf-ov').remove()">Let's go →</button>
+      <button class="btn bg" style="flex:1;padding:11px;" onclick="speak(${JSON.stringify('')}||briefingTextCache)" id="brf-speak">🔊</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  window.briefingTextCache=txt;
+  document.getElementById('brf-speak').onclick=()=>speak(txt);
+  if(BRF.voice)setTimeout(()=>speak(txt),400);
+}
+
+// ── COMPLETION FOLLOW-UP (Track completion) ────
+function checkFollowUps(){
+  if(isTyping())return;
+  if(document.getElementById('fu-ov')||document.getElementById('chk-ov')||document.getElementById('hp-ov')||document.getElementById('rm-ov')||document.getElementById('brf-ov'))return;
+  const now=new Date();
+  const nowHM=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  const asked=DB.get('followAsked',{});
+  const tk=today();
+  const due=S.tasks.find(t=>{
+    if(t.done||!t.due)return false;
+    if((asked[tk]||[]).includes(t.id))return false;
+    const [h,m]=t.due.split(':').map(Number);
+    const mins=(now.getHours()*60+now.getMinutes())-(h*60+m);
+    return mins>=25&&mins<=180;   // 25min–3h past due
+  });
+  if(!due)return;
+  asked[tk]=(asked[tk]||[]).concat(due.id);
+  Object.keys(asked).forEach(k=>{if(k!==tk)delete asked[k];});
+  DB.set('followAsked',asked);
+  const ov=document.createElement('div');ov.id='fu-ov';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(8,11,20,.9);backdrop-filter:blur(8px);z-index:610;display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--b2);border-radius:18px;padding:24px 20px;max-width:360px;width:100%;text-align:center;">
+    <div style="font-size:24px;margin-bottom:8px;">📋</div>
+    <div style="font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--sky);margin-bottom:8px;">FOLLOW-UP · WAS DUE ${due.due}</div>
+    <div style="font-size:14px;color:var(--t0);line-height:1.5;">Did you complete this?</div>
+    <div style="margin-top:10px;padding:11px 13px;background:var(--is);border-radius:10px;font-size:13px;color:var(--t0);">${escH(due.text)}</div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn bp" style="flex:1;padding:11px;" onclick="fuAnswer(${due.id},'done')">✓ Done</button>
+      <button class="btn bg" style="flex:1;padding:11px;" onclick="fuAnswer(${due.id},'later')">Not yet</button>
+      <button class="btn bg" style="flex:1;padding:11px;" onclick="fuAnswer(${due.id},'skip')">Skip today</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  if(navigator.vibrate)try{navigator.vibrate(50)}catch(e){}
+}
+function fuAnswer(id,ans){
+  const o=document.getElementById('fu-ov');if(o)o.remove();
+  const t=S.tasks.find(x=>x.id===id);if(!t)return;
+  if(ans==='done'){t.done=true;save();logEvent('task',`Completed: ${t.text}`,8,8,t.cat);toast('✓','Logged. Well done.');}
+  else if(ans==='later'){
+    const asked=DB.get('followAsked',{});const tk=today();
+    asked[tk]=(asked[tk]||[]).filter(x=>x!==id);DB.set('followAsked',asked); // ask again later
+    toast('⏱','I\'ll check again in a while');
+  }else{toast('◽','Skipped for today');}
+  if(S.panel==='tasks')renderTasks();
+}
+
+// ── RECURRING TASKS ────────────────────────────
+function addRecurring(it){
+  if(S.recurring.some(r=>r.text===it.text&&r.rule===it.recur))return;
+  S.recurring.push({text:it.text,cat:it.cat,pri:it.pri,due:it.due||'',remind:it.remind||'',rule:it.recur});
+  DB.set('recurring',S.recurring);
+}
+function recurMatchesToday(rule){
+  const d=new Date().getDay(); // 0=Sun
+  if(rule==='daily')return true;
+  if(rule==='weekdays')return d>=1&&d<=5;
+  const map={sun:0,mon:1,tue:2,wed:3,thu:4,fri:5,sat:6};
+  return map[rule]===d;
+}
+function generateRecurring(){
+  const tk=today();
+  if(DB.get('recurGen','')===tk)return;
+  let n=0;
+  S.recurring.forEach(r=>{
+    if(!recurMatchesToday(r.rule))return;
+    // skip if an identical open task already exists
+    if(S.tasks.some(t=>t.text===r.text&&!t.done))return;
+    const id=S.nextTaskId++;
+    S.tasks.push({id,text:r.text,cat:r.cat,pri:r.pri,done:false,ts:Date.now(),due:r.due,recur:r.rule});
+    if(r.remind)scheduleReminder(id,r.text,r.remind);
+    n++;
+  });
+  DB.set('recurGen',tk);
+  if(n){save();toast('↻',`${n} recurring task${n>1?'s':''} added for today`);}
+}
+
+// ── AI BRAIN ───────────────────────────────────
+// With an API key (Settings → AI Assistant), capture and coaching use Claude.
+// Without one, everything falls back to the local rule engine — the app never
+// depends on the network to function.
+function aiKey(){return DB.get('aiKey','')}
+async function aiCall(messages,maxTokens){
+  const key=aiKey();
+  const headers={'Content-Type':'application/json'};
+  if(key){headers['x-api-key']=key;headers['anthropic-version']='2023-06-01';headers['anthropic-dangerous-direct-browser-access']='true';}
+  const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers,
+    body:JSON.stringify({model:'claude-haiku-4-5',max_tokens:maxTokens||1200,messages})});
+  if(!res.ok)throw new Error('AI '+res.status);
+  const data=await res.json();
+  return (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n');
+}
+const AI_PARSE_PROMPT=()=>`You are the intake brain of a personal assistant app. Convert the user's brain-dump (may be voice-transcribed, messy, Indian English) into a JSON array. Each element:
+{"type":"task"|"goal"|"idea"|"memory"|"expense"|"journal","text":"clean imperative phrasing, no time words","due":"HH:MM 24h or \"\"","remind":"HH:MM or \"\"","pri":1|2|3,"cat":"deep|work|trade|admin|body|learn|mind|family|home|money|personal","recur":"daily|weekdays|mon|tue|wed|thu|fri|sat|sun|\"\""}
+Routing: something to DO becomes task; an aspiration becomes goal; a product or business thought becomes idea; a fact about a person worth remembering becomes memory; money spent becomes expense (include numeric amount); a feeling or reflection on the day becomes journal.\nRules: separate a task's own time from its reminder/alarm time. "morning"≈08:00, "afternoon"≈15:00, "evening"≈18:00, "night"≈21:00 only when no clock time given. "set reminder" with no time → 15 min before due. urgent/must/important → pri 1; someday/later → pri 3; else 2. exercise/gym→body, kids/school/family→family, groceries/household→home, doctor→personal, class/study→learn, meeting/office→work, trading/market→trade, pay/EMI/tax→money. Today is ${today()}. Respond ONLY with the JSON array, no markdown, no commentary.
+INPUT:
+`;
+function sanitizeParsed(arr){
+  const T=v=>{const m=/^(\d{2}):(\d{2})$/.exec(v||'');return !!m&&+m[1]<=23&&+m[2]<=59;};
+  if(!Array.isArray(arr))return null;
+  const out=arr.map((x,i)=>({
+    id:i,include:true,
+    type:['task','goal','idea','memory','expense','journal'].includes(x.type)?x.type:'task',
+    amount:(typeof x.amount==='number'&&x.amount>0)?x.amount:0,
+    text:String(x.text||'').slice(0,200).trim(),
+    due:T(x.due)?x.due:'',
+    remind:T(x.remind)?x.remind:'',
+    pri:[1,2,3].includes(x.pri)?x.pri:2,
+    cat:CATS[x.cat]?x.cat:'personal',
+    recur:['daily','weekdays','mon','tue','wed','thu','fri','sat','sun'].includes(x.recur)?x.recur:'',
+    day:/^\d{4}-\d{2}-\d{2}$/.test(x.day||'')?x.day:'',mins:0,
+    raw:String(x.text||'')
+  })).filter(x=>x.text.length>1);
+  return out.length?out:null;
+}
+async function smartParse(text){
+  try{
+    const key=aiKey();
+    if(!key&&location.hostname!=='localhost')return null;   // deployed without key → local engine
+    const raw=await aiCall([{role:'user',content:AI_PARSE_PROMPT()+text}],1500);
+    const clean=raw.replace(/```json|```/g,'').trim();
+    return sanitizeParsed(JSON.parse(clean));
+  }catch(e){return null;}
+}
+
+// ── QUICK CAPTURE PANEL ────────────────────────
+let capParsed=[];
+function renderCapture(){
+  const p=document.getElementById('p-capture');
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">Quick Capture</div><div class="ph-s">Speak or type everything at once — Life OS sorts it into tasks, goals and ideas</div></div></div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="chd"><span class="ct">Brain Dump</span>${VOICE_OK?'<span style="font-size:9.5px;color:var(--t2)">tap 🎤 and just talk</span>':''}</div>
+      <div style="display:flex;gap:8px;align-items:flex-start;">
+        <textarea class="jta" id="cap-in" style="min-height:130px;flex:1;" placeholder="One item per line, or just speak:&#10;&#10;exercise at 5am set reminder&#10;drop kids at school 9am&#10;buy vegetables from supermarket&#10;doctor appointment 8pm set reminder at 7:45pm"></textarea>
+        ${VOICE_OK?`<div style="display:flex;flex-direction:column;gap:6px;">${micBtn('cap-in',{continuous:true})}</div>`:''}
+      </div>
+      ${!VOICE_OK?'<div style="font-size:10.5px;color:var(--t2);margin-top:8px;">Voice input isn\'t available in this browser — use Chrome on Android or Safari on iPhone.</div>':''}
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+        <button class="btn bp" id="cap-go" onclick="runCapture()">✨ Capture</button>
+        <button class="btn bg bsm" onclick="document.getElementById('cap-in').value='';capParsed=[];renderCapPreview()">Clear</button>
+      </div>
+    </div>
+    <div id="cap-preview"></div>`;
+  renderCapPreview();
+}
+let lastCapture=null; // {taskIds,goalIds,memIds} for undo
+async function runCapture(){
+  stopDictation();
+  const txt=document.getElementById('cap-in').value.trim();
+  if(!txt){toast('⚠️','Speak or type something first');return;}
+  const btn=document.getElementById('cap-go');
+  if(btn){btn.disabled=true;btn.textContent='🧠 Understanding…';}
+  let parsed=await smartParse(txt);           // AI brain first
+  const usedAI=!!parsed;
+  if(!parsed)parsed=parseBrainDump(txt);      // local engine fallback
+  if(btn){btn.disabled=false;btn.textContent='✨ Capture';}
+  if(!parsed.length){toast('⚠️','Nothing recognised — try one item per line');return;}
+  capParsed=parsed;
+  // ZERO-TOUCH: save immediately, offer Undo/Review instead of demanding review
+  autoSaveCapture(usedAI);
+}
+function autoSaveCapture(usedAI){
+  const sel=capParsed.filter(x=>x.include);
+  const ids={t:[],g:[],m:[],r:[],e:[],j:[]};let nT=0,nG=0,nI=0,nR=0,nRec=0,nE=0,nJ=0;
+  sel.forEach(it=>{
+    if(it.type==='task'){
+      const id=S.nextTaskId++;
+      S.tasks.push({id,text:it.text,cat:it.cat,pri:it.pri,done:false,ts:Date.now(),due:it.due||'',day:it.day||'',mins:it.mins||0,recur:it.recur||''});
+      ids.t.push(id);nT++;
+      if(it.recur){addRecurring(it);nRec++;}
+      if(it.remind){scheduleReminder(id,it.text,it.remind,it.day);ids.r.push(it.text);nR++;}
+    }else if(it.type==='goal'){
+      const id=S.nextGoalId++;
+      S.goals.push({id,level:'Week',text:it.text,domain:'Personal',progress:0});ids.g.push(id);nG++;
+    }else if(it.type==='expense'){
+      const etxt=cleanExpenseText(it.raw||it.text);
+      addExpense(etxt,it.amount||parseAmount(it.raw||it.text),it.day);ids.e.push(etxt);nE++;
+    }else if(it.type==='journal'){
+      const label=new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+      const ex=S.journalEntries.find(j=>j.dk===today());
+      if(ex)ex.wins=((ex.wins||'')+' '+it.text).trim();
+      else S.journalEntries.unshift({dk:today(),date:label,wins:it.text,drain:'',tomorrow:'',insight:''});
+      ids.j.push(it.text);nJ++;
+    }else{
+      const id=S.nextMemoryId++;
+      S.aiMemory.unshift({id,text:it.text,icon:it.type==='memory'?'🧠':'💡',date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'})});ids.m.push(id);nI++;
+    }
+  });
+  save();
+  lastCapture=ids;
+  const parts=[nT?`${nT} task${nT>1?'s':''}`:null,nG?`${nG} goal${nG>1?'s':''}`:null,nI?`${nI} note${nI>1?'s':''}`:null,nE?`💰 ${nE} expense${nE>1?'s':''}`:null,nJ?'✍️ journal':null,nR?`⏰ ${nR}`:null,nRec?`↻ ${nRec} recurring`:null].filter(Boolean);
+  showCaptureBar(`${usedAI?'🧠':'✨'} ${parts.join(' · ')} added`,ids);
+  const capEl=document.getElementById('cap-in');if(capEl)capEl.value='';
+  logEvent('review',`Capture: ${nT} tasks, ${nG} goals, ${nI} ideas${usedAI?' (AI)':''}`,7,7,'general');
+}
+function showCaptureBar(msg,ids){
+  const old=document.getElementById('capbar');if(old)old.remove();
+  const b=document.createElement('div');b.id='capbar';
+  b.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:450;background:var(--bg2);border:1px solid var(--em);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 30px rgba(0,0,0,.4);';
+  b.innerHTML=`<span style="flex:1;font-size:12px;color:var(--t0);">${msg}</span>
+    <button class="btn bg bsm" onclick="undoCapture()">Undo</button>
+    <button class="btn bg bsm" onclick="reviewCapture()">Edit</button>
+    <span style="cursor:pointer;color:var(--t2);padding:4px;" onclick="document.getElementById('capbar').remove()">✕</span>`;
+  document.body.appendChild(b);
+  setTimeout(()=>{const x=document.getElementById('capbar');if(x)x.remove();},12000);
+}
+function undoCapture(){
+  if(!lastCapture)return;
+  S.tasks=S.tasks.filter(t=>!lastCapture.t.includes(t.id));
+  S.goals=S.goals.filter(g=>!lastCapture.g.includes(g.id));
+  S.aiMemory=S.aiMemory.filter(m=>!lastCapture.m.includes(m.id));
+  if(lastCapture.e&&lastCapture.e.length){S.expenses=S.expenses.filter(x=>!lastCapture.e.includes(x.text));DB.set('expenses',S.expenses);}
+  if(lastCapture.j&&lastCapture.j.length)S.journalEntries=S.journalEntries.filter(j=>!lastCapture.j.some(t=>(j.wins||'').includes(t)));
+  S.reminders=S.reminders.filter(r=>!lastCapture.t.includes(r.taskId));
+  save();lastCapture=null;
+  const x=document.getElementById('capbar');if(x)x.remove();
+  toast('↩️','Removed — nothing saved');
+  if(S.panel==='tasks')renderTasks();
+}
+function reviewCapture(){
+  undoCapture();                 // pull them back out…
+  renderCapPreview();            // …and show the editable list to re-save manually
+  toast('✎','Edit below, then add');
+}
+function renderCapPreview(){
+  const el=document.getElementById('cap-preview');if(!el)return;
+  if(!capParsed.length){el.innerHTML='';return;}
+  const PR={1:'P1',2:'P2',3:'P3'};
+  el.innerHTML=`
+    <div class="card">
+      <div class="chd"><span class="ct">Review · ${capParsed.filter(x=>x.include).length} selected</span>
+      <span class="ca" onclick="capParsed.forEach(x=>x.include=!x.include);renderCapPreview()">toggle all</span></div>
+      ${capParsed.map((it,i)=>`
+        <div style="display:flex;gap:9px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--b1);opacity:${it.include?1:.4};">
+          <div class="tck ${it.include?'d':''}" style="margin-top:2px;" onclick="capParsed[${i}].include=!capParsed[${i}].include;renderCapPreview()">${it.include?'✓':''}</div>
+          <div style="flex:1;min-width:0;">
+            <input class="ti" value="${escH(it.text)}" style="margin:0 0 6px;font-size:12.5px;" onchange="capParsed[${i}].text=this.value">
+            <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
+              <select onchange="capParsed[${i}].type=this.value;renderCapPreview()" style="background:var(--bg3);border:1px solid var(--b2);border-radius:6px;padding:4px 6px;color:var(--t1);font-size:10px;">
+                ${[['task','✓ Task'],['goal','◎ Goal'],['idea','💡 Idea'],['memory','🧠 Memory'],['expense','💰 Expense'],['journal','✍️ Journal']].map(o=>`<option value="${o[0]}"${it.type===o[0]?' selected':''}>${o[1]}</option>`).join('')}
+              </select>
+              ${it.type==='task'?`
+              <select onchange="capParsed[${i}].pri=+this.value" style="background:var(--bg3);border:1px solid var(--b2);border-radius:6px;padding:4px 6px;color:var(--t1);font-size:10px;">
+                ${[1,2,3].map(n=>`<option value="${n}"${it.pri===n?' selected':''}>${PR[n]}</option>`).join('')}
+              </select>
+              <span style="font-size:9.5px;color:var(--t2);">at</span>
+              <input type="time" value="${it.due}" onchange="capParsed[${i}].due=this.value" style="background:var(--bg3);border:1px solid var(--b2);border-radius:6px;padding:4px 6px;color:var(--t1);font-size:10px;width:92px;">
+              <span style="font-size:9.5px;color:var(--t2);">⏰</span>
+              <input type="time" value="${it.remind}" onchange="capParsed[${i}].remind=this.value" style="background:var(--bg3);border:1px solid var(--b2);border-radius:6px;padding:4px 6px;color:${it.remind?'var(--saf)':'var(--t2)'};font-size:10px;width:92px;">
+              <span class="ttag" style="background:${(CATS[it.cat]||CATS.personal).c}22;color:${(CATS[it.cat]||CATS.personal).c}">${(CATS[it.cat]||CATS.personal).l}</span>`:''}
+            </div>
+          </div>
+        </div>`).join('')}
+      <button class="btn bp" style="width:100%;margin-top:12px;" onclick="saveCapture()">＋ Add ${capParsed.filter(x=>x.include).length} to Life OS</button>
+    </div>`;
+}
+function saveCapture(){
+  const sel=capParsed.filter(x=>x.include);
+  if(!sel.length){toast('⚠️','Select at least one item');return;}
+  let nT=0,nG=0,nI=0,nR=0;
+  sel.forEach(it=>{
+    if(it.type==='task'){
+      const id=S.nextTaskId++;
+      S.tasks.push({id,text:it.text,cat:it.cat,pri:it.pri,done:false,ts:Date.now(),due:it.due||''});
+      nT++;
+      if(it.remind){scheduleReminder(id,it.text,it.remind);nR++;}
+    }else if(it.type==='goal'){
+      S.goals.push({id:S.nextGoalId++,level:'Week',text:it.text,domain:'Personal',progress:0});nG++;
+    }else{
+      S.aiMemory.unshift({id:S.nextMemoryId++,text:it.text,icon:'💡',date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'})});nI++;
+    }
+  });
+  save();
+  logEvent('review',`Quick capture: ${nT} tasks, ${nG} goals, ${nI} ideas`,7,7,'general');
+  const parts=[nT?`${nT} task${nT>1?'s':''}`:null,nG?`${nG} goal${nG>1?'s':''}`:null,nI?`${nI} idea${nI>1?'s':''}`:null,nR?`${nR} reminder${nR>1?'s':''}`:null].filter(Boolean);
+  toast('✅',parts.join(' · ')+' added');
+  capParsed=[];document.getElementById('cap-in').value='';
+  renderCapPreview();
+  setTimeout(()=>goPanelB('tasks'),700);
+}
+function openCaptureVoice(){
+  goPanelB('capture');
+  setTimeout(()=>{if(VOICE_OK)startDictation('cap-in',true);},420);
+}
+
+// ── REMINDERS ──────────────────────────────────
+// Fires while the app is open (and via notification if granted + backgrounded).
+// A closed PWA cannot be woken — that needs the native build.
+function scheduleReminder(taskId,text,hhmmStr,dayKey){
+  if(!hhmmStr)return;
+  const [h,m]=hhmmStr.split(':').map(Number);
+  const at=dayKey?new Date(dayKey+'T00:00:00'):new Date();
+  at.setHours(h,m,0,0);
+  if(!dayKey&&at.getTime()<Date.now()-60000)at.setDate(at.getDate()+1);
+  S.reminders.push({id:Date.now()+Math.random(),taskId,text,at:at.getTime(),fired:false});
+  DB.set('reminders',S.reminders);
+}
+function checkReminders(){
+  const now=Date.now();let changed=false;
+  S.reminders.forEach(r=>{
+    if(r.fired||r.at>now||now-r.at>30*60*1000)return;
+    r.fired=true;changed=true;
+    showReminder(r);
+  });
+  if(changed){
+    S.reminders=S.reminders.filter(r=>!r.fired||now-r.at<24*3600*1000);
+    DB.set('reminders',S.reminders);
+  }
+}
+function showReminder(r){
+  if(document.getElementById('rm-ov'))return;
+  const t=S.tasks.find(x=>x.id===r.taskId);
+  const ov=document.createElement('div');ov.id='rm-ov';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(8,11,20,.9);backdrop-filter:blur(8px);z-index:650;display:flex;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--saf);border-radius:18px;padding:24px 20px;max-width:360px;width:100%;text-align:center;">
+    <div style="font-size:30px;margin-bottom:6px;">⏰</div>
+    <div style="font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--saf);margin-bottom:8px;">REMINDER · ${new Date(r.at).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</div>
+    <div style="font-size:15px;color:var(--t0);line-height:1.5;">${escH(r.text)}</div>
+    <div style="display:flex;gap:8px;margin-top:18px;">
+      ${t&&!t.done?`<button class="btn bp" style="flex:1;padding:11px;" onclick="doneFromReminder(${t.id})">✓ Done</button>`:''}
+      <button class="btn bg" style="flex:1;padding:11px;" onclick="snoozeReminder(${r.id})">⏱ 10 min</button>
+      <button class="btn bg" style="flex:1;padding:11px;" onclick="document.getElementById('rm-ov').remove()">Dismiss</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  if(navigator.vibrate)try{navigator.vibrate([90,70,90,70,140])}catch(e){}
+  if(NCFG.notifs&&'Notification'in window&&Notification.permission==='granted'&&document.hidden){
+    try{new Notification('⏰ '+r.text,{body:'Life OS reminder',tag:'los-rem-'+r.id});}catch(e){}
+  }
+}
+function doneFromReminder(id){
+  const t=S.tasks.find(x=>x.id===id);
+  if(t&&!t.done){t.done=true;save();logEvent('task',`Completed: ${t.text}`,8,8,t.cat);toast('✓','Task completed!');}
+  const o=document.getElementById('rm-ov');if(o)o.remove();
+  if(S.panel==='tasks')renderTasks();
+}
+function snoozeReminder(rid){
+  const r=S.reminders.find(x=>x.id===rid);
+  if(r){r.fired=false;r.at=Date.now()+10*60*1000;DB.set('reminders',S.reminders);}
+  const o=document.getElementById('rm-ov');if(o)o.remove();
+  toast('⏱','Reminder in 10 minutes');
+}
+
+
+// ── DATE PHRASE PARSING (local, no API) ────────
+const DOW={sunday:0,sun:0,monday:1,mon:1,tuesday:2,tue:2,tues:2,wednesday:3,wed:3,thursday:4,thu:4,thurs:4,friday:5,fri:5,saturday:6,sat:6};
+// "in 30 minutes" / "in next 2 hours" / "after 45 mins" → an actual clock time
+function parseRelativeTime(line){
+  const m=normalizeSpeech(line).toLowerCase().match(/\b(?:in|after|within)\s+(?:the\s+)?(?:next\s+)?(\d{1,3})\s*(min|mins|minute|minutes|hr|hrs|hour|hours)\b/);
+  if(!m)return null;
+  const n=+m[1],mins=/^h/.test(m[2])?n*60:n;
+  if(mins<1||mins>24*60)return null;
+  const d=new Date(Date.now()+mins*60000);
+  return{h:d.getHours(),mi:d.getMinutes()};
+}
+function parseDayPhrase(line){
+  const l=line.toLowerCase();
+  if(/\btomorrow\b|\btmrw\b/.test(l))return dkey(addDays(new Date(),1));
+  if(/\bday after tomorrow\b/.test(l))return dkey(addDays(new Date(),2));
+  if(/\btoday\b|\btonight\b/.test(l))return today();
+  const nx=l.match(/\bnext\s+(sunday|sun|monday|mon|tuesday|tues|tue|wednesday|wed|thursday|thurs|thu|friday|fri|saturday|sat)\b/);
+  const on=l.match(/\b(?:on\s+)?(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/);
+  const pick=nx?nx[1]:(on?on[1]:null);
+  if(pick){
+    const target=DOW[pick],cur=new Date().getDay();
+    let delta=(target-cur+7)%7;
+    if(delta===0)delta=7;                 // "on friday" said on a Friday → next week
+    if(nx&&delta<7&&(target-cur+7)%7===0)delta=7;
+    return dkey(addDays(new Date(),delta));
+  }
+  const inD=l.match(/\bin\s+(\d{1,2})\s+days?\b/);
+  if(inD)return dkey(addDays(new Date(),+inD[1]));
+  return '';
+}
+function parseDuration(line){
+  const m=line.toLowerCase().match(/\b(?:for\s+)?(\d{1,3})\s*(min|mins|minutes?|hrs?|hours?)\b/);
+  if(!m)return 0;
+  const n=+m[1];
+  return /h/.test(m[2])?n*60:n;
+}
+const dayLabel=k=>{
+  if(!k||k===today())return '';
+  const t=dkey(addDays(new Date(),1));
+  if(k===t)return 'Tomorrow';
+  const d=new Date(k+'T00:00:00');
+  return d.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+};
+
+// ── NATURAL LANGUAGE CAPTURE ENGINE ────────────
+// Turns a spoken/typed brain-dump into structured tasks, goals, ideas and
+// reminders. Everything is shown as an editable preview before it is saved.
+const CAT_HINTS=[
+  {c:'body',  w:['exercise','workout','gym','run','walk','yoga','jog','swim','cycle','training','asana','pranayama','stretch']},
+  {c:'family',w:['kids','kid','child','school','wife','husband','mom','dad','mother','father','family','parents','birthday','pick up','drop']},
+  {c:'home',  w:['vegetable','vegetables','grocery','groceries','supermarket','instamart','blinkit','zepto','swiggy','cooking oil','milk','cook','clean','laundry','repair','bill','rent','maid','plumber','electrician','gas cylinder','water can']},
+  {c:'personal',w:['doctor','dentist','appointment','medicine','tablet','hospital','clinic','haircut','checkup','vaccine','test','scan','pharmacy','temple','pooja']},
+  {c:'learn', w:['music class','class','study','course','learn','reading','read','practice','tuition','lesson']},
+  {c:'work',  w:['meeting','client','office','report','presentation','email','call','deadline','standup','review with']},
+  {c:'trade', w:['trade','trading','market','chart','stock','nifty','backtest','screener','position']},
+  {c:'mind',  w:['meditate','meditation','sadhana','journal','reflect','breathe','stillness']},
+  {c:'money', w:['pay','payment','emi','insurance','tax','invest','sip','budget','bank']},
+  {c:'admin', w:['book','ticket','renew','submit','form','document','license','courier']},
+];
+const P1_WORDS=['urgent','asap','must','important','critical','priority','p1','today only','deadline'];
+const P3_WORDS=['someday','later','sometime','eventually','if time','optional','p3','low priority'];
+const GOAL_WORDS=['goal','my goal','i want to','aim to','target','achieve','by end of','this year','this month','this quarter'];
+const IDEA_WORDS=['idea','note down','note that','remember that','thought','remind me that','insight','learn that'];
+
+function allTimes(str){
+  const out=[];
+  // 4.45am · 7:45 pm · 15:30
+  let re=/\b(\d{1,2})[:.](\d{2})\s*(a\.?m\.?|p\.?m\.?)?/gi,m;
+  while((m=re.exec(str))){
+    let h=+m[1],mi=+m[2];const ap=(m[3]||'').toLowerCase().replace(/\./g,'');
+    if(ap==='pm'&&h<12)h+=12; if(ap==='am'&&h===12)h=0;
+    if(h<=23&&mi<=59)out.push({h,mi,raw:m[0],idx:m.index});
+  }
+  // 5AM · 11 am · 3pm  (skip ones already captured above)
+  re=/\b(\d{1,2})\s*(a\.?m\.?|p\.?m\.?)/gi;
+  while((m=re.exec(str))){
+    if(out.some(t=>m.index>=t.idx&&m.index<t.idx+t.raw.length))continue;
+    let h=+m[1];const ap=m[2].toLowerCase().replace(/\./g,'');
+    if(ap==='pm'&&h<12)h+=12; if(ap==='am'&&h===12)h=0;
+    if(h<=23)out.push({h,mi:0,raw:m[0],idx:m.index});
+  }
+  out.sort((a,b)=>a.idx-b.idx);
+  if(out.length)return out;
+  // vague words only if no clock time at all
+  const vm=/\b(morning|afternoon|evening|night|noon)\b/i.exec(str);
+  if(vm){const map={morning:[8,0],noon:[12,0],afternoon:[15,0],evening:[18,0],night:[21,0]};
+    const v=map[vm[1].toLowerCase()];return[{h:v[0],mi:v[1],raw:'',idx:vm.index,vague:true}];}
+  return[];
+}
+const hhmm=t=>String(t.h).padStart(2,'0')+':'+String(t.mi).padStart(2,'0');
+function normalizeSpeech(t){
+  return String(t||'')
+    .replace(/\r/g,'')
+    .replace(/\b([ap])\.\s*m\.?/gi,'$1m')          // "p. m." / "p.m." → "pm"
+    .replace(/\brupees?\b|\brs\.?\b|₹/gi,'₹')
+    .replace(/\s{2,}/g,' ');
+}
+// Junk that voice transcription adds around real content
+const NOISE_LEAD=/^(?:and|also|so|then|next|ok|okay|um+|uh+|actually|basically|address|plus|after that|number)\b[\s,.-]*/i;
+const META_LINE=/^(?:i am going to|i'm going to|let me|these are|here are|listing|list of|i want to list|my list|to sorry|sorry|ok|okay)\b[\s\S]{0,20}$/i;
+// "Hey I am going to give three tasks and one idea" — an announcement, not an item
+const ANNOUNCE=/^(?:hey|hi|hello|ok|okay|so)?\s*(?:i\s*(?:am|'m)\s*going\s*to|i\s*will|let\s*me)\s*(?:give|list|tell|share|say|add|note)\b[\s\S]{0,60}\b(?:task|tasks|idea|ideas|item|items|point|points|thing|things)\b/i;
+function splitDump(text){
+  let t=normalizeSpeech(text);
+  // 1) Explicit spoken item markers: "task 1", "task number 3", "item 2", "point two"
+  t=t.replace(/\b(?:task|item|point|thing|number)\s*(?:number\s*)?(?:\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten)\b/gi,'\n');
+  // 2) Ordinal openers: "first, ... second, ... thirdly ..."
+  t=t.replace(/\b(?:first|second|third|fourth|fifth|sixth)(?:ly)?\b(?=[\s,:-])/gi,'\n');
+  // 3) Spoken connectors that start a new item
+  t=t.replace(/\s+(?:and then|then next|after that|also i need to|also need to|and also|one more thing|another thing|next i need to|apart from that)\s+/gi,'\n');
+  // 3b) A new "idea …" clause starts a new item
+  t=t.replace(/(?<!\b(?:a|an|the|my|our|his|her|this|that|one|another|new|good|great|business|small))\s+(?=(?:idea|ideas)\s+(?:regarding|about|for|is|on)\b)/gi,'\n');
+  // 4) Bullets / numbered lists
+  t=t.replace(/\s*(?:•|·|—|\d{1,2}[\).])\s+/g,'\n');
+  // 5) Sentence boundary — but only when the NEXT sentence looks like a new item
+  //    (has its own time or starts with an action verb) and isn't a reminder clause
+  //    that belongs to the sentence before it.
+  t=t.split(/(?<=[.!?])\s+/).map(sent=>sent.trim()).filter(Boolean).map((sent,i,arr)=>sent).join('\n');
+  return t.split(/\n+/)
+    .map(x=>x.trim().replace(NOISE_LEAD,'').replace(/^[\s,.:;-]+|[\s,;:-]+$/g,'').trim())
+    .filter(x=>x.length>2)
+    .filter(x=>!(META_LINE.test(x)&&!allTimes(x).length))
+    .filter(x=>!(ANNOUNCE.test(x)&&!allTimes(x).length))     // drop "I am going to list three tasks"
+    .filter(x=>x.split(/\s+/).length>=2||allTimes(x).length)  // drop stray fragments
+    .reduce((acc,cur)=>{
+      // A pure reminder clause belongs to the previous item, not its own task
+      const bareReminder=/^(?:so\s+)?(?:remind me|set (?:an? )?(?:reminder|alarm)|alarm)\s+(?:at|for)\s/i.test(cur)
+        && allTimes(cur).length>0 && cur.split(/\s+/).length<=8;
+      if(acc.length&&bareReminder){acc[acc.length-1]+=' '+cur;return acc;}
+      return acc.concat(cur);
+    },[]);
+}
+function cleanExpenseText(line){
+  let t=normalizeSpeech(line)
+    .replace(/\u20b9\s*\d[\d,]*(?:\.\d{1,2})?/g,' ')
+    .replace(/\b\d[\d,]{1,7}(?:\.\d{1,2})?\b/g,' ')
+    .replace(/\b(?:i\s+)?(?:spent|spend|paid|pay|bought|purchased|cost|costs)\b/gi,' ')
+    .replace(/^\s*(?:on|for|at|in|to)\s+/i,'')
+    .replace(/\s{2,}/g,' ').replace(/^[\s,.-]+|[\s,.-]+$/g,'').trim();
+  return t?t.charAt(0).toUpperCase()+t.slice(1):'Expense';
+}
+function cleanTaskText(line,times){
+  let t=line;
+  t=t.replace(/\s*(?:task|item|point|number)?\s*(?:number\s*)?(?:to\s+)?sorry\b.*$/i,' ');  // voice self-correction
+  t=t.replace(/^(?:i|we)\s+(?:have|has|had|need|want|will|must|should|am|are|was|going)\s+(?:to\s+|an?\s+|got\s+to\s+)?/i,'');
+  t=t.replace(/\bthat\s+is\s+(?:around|about|at)\b/gi,' ');
+  t=t.replace(/\b(?:in|after|within)\s+(?:the\s+)?(?:next\s+)?\d{1,3}\s*(?:min|mins|minute|minutes|hr|hrs|hour|hours)\b/gi,' ');
+  (times||[]).forEach(x=>{if(x&&x.raw)t=t.split(x.raw).join(' ');});
+  t=t.replace(/\b(set\s+(?:an?\s+)?(?:reminder|alarm)(?:\s+(?:at|for))?|remind\s+me(?:\s+(?:at|to))?)\b/gi,' ');
+  t=t.replace(/^\s*(?:set\s+(?:an?|the)\s+)/i,'');
+  t=t.replace(/\b(?:please|kindly|i\s+)?\b(?:need(?:\s+to)?|have\s+to|want\s+to|should|must|gotta|got\s+to|make\s+sure(?:\s+to)?)\b/gi,' ');
+  t=t.replace(/\b(?:at|by|on|around|from)\s*(?=[,.\-–]|$)/gi,' ');
+  for(let i=0;i<3;i++)t=t.replace(/\s+(?:so|and|also|then|at|for|to|the|a|an|is|around|about)\s*$/i,'');
+  t=t.replace(/[\s,.\-–:]+$/,'').replace(/^[\s,.\-–:]+/,'').replace(/\s{2,}/g,' ').trim();
+  return t.charAt(0).toUpperCase()+t.slice(1);
+}
+function detectCat(line){
+  const l=line.toLowerCase();
+  for(const g of CAT_HINTS)if(g.w.some(w=>l.includes(w)))return g.c;
+  return 'personal';
+}
+function detectPri(line){
+  const l=line.toLowerCase();
+  if(P1_WORDS.some(w=>l.includes(w)))return 1;
+  if(P3_WORDS.some(w=>l.includes(w)))return 3;
+  return 2;
+}
+// Money: 700 rupees, Rs 700, Rs.700 — normalizeSpeech turns all into the rupee sign
+function parseAmount(line){
+  const n=normalizeSpeech(line);
+  let m=n.match(/\u20b9\s*(\d[\d,]*(?:\.\d{1,2})?)|\b(\d[\d,]*(?:\.\d{1,2})?)\s*\u20b9/);
+  if(m)return parseFloat((m[1]||m[2]).replace(/,/g,''));
+  // bare number, but only when the sentence is clearly about spending and has no clock time
+  if(/\b(spent|spend|paid|pay|bought|purchased|cost|costs|recharge|bill)\b/i.test(n)&&!allTimes(n).length){
+    m=n.match(/\b(\d[\d,]{1,7}(?:\.\d{1,2})?)\b/);
+    if(m)return parseFloat(m[1].replace(/,/g,''));
+  }
+  return 0;
+}
+const SPEND_W=['spent','spend','paid','bought','purchased','cost','bill','recharge','fare','emi','fees','fee'];
+const FEEL_W=['i feel','i am feeling','feeling','i felt','today was','today i','good day','bad day','tired','exhausted','drained','happy','stressed','anxious','grateful','frustrated','proud of','went well','productive day'];
+const MEM_W=['likes','loves','prefers','birthday','anniversary','remember that','favourite','favorite','allergic','hates','is good at','dreams of','told me','interested in'];
+const ACTION_W=['remind','call','buy','pick','drop','send','pay','book','submit','renew','collect','finish','complete','clean','wash','fix','meet','attend','turn off','turn on','check','email','order','visit','apply','file','schedule','print'];
+function detectType(line){
+  const l=normalizeSpeech(line).toLowerCase().trim();
+  const hasAction=ACTION_W.some(w=>l.includes(w));
+  // 1 Expense — an amount plus a spending verb
+  if(parseAmount(line)>0&&SPEND_W.some(w=>l.includes(w)))return 'expense';
+  // 2 Explicit idea
+  if(/\b(i have an idea|idea for|idea about|idea regarding|idea is|idea on|new idea|concept for|what if we|thought of)\b/.test(l)||/^ideas?\b/.test(l))return 'idea';
+  // 3 Explicit goal
+  if(GOAL_WORDS.some(w=>l.startsWith(w))||/\b(my goal|i want to become|i aim to|by end of)\b/.test(l))return 'goal';
+  // 4 Journal — a feeling or reflection, with nothing to do in it
+  if(FEEL_W.some(w=>l.includes(w))&&!hasAction)return 'journal';
+  // 5 Memory — a fact about someone, not a task
+  if(MEM_W.some(w=>l.includes(w))&&!hasAction&&!/\bremind me\b/.test(l))return 'memory';
+  if(IDEA_WORDS.some(w=>l.startsWith(w)))return 'idea';
+  return 'task';
+}
+function parseBrainDump(text){
+  return splitDump(text).map((line,i)=>{
+    const times=allTimes(line);
+    // Where does a reminder/alarm instruction begin?
+    const remPhrase=/\b(?:set\s+(?:an?\s+)?(?:reminder|alarm)|remind\s+me|alarm)\b/i.exec(line);
+    let due=null,remind=null;
+    if(remPhrase){
+      const at=remPhrase.index;
+      // reminder time = first time appearing at/after the phrase
+      remind=times.find(t=>t.idx>=at&&!t.vague)||null;
+      // task time = first time BEFORE the phrase
+      due=times.find(t=>t.idx<at&&!t.vague)||null;
+      if(!due&&remind){
+        const other=times.filter(t=>t!==remind&&!t.vague);
+        due=other[0]||null;
+      }
+    }else{
+      due=times.find(t=>!t.vague)||times[0]||null;
+    }
+    if(!due&&times.length)due=times[0];
+    if(!due||due.vague){const rel=parseRelativeTime(line);if(rel)due=rel;}
+    // "set reminder" with no explicit time → 15 minutes before the task
+    if(remPhrase&&!remind&&due&&!due.vague){
+      let mm=due.h*60+due.mi-15; if(mm<0)mm+=1440;
+      remind={h:Math.floor(mm/60),mi:mm%60};
+    }
+    if(remind&&due&&!due.vague){
+      const dm=due.h*60+due.mi;let rm=remind.h*60+remind.mi;
+      if(dm-rm>12*60){rm+=12*60;if(rm<24*60)remind={h:Math.floor(rm/60),mi:rm%60};}   // "8:45" meant 20:45
+      else if(rm>dm&&rm-dm<12*60&&remind.h<12&&due.h>=12){/* keep */}
+    }
+    if(remind&&due&&remind.h===due.h&&remind.mi===due.mi)remind=null;
+    // Strip every recognised time + the reminder clause from the display text
+    let body=line;
+    if(remPhrase){
+      const tail=remind&&remind.raw?remind.idx+remind.raw.length:line.length;
+      body=line.slice(0,remPhrase.index)+' '+line.slice(Math.max(tail,remPhrase.index));
+    }
+    const type=detectType(line);
+    return{
+      id:i,include:true,type,
+      text:cleanTaskText(body,times)||line,
+      due:due&&!due.vague?hhmm(due):(due&&due.vague?hhmm(due):''),
+      vague:!!(due&&due.vague),
+      remind:remind?hhmm(remind):'',
+      pri:detectPri(line),cat:detectCat(line),
+      day:parseDayPhrase(line),mins:parseDuration(line),amount:parseAmount(line),
+      recur:(()=>{const ll=line.toLowerCase();return ll.match(/\b(daily|every\s?day|everyday)\b/)?'daily':ll.match(/\bweekdays\b/)?'weekdays':(ll.match(/\bevery\s+(sun|mon|tue|wed|thu|fri|sat)/)||[])[1]||'';})(),
+      raw:line
+    };
+  }).filter(x=>x.text.length>1);
+}
+
+// ── VOICE INPUT ENGINE ─────────────────────────
+// Web Speech API. Works in Chrome/Android and Safari/iOS 14.5+ over HTTPS.
+// Dictated text is appended to whatever field the mic button targets.
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition||null;
+const VOICE_OK=!!SR;
+let recog=null,recogTarget=null,recogBtn=null,recogBase='',recogOnEnd=null;
+function micBtn(targetId,opts){
+  if(!VOICE_OK)return '';
+  const o=opts||{};
+  return `<span class="micb" id="mic-${targetId}" title="Speak instead of typing"
+    onclick="toggleDictation('${targetId}',${o.continuous?'true':'false'})">🎤</span>`;
+}
+function toggleDictation(targetId,continuous){
+  if(recog&&recogTarget===targetId){stopDictation();return;}
+  if(recog)stopDictation();
+  startDictation(targetId,continuous);
+}
+function startDictation(targetId,continuous){
+  const el=document.getElementById(targetId);
+  if(!el)return;
+  if(!VOICE_OK){toast('⚠️','Voice input needs Chrome or Safari (iOS 16+)');return;}
+  try{
+    recog=new SR();
+    recog.lang=DB.get('voiceLang','en-IN');
+    recog.interimResults=true;
+    recog.continuous=!!continuous;
+    recogTarget=targetId;recogBase=el.value?el.value.trim()+' ':'';
+    recogBtn=document.getElementById('mic-'+targetId);
+    if(recogBtn)recogBtn.classList.add('rec');
+    el.placeholder='🎙 Listening…';
+    recog.onresult=e=>{
+      let final='',interim='';
+      for(let i=e.resultIndex;i<e.results.length;i++){
+        const t=e.results[i][0].transcript;
+        if(e.results[i].isFinal)final+=t+' ';else interim+=t;
+      }
+      if(final)recogBase+=final;
+      el.value=(recogBase+interim).replace(/\s+/g,' ').trimStart();
+      el.dispatchEvent(new Event('input',{bubbles:true}));
+      if(el.tagName==='TEXTAREA')el.scrollTop=el.scrollHeight;
+    };
+    recog.onerror=ev=>{
+      stopDictation();
+      if(ev.error==='not-allowed')toast('🎤','Microphone blocked — allow it in browser settings');
+      else if(ev.error==='no-speech')toast('🎤','Didn\'t catch that — try again');
+      else toast('🎤','Voice error: '+ev.error);
+    };
+    recog.onend=()=>{const cb=recogOnEnd;stopDictation();if(cb)cb();};
+    recog.start();
+    if(navigator.vibrate)try{navigator.vibrate(30)}catch(e){}
+  }catch(e){toast('⚠️','Could not start voice input');stopDictation();}
+}
+function stopDictation(){
+  if(recog){try{recog.onend=null;recog.stop();}catch(e){}}
+  if(recogBtn)recogBtn.classList.remove('rec');
+  const el=recogTarget?document.getElementById(recogTarget):null;
+  if(el&&el.placeholder==='🎙 Listening…')el.placeholder=el.dataset.ph||'';
+  recog=null;recogTarget=null;recogBtn=null;recogBase='';recogOnEnd=null;
+}
+
+// ── THEME ENGINE ───────────────────────────────
+// 'dark' · 'light' · 'auto' (follows the system setting, and falls back to
+// clock-based day/night when the OS gives no preference).
+const THEME=DB.get('theme','dark');
+let themeMode=THEME;
+function resolveTheme(mode){
+  if(mode==='light'||mode==='dark')return mode;
+  try{
+    if(window.matchMedia){
+      if(window.matchMedia('(prefers-color-scheme: light)').matches)return 'light';
+      if(window.matchMedia('(prefers-color-scheme: dark)').matches)return 'dark';
+    }
+  }catch(e){}
+  const h=new Date().getHours();          // no OS preference → use time of day
+  return (h>=7&&h<19)?'light':'dark';
+}
+function applyTheme(mode){
+  themeMode=mode;DB.set('theme',mode);
+  const eff=resolveTheme(mode);
+  document.documentElement.setAttribute('data-theme',eff);
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta)meta.setAttribute('content',eff==='light'?'#ffffff':'#0a0d17');
+  const t=document.getElementById('thtog');
+  if(t){t.textContent=mode==='auto'?'🌗':(eff==='light'?'☀️':'🌙');t.title='Theme: '+mode+' (tap to change)';}
+}
+function cycleTheme(){
+  const order=['dark','light','auto'],next=order[(order.indexOf(themeMode)+1)%3];
+  applyTheme(next);toast(next==='auto'?'🌗':next==='light'?'☀️':'🌙','Theme: '+next);
+  if(S.panel==='settings')renderSettings();
+}
+function initTheme(){
+  applyTheme(themeMode);
+  try{
+    if(window.matchMedia){
+      const mq=window.matchMedia('(prefers-color-scheme: light)');
+      const h=()=>{if(themeMode==='auto')applyTheme('auto')};
+      mq.addEventListener?mq.addEventListener('change',h):mq.addListener(h);
+    }
+  }catch(e){}
+  setInterval(()=>{if(themeMode==='auto')applyTheme('auto')},10*60*1000);
+}
+
 // ── ACTIVITY PRESETS (urban routine defaults + your own history) ──
 const ACT_PRESETS=['Office work','Meeting','Emails','Commute','Deep work','Study','Exercise','Cooking','Eating','Family time','Household chores','Errands','Social media','Watching videos','Rest / nap','Sleep','Reading','Trading'];
 function recentActivities(n=6){
@@ -910,7 +2120,7 @@ function renderSleep(){
         ${[1,2,3,4,5].map(q=>`<div onclick="pickSleepQ(${q})" data-q="${q}" style="flex:1;min-width:58px;text-align:center;padding:9px 4px;border-radius:9px;cursor:pointer;font-size:10.5px;font-weight:600;border:1px solid ${cur.quality===q?'var(--ind)':'var(--b1)'};background:${cur.quality===q?'var(--is)':'var(--bg3)'};color:${cur.quality===q?'var(--ind)':'var(--t2)'};">${['😫','😕','😐','🙂','😴'][q-1]}<br>${QL[q]}</div>`).join('')}
       </div>
       <div style="font-size:9.5px;color:var(--t2);margin-bottom:4px;">Notes (optional)</div>
-      <input type="text" class="ti" id="sl-note" value="${escH(cur.note||'')}" placeholder="Woke at 3am · late dinner · screen before bed…" style="margin:0 0 12px;">
+      <div class="inrow" style="margin-bottom:12px;"><input type="text" class="ti" id="sl-note" value="${escH(cur.note||'')}" placeholder="Woke at 3am · late dinner…">${micBtn('sl-note')}</div>
       <button class="btn bp" style="width:100%;" onclick="saveSleep()">Save Sleep Log</button>
     </div>
     <div class="g2">
@@ -1024,8 +2234,9 @@ function checkStorage(){
 // ── HOURLY LOG PROMPT ──────────────────────────
 // Fires once per hour while the app is open, if the previous hour is unlogged.
 const HP={last:DB.get('lastHourPrompt','')};
+function inHourWindow(){const h=new Date().getHours();return h>=HRCFG.from&&h<HRCFG.to;}
 function maybeHourPrompt(){
-  if(!CHK.enabled||inQuiet())return;
+  if(!HRCFG.enabled||!inHourWindow())return;
   if(isTyping())return;
   if(document.getElementById('chk-ov')||document.getElementById('hp-ov')||document.getElementById('rw-ov'))return;
   const now=new Date(),prevH=new Date(now.getTime()-3600*1000);
@@ -1034,6 +2245,7 @@ function maybeHourPrompt(){
   if(S.hourlyLog[slot])return;          // already logged
   if(HP.last===slot)return;             // already asked about this hour
   if(now.getMinutes()<5)return;         // give the hour a moment to finish
+  if(HRCFG.every>1&&prevH.getHours()%HRCFG.every!==0)return;
   HP.last=slot;DB.set('lastHourPrompt',slot);
   showHourPrompt(hk,slot);
 }
@@ -1043,7 +2255,7 @@ function showHourPrompt(hk,slot){
   ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--b2);border-radius:18px;padding:22px 20px;max-width:360px;width:100%;">
     <div style="text-align:center;font-size:24px;margin-bottom:6px;">⏱</div>
     <div style="text-align:center;font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--sky);margin-bottom:10px;">HOUR ${hk}:00 — WHAT DID YOU DO?</div>
-    <input type="text" class="ti" id="hp-act" placeholder="What were you doing?" style="margin:0 0 9px;" onkeydown="if(event.key==='Enter')saveHourPrompt('${slot}','${hk}')">
+    <div class="inrow" style="margin-bottom:9px;"><input type="text" class="ti" id="hp-act" placeholder="What were you doing?" onkeydown="if(event.key==='Enter')saveHourPrompt('${slot}','${hk}')">${micBtn('hp-act')}</div>
     ${activityChips('hp-act')}
     <div style="font-size:10px;color:var(--t2);margin-bottom:4px;">Energy during that hour</div>
     <input type="range" id="hp-en" min="1" max="10" value="6" style="width:100%;margin-bottom:6px;" oninput="document.getElementById('hp-env').textContent=this.value">
@@ -1219,6 +2431,10 @@ function onViewportChange(){
 
 // ── MOBILE NAV ─────────────────────────────────
 const MORE_ITEMS=[
+  {id:'capture',icon:'🎤',name:'Capture'},
+  {id:'insights',icon:'💡',name:'Insights'},
+  {id:'expenses',icon:'💰',name:'Expenses'},
+  {id:'feedback',icon:'🙏',name:'Feedback'},
   {id:'screentime',icon:'📱',name:'Screen Time'},{id:'sleep',icon:'😴',name:'Sleep'},{id:'rewards',icon:'⭐',name:'Rewards'},
   {id:'habits',icon:'✦',name:'Habits'},{id:'planner',icon:'⏱',name:'Planner'},{id:'goals',icon:'◎',name:'Goals'},
   {id:'events',icon:'⚡',name:'Events'},{id:'decisions',icon:'⚖',name:'Decisions'},
@@ -1332,6 +2548,10 @@ const NAV_GROUPS = [
   ]},
   {label:'Intelligence',items:[
     {id:'events',icon:'⚡',name:'Event Logger',badge:'NEW',bc:'s'},
+    {id:'capture',icon:'🎤',name:'Quick Capture',badge:'NEW',bc:'s'},
+    {id:'insights',icon:'💡',name:'Insights',badge:'NEW',bc:'s'},
+    {id:'expenses',icon:'💰',name:'Expenses',badge:'NEW',bc:'s'},
+    {id:'feedback',icon:'🙏',name:'Feedback'},
     {id:'hourly',icon:'⏲',name:'Hourly Logger'},
     {id:'screentime',icon:'📱',name:'Screen Time',badge:'NEW',bc:'s'},
     {id:'sleep',icon:'😴',name:'Sleep Log',badge:'NEW',bc:'s'},
@@ -1353,7 +2573,7 @@ const NAV_GROUPS = [
     {id:'settings',icon:'⚙',name:'Settings'},
   ]}
 ];
-const PANELS_DEF = ['dashboard','planner','tasks','goals','habits','events','hourly','screentime','sleep','rewards','decisions','ai','memory','domains','knowledge','weekly','burnout','audit','journal','procrastination','settings'];
+const PANELS_DEF = ['dashboard','planner','tasks','goals','habits','events','hourly','capture','screentime','sleep','rewards','insights','expenses','feedback','decisions','ai','memory','domains','knowledge','weekly','burnout','audit','journal','procrastination','settings'];
 
 function buildNav(){
   const sb=document.getElementById('sb-nav'),tnav=document.getElementById('tnav');
@@ -1378,6 +2598,7 @@ function buildPanels(){
 }
 
 function goPanel(id){
+  if(id!=='feedback')S.lastPanel=id;
   if(document.body.classList.contains('sb-open'))closeSidebarDrawer();
   ACT.switch(id);
   S.panel=id;
@@ -1397,7 +2618,7 @@ function renderPanel(id){
     memory:renderMemory,domains:renderDomains,knowledge:renderKnowledge,
     weekly:renderWeekly,burnout:renderBurnout,audit:renderAudit,
     journal:renderJournal,procrastination:renderProcrastination,settings:renderSettings,
-    screentime:renderScreentime,rewards:renderRewards,sleep:renderSleep
+    screentime:renderScreentime,rewards:renderRewards,sleep:renderSleep,capture:renderCapture,insights:renderInsights,feedback:renderFeedback,expenses:renderExpenses
   };
   if(fns[id])fns[id]();
 }
@@ -1469,11 +2690,19 @@ function renderDashboard(){
       </div>
     </div>
     <div class="nudgecard" id="nudge-card"></div>
+    ${(()=>{try{const ins=buildInsights().filter(x=>x.action);if(!ins.length)return '';const i=ins[0];
+      return `<div class="card" style="margin-bottom:14px;cursor:pointer;" onclick="goPanelB('insights')">
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <div style="font-size:18px;">${i.icon}</div>
+          <div style="flex:1;"><div style="font-size:8.5px;font-weight:800;letter-spacing:.12em;color:var(--vio);margin-bottom:4px;">PATTERN FOUND</div>
+          <div style="font-size:11.5px;color:var(--t1);line-height:1.6;">${i.text}</div></div>
+          <span style="color:var(--t2);font-size:13px;">›</span>
+        </div></div>`;}catch(e){return ''}})()}
     <div class="qrow">
       <div class="qbtn" onclick="goPanelB('hourly')"><div class="qbi">⚡</div><div class="qbl">Quick Log</div></div>
       <div class="qbtn" onclick="openFocus()"><div class="qbi">⏱</div><div class="qbl">Focus</div></div>
       <div class="qbtn" onclick="goPanelB('screentime')"><div class="qbi">📱</div><div class="qbl">Screen</div></div>
-      <div class="qbtn" onclick="showCheckin(true)"><div class="qbi">🎯</div><div class="qbl">Check In</div></div>
+      <div class="qbtn" onclick="openCaptureVoice()"><div class="qbi">🎤</div><div class="qbl">Capture</div></div>
     </div>
     <div style="display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:11px 14px;margin-bottom:14px;cursor:pointer;" onclick="goPanelB('rewards')">
       <span style="font-size:20px;">⭐</span>
@@ -1543,7 +2772,7 @@ function renderEvents(){
       <div class="card">
         <div class="chd"><span class="ct">Log New Event</span></div>
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <input type="text" class="ti" id="ev-detail" placeholder="What did you do? (e.g. GoCharting analysis 1h)">
+          <div class="inrow"><input type="text" class="ti" id="ev-detail" placeholder="What did you do?">${micBtn('ev-detail')}</div>
           <div style="display:flex;gap:8px;">
             <select id="ev-type" style="flex:1;background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:7px 10px;color:var(--t1);font-size:11.5px;">
               <option value="deep_work">Deep Work</option>
@@ -1630,7 +2859,7 @@ function renderHourly(){
     <div class="card" id="hl-log-form" style="display:none;margin-bottom:14px;">
       <div class="chd"><span class="ct" id="hl-form-title">Log Hour</span><span class="ca" onclick="document.getElementById('hl-log-form').style.display='none'">✕</span></div>
       <div style="display:flex;flex-direction:column;gap:8px;">
-        <input type="text" class="ti" id="hl-activity" placeholder="What were you doing?">
+        <div class="inrow"><input type="text" class="ti" id="hl-activity" placeholder="What were you doing?">${micBtn('hl-activity')}</div>
         <div id="hl-chips"></div>
         <div style="font-size:9.5px;color:var(--t2);margin-bottom:2px;">Energy Level <span id="hl-e-val">7</span>/10</div>
         <input type="range" min="1" max="10" value="7" id="hl-energy" oninput="document.getElementById('hl-e-val').textContent=this.value;updateHourEmoji()">
@@ -1818,6 +3047,7 @@ function renderMemory(){
       <div class="card">
         <div class="chd"><span class="ct">Add Memory</span></div>
         <textarea class="jta" id="mem-input" placeholder="What should your AI Coach always remember? (e.g. I perform best at 09:00, I struggle with afternoon slumps…)" style="margin-bottom:8px;"></textarea>
+        ${VOICE_OK?`<div style="text-align:right;margin-bottom:6px;">${micBtn('mem-input',{continuous:true})}</div>`:''}
         <div style="display:flex;gap:8px;">
           <select id="mem-icon" style="background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:7px 10px;color:var(--t1);font-size:13px;">
             <option value="📈">📈 Trading</option><option value="🧘">🧘 Mindfulness</option><option value="⚡">⚡ Energy</option><option value="📚">📚 Learning</option><option value="⚠️">⚠️ Warning</option><option value="✅">✅ Strength</option><option value="🎯">🎯 Goal</option><option value="💪">💪 Body</option>
@@ -2061,13 +3291,18 @@ const CATS={deep:{c:'var(--ind)',l:'Deep Work'},work:{c:'var(--sky)',l:'Work/Off
 function renderTasks(){
   const p=document.getElementById('p-tasks');
   const PR={1:{l:'P1',c:'var(--ros)'},2:{l:'P2',c:'var(--saf)'},3:{l:'P3',c:'var(--t2)'}};
-  const open=S.tasks.filter(t=>!t.done).sort((a,b)=>(a.pri||2)-(b.pri||2)),done=S.tasks.filter(t=>t.done);
+  const open=S.tasks.filter(t=>!t.done).sort((a,b)=>{
+    const pd=(a.pri||2)-(b.pri||2); if(pd)return pd;
+    if(a.due&&b.due)return a.due.localeCompare(b.due);
+    return a.due?-1:b.due?1:0;
+  }),done=S.tasks.filter(t=>t.done);
   p.innerHTML=`
     <div class="ph"><div><div class="ph-t">Task Manager</div><div class="ph-s">P1 first · Your top P1 drives the check-in prompts</div></div></div>
     <div class="g2">
       <div>
         <div style="display:flex;gap:7px;margin-bottom:8px;">
-          <input type="text" class="ti" id="t-inp" placeholder="Add task…" style="flex:1;margin:0;" onkeydown="if(event.key==='Enter')addTask()">
+          ${micBtn('t-inp')}
+          <input type="text" class="ti" id="t-inp" placeholder="Add task… or use 🎤" style="flex:1;margin:0;" onkeydown="if(event.key==='Enter')addTask()">
           <select id="t-pri" style="background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:0 8px;color:var(--t1);font-size:11px;"><option value="1">P1 · Must</option><option value="2" selected>P2 · Should</option><option value="3">P3 · Later</option></select>
           <select id="t-cat" style="background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:0 8px;color:var(--t1);font-size:11px;">${Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v.l}</option>`).join('')}</select>
           <button class="btn bp bsm" onclick="addTask()">Add</button>
@@ -2090,6 +3325,8 @@ function renderTaskList(tasks,isDone=false){
   return tasks.map(t=>`<div class="trow">
     <div class="tck ${t.done?'d':''}" onclick="toggleTask(${t.id})">${t.done?'✓':''}</div>
     <span class="ttag" style="background:${PR[t.pri||2].c}22;color:${PR[t.pri||2].c};cursor:pointer;" onclick="cyclePri(${t.id})">${PR[t.pri||2].l}</span>
+    ${t.due?`<span class="ttag" style="background:var(--ks);color:var(--sky);">${t.due}${S.reminders.some(r=>r.taskId===t.id&&!r.fired)?' ⏰':''}</span>`:''}
+    ${t.recur?`<span class="ttag" style="background:var(--vs);color:var(--vio);">↻</span>`:''}
     <div class="ttx ${t.done?'d':''}">${escH(t.text)}</div>
     <span class="ttag" style="background:${CATS[t.cat]?.c||'var(--ind)'}22;color:${CATS[t.cat]?.c||'var(--ind)'}">${CATS[t.cat]?.l||t.cat}</span>
     <span class="tx" onclick="deleteTask(${t.id})">×</span>
@@ -2147,7 +3384,7 @@ function renderGoals(){
     <div class="card" style="margin-bottom:14px;">
       <div class="chd"><span class="ct">Add Goal</span></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <input type="text" class="ti" id="g-text" placeholder="Goal…" style="flex:2;min-width:200px;margin:0;" onkeydown="if(event.key==='Enter')addGoal()">
+        <input type="text" class="ti" id="g-text" placeholder="Goal…" style="flex:2;min-width:180px;margin:0;" onkeydown="if(event.key==='Enter')addGoal()">${micBtn('g-text')}
         <select id="g-level" style="background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:7px 10px;color:var(--t1);font-size:11.5px;">${GLEVELS.map(l=>`<option>${l}</option>`).join('')}</select>
         <input type="text" class="ti" id="g-domain" placeholder="Domain (e.g. Trading)" style="width:150px;margin:0;" list="g-doms">
         <datalist id="g-doms">${domains.map(d=>`<option value="${escH(d)}">`).join('')}</datalist>
@@ -2268,7 +3505,8 @@ function renderWeekly(){
       <div class="g2">
         ${[{id:'wr-wins',k:'wins',c:'var(--em)',t:'WINS',ph:'What went well this week?'},{id:'wr-lessons',k:'lessons',c:'var(--ros)',t:'LESSONS',ph:'What will you change?'},{id:'wr-next3',k:'next3',c:'var(--ind)',t:'NEXT WEEK TOP 3',ph:'3 must-happen priorities…'},{id:'wr-recovery',k:'recovery',c:'var(--saf)',t:'RECOVERY PLAN',ph:'How will you recharge?'}].map(f=>`
           <div><div style="font-size:9px;font-weight:800;color:${f.c};letter-spacing:.08em;margin-bottom:5px;">${f.t}</div>
-          <textarea class="jta" id="${f.id}" placeholder="${f.ph}">${escH(rev[f.k]||'')}</textarea></div>`).join('')}
+          <textarea class="jta" id="${f.id}" placeholder="${f.ph}">${escH(rev[f.k]||'')}</textarea>
+          ${VOICE_OK?`<div style="text-align:right;margin-top:-4px;">${micBtn(f.id,{continuous:true})}</div>`:''}</div>`).join('')}
       </div>
       <div style="margin-top:10px;text-align:right;"><button class="btn bp bsm" onclick="saveWeekReview('${wk}')">Save Review</button></div>
     </div>`;
@@ -2403,6 +3641,7 @@ function renderJournal(){
           <div style="margin-bottom:10px;">
             <div style="font-size:8.5px;font-weight:800;color:${f.c};letter-spacing:.1em;margin-bottom:5px;">${f.t}</div>
             <textarea class="jta" id="${f.id}" placeholder="${f.ph}"></textarea>
+            ${VOICE_OK?`<div style="text-align:right;margin-top:-4px;">${micBtn(f.id,{continuous:true})}</div>`:''}
           </div>`).join('')}
       </div>
       <div>
@@ -2414,9 +3653,10 @@ function renderJournal(){
 function saveJournal(){
   const w=document.getElementById('jw')?.value.trim(),d=document.getElementById('jd')?.value.trim();
   if(!w&&!d){toast('⚠️','Write something first');return;}
-  const entry={date:new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'}),wins:w,drain:d,tomorrow:document.getElementById('jt')?.value.trim(),insight:document.getElementById('jm')?.value.trim()};
+  const entry={dk:today(),date:new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'}),wins:w,drain:d,tomorrow:document.getElementById('jt')?.value.trim(),insight:document.getElementById('jm')?.value.trim()};
   S.journalEntries.unshift(entry);save();
   logEvent('review','Journal entry saved',6,6,'mind');
+  closeJournalPrompt();
   toast('✍️','Journal entry saved!');renderJournal();
 }
 function deleteJournal(i){if(!confirm('Delete this journal entry?'))return;S.journalEntries.splice(i,1);save();renderJournal();}
@@ -2484,6 +3724,72 @@ function renderSettings(){
         <button class="btn bp bsm" onclick="saveFocusCfg()">Save Settings</button>
       </div>
       <div class="card">
+        <div class="chd"><span class="ct">🧠 AI Assistant</span></div>
+        <div style="font-size:11.5px;color:var(--t1);line-height:1.7;margin-bottom:10px;"><strong style="color:var(--em)">Life OS is completely free and works fully without this.</strong> The built-in engine parses your speech, and Insights, briefings and reminders are all computed on-device at zero cost.<br><br>Optional: adding your own Anthropic API key lets Capture understand any phrasing or language mix, and enables the AI Coach. You pay Anthropic directly (a few paise per capture). Stored only on this device.</div>
+        <div class="inrow" style="margin-bottom:8px;">
+          <input type="password" class="ti" id="ai-key" value="${aiKey()?'••••••••••••':''}" placeholder="sk-ant-…  (console.anthropic.com)">
+          <button class="btn bp bsm" onclick="saveAIKey()">Save</button>
+          ${aiKey()?'<button class="btn bg bsm" onclick="DB.del(\'aiKey\');renderSettings();toast(\'🧠\',\'Key removed\')">✕</button>':''}
+        </div>
+        <div style="font-size:10px;color:var(--t2);line-height:1.6;">Status: <strong style="color:${aiKey()?'var(--em)':'var(--t1)'}">${aiKey()?'AI brain active':'Local rule engine'}</strong> · For a future public version this must move to a server — fine for personal use.</div>
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Share & Help</span></div>
+        <div style="font-size:11.5px;color:var(--t1);line-height:1.7;margin-bottom:12px;">Life OS is free with no account and no ads. Share it with anyone.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn bp bsm" onclick="shareApp()">📤 Share app</button>
+          <button class="btn bg bsm" onclick="goPanelB('feedback')">🙏 Send feedback</button>
+          <button class="btn bg bsm" onclick="if(confirm('Replay the setup tour? Your data stays.')){DB.del('mode');showOnboarding()}">↻ Replay tour</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">☀️ Morning Briefing</span></div>
+        <div style="font-size:11.5px;color:var(--t1);line-height:1.7;margin-bottom:10px;">Once a day around your wake time: your schedule, top priority and yesterday's score — like a chief of staff starting your day.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn ${BRF.enabled?'bp':'bg'} bsm" onclick="BRF.enabled=!BRF.enabled;DB.set('briefCfg',BRF);renderSettings()">${BRF.enabled?'☀️ Briefing: ON':'☀️ Briefing: OFF'}</button>
+          <button class="btn ${BRF.voice?'bp':'bg'} bsm" onclick="BRF.voice=!BRF.voice;DB.set('briefCfg',BRF);renderSettings()">${BRF.voice?'🔊 Speaks aloud: ON':'🔇 Speaks aloud: OFF'}</button>
+          <button class="btn bg bsm" onclick="DB.del('briefShown');showBriefing()">Preview now</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Appearance</span></div>
+        <div style="font-size:11.5px;color:var(--t1);line-height:1.7;margin-bottom:12px;">Auto follows your device's light/dark setting; if your device doesn't set one, it switches by time of day (light 07:00–19:00).</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          ${[{k:'dark',l:'🌙 Dark'},{k:'light',l:'☀️ Light'},{k:'auto',l:'🌗 Auto'}].map(t=>
+            `<button class="btn ${themeMode===t.k?'bp':'bg'} bsm" onclick="applyTheme('${t.k}');renderSettings()">${t.l}</button>`).join('')}
+        </div>
+        <div style="font-size:10.5px;color:var(--t2);margin-top:9px;">Currently showing: <strong style="color:var(--t1)">${resolveTheme(themeMode)}</strong></div>
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Hourly Log Prompts</span></div>
+        <div style="font-size:11.5px;color:var(--t1);line-height:1.7;margin-bottom:12px;">Once an hour Life OS asks what you did in the hour just gone — the entry takes two taps using the preset chips. This is what builds your energy pattern and time audit. Turn it off any time if it gets annoying.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+          <button class="btn ${HRCFG.enabled?'bp':'bg'} bsm" onclick="HRCFG.enabled=!HRCFG.enabled;DB.set('hourCfg',HRCFG);renderSettings();toast('⏱',HRCFG.enabled?'Hourly prompts on':'Hourly prompts off')">${HRCFG.enabled?'⏱ Hourly prompts: ON':'⏱ Hourly prompts: OFF'}</button>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <span style="font-size:10.5px;color:var(--t2);">From</span>
+          <input type="number" class="ti" id="hr-from" value="${HRCFG.from}" min="0" max="23" style="width:56px;margin:0;text-align:right;">
+          <span style="font-size:10.5px;color:var(--t2);">to</span>
+          <input type="number" class="ti" id="hr-to" value="${HRCFG.to}" min="1" max="24" style="width:56px;margin:0;text-align:right;">
+          <span style="font-size:10.5px;color:var(--t2);">h · ask every</span>
+          <select id="hr-every" style="background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:7px 9px;color:var(--t1);font-size:11.5px;">
+            ${[1,2,3].map(n=>`<option value="${n}"${HRCFG.every===n?' selected':''}>${n} hour${n>1?'s':''}</option>`).join('')}
+          </select>
+        </div>
+        <button class="btn bp bsm" style="margin-top:10px;" onclick="saveHourCfg()">Save Hourly Settings</button>
+      </div>
+      <div class="card">
+        <div class="chd"><span class="ct">Nightly Journal Reminder</span></div>
+        <div style="font-size:11.5px;color:var(--t1);line-height:1.7;margin-bottom:12px;">Each night Life OS asks you to write the day's journal, with a recap of what you did. It won't ask if you've already written one.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <button class="btn ${JRCFG.enabled?'bp':'bg'} bsm" onclick="JRCFG.enabled=!JRCFG.enabled;DB.set('journalCfg',JRCFG);renderSettings();toast('🌙',JRCFG.enabled?'Journal reminder on':'Journal reminder off')">${JRCFG.enabled?'🌙 Reminder: ON':'🌙 Reminder: OFF'}</button>
+          <span style="font-size:10.5px;color:var(--t2);">at</span>
+          <input type="number" class="ti" id="jr-hour" value="${JRCFG.hour}" min="17" max="23" style="width:56px;margin:0;text-align:right;">
+          <span style="font-size:10.5px;color:var(--t2);">:00</span>
+          <button class="btn bp bsm" onclick="saveJournalCfg()">Save</button>
+        </div>
+      </div>
+      <div class="card">
         <div class="chd"><span class="ct">Check-in Prompts & Rewards</span></div>
         <div style="font-size:11.5px;color:var(--t1);line-height:1.7;margin-bottom:12px;">Life OS asks if you're on your top P1 task. Three honest "yes" answers in a row earns a ⭐. Currently ${RW.stars} stars · ${RW.streak}/3 toward the next.</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
@@ -2529,15 +3835,31 @@ function renderSettings(){
         </div>
       </div>
       <div class="card">
-        <div class="chd"><span class="ct">About Life OS v6</span></div>
+        <div class="chd"><span class="ct">About Life OS v10</span></div>
         <div style="font-size:11.5px;color:var(--t1);line-height:1.9;">
-          <strong style="color:var(--t0)">Life OS v6</strong> — Personal Intelligence System<br>
+          <strong style="color:var(--t0)">Life OS v10</strong> — Personal Intelligence System<br>
           Built for: ${escH(PROFILE.name)} · ${escH(PROFILE.location)}<br>
           Layers: Event Store · Activity Tracker · Metrics Engine · AI Memory · Knowledge Graph<br>
           <span style="color:var(--t2)">Local-first · Auto time/focus/energy tracking · Data stays with you</span>
         </div>
       </div>
     </div>`;
+}
+function saveAIKey(){
+  const v=document.getElementById('ai-key').value.trim();
+  if(!v||v.startsWith('•')){toast('⚠️','Paste your API key first');return;}
+  if(!v.startsWith('sk-ant')){toast('⚠️','That does not look like an Anthropic key');return;}
+  DB.set('aiKey',v);renderSettings();toast('🧠','AI brain activated');
+}
+function saveHourCfg(){
+  HRCFG.from=Math.max(0,Math.min(23,parseInt(document.getElementById('hr-from').value)||7));
+  HRCFG.to=Math.max(1,Math.min(24,parseInt(document.getElementById('hr-to').value)||22));
+  HRCFG.every=parseInt(document.getElementById('hr-every').value)||1;
+  DB.set('hourCfg',HRCFG);toast('⏱','Hourly settings saved');renderSettings();
+}
+function saveJournalCfg(){
+  JRCFG.hour=Math.max(17,Math.min(23,parseInt(document.getElementById('jr-hour').value)||22));
+  DB.set('journalCfg',JRCFG);toast('🌙',`Journal reminder set for ${JRCFG.hour}:00`);renderSettings();
 }
 function saveChkCfg(){
   CHK.every=Math.max(15,Math.min(240,parseInt(document.getElementById('chk-every').value)||45));
@@ -2558,7 +3880,7 @@ function saveFocusCfg(){
 }
 function exportData(){
   ACT.flush();
-  const data=JSON.stringify({version:'4.0',exported:new Date().toISOString(),profile:PROFILE,focusCfg:FCFG,events:S.events,tasks:S.tasks,habits:S.habits,goals:S.goals,decisions:S.decisions,aiMemory:S.aiMemory,journalEntries:S.journalEntries,hourlyLog:S.hourlyLog,weekPlans:S.weekPlans,weekReviews:S.weekReviews,burnout:S.burnout,activity:ACT.data,focusSessions:S.focusSessions,screenTime:S.screenTime,rewards:RW,chkCfg:CHK,ftasks:FTASKS,sleep:S.sleep},null,2);
+  const data=JSON.stringify({version:'4.0',exported:new Date().toISOString(),profile:PROFILE,focusCfg:FCFG,events:S.events,tasks:S.tasks,habits:S.habits,goals:S.goals,decisions:S.decisions,aiMemory:S.aiMemory,journalEntries:S.journalEntries,hourlyLog:S.hourlyLog,weekPlans:S.weekPlans,weekReviews:S.weekReviews,burnout:S.burnout,activity:ACT.data,focusSessions:S.focusSessions,screenTime:S.screenTime,rewards:RW,chkCfg:CHK,hourCfg:HRCFG,journalCfg:JRCFG,theme:themeMode,ftasks:FTASKS,sleep:S.sleep,recurring:S.recurring,briefCfg:BRF,expenses:S.expenses,feedback:DB.get('feedback',[])},null,2);
   const a=document.createElement('a');a.href='data:text/json;charset=utf-8,'+encodeURIComponent(data);a.download='life-os-backup-'+today()+'.json';a.click();
   toast('📥','Data exported!');
 }
@@ -2571,6 +3893,13 @@ function importData(inp){
       if(!d.tasks&&!d.events){toast('⚠️','Not a Life OS backup file');return;}
       if(d.rewards)Object.assign(RW,d.rewards),saveRW();
       if(d.ftasks)FTASKS=d.ftasks,saveFTasks();
+      if(d.hourCfg)Object.assign(HRCFG,d.hourCfg),DB.set('hourCfg',HRCFG);
+      if(d.journalCfg)Object.assign(JRCFG,d.journalCfg),DB.set('journalCfg',JRCFG);
+      if(d.recurring)S.recurring=d.recurring,DB.set('recurring',S.recurring);
+      if(d.briefCfg)Object.assign(BRF,d.briefCfg),DB.set('briefCfg',BRF);
+      if(d.feedback)DB.set('feedback',d.feedback);
+      if(d.expenses)S.expenses=d.expenses,DB.set('expenses',S.expenses);
+      if(d.theme)applyTheme(d.theme);
       if(d.sleep)S.sleep=Object.assign(S.sleep||{},d.sleep);
       if(d.screenTime)S.screenTime=Object.assign(S.screenTime,d.screenTime);
       ['tasks','habits','goals','events','aiMemory','decisions','journalEntries','hourlyLog','weekPlans','weekReviews','burnout'].forEach(k=>{if(d[k]!==undefined)S[k]=k==='habits'?migrateHabits(d[k]):k==='hourlyLog'?migrateHourly(d[k]):d[k];});
@@ -2584,7 +3913,7 @@ function importData(inp){
   r.readAsText(f);
 }
 function clearAllData(){
-  ['tasks','nextTaskId','habits','events','nextEventId','aiMemory','nextMemoryId','decisions','nextDecisionId','journalEntries','hourlyLog','burnout','focusSessions','goals','nextGoalId','weekPlans','weekReviews','activity','domains','mode','screenTime','rewards','chkCfg','nudgeCfg','ftasks','sleep','lastHourPrompt'].forEach(k=>DB.del(k));
+  ['tasks','nextTaskId','habits','events','nextEventId','aiMemory','nextMemoryId','decisions','nextDecisionId','journalEntries','hourlyLog','burnout','focusSessions','goals','nextGoalId','weekPlans','weekReviews','activity','domains','mode','screenTime','rewards','chkCfg','nudgeCfg','ftasks','sleep','lastHourPrompt','hourCfg','journalCfg','theme','journalPrompted','recurring','recurGen','briefCfg','briefShown','followAsked','reminders','aiKey','feedback','schedMode','voiceLang','expenses'].forEach(k=>DB.del(k));
   location.reload();
 }
 
@@ -2649,7 +3978,9 @@ async function sendAI(){
   thk.innerHTML=`<div class="mav b">✦</div><div class="mb"><div class="thk"><div class="td"></div><div class="td"></div><div class="td"></div><span style="font-size:10px;color:var(--t2);margin-left:4px;">Thinking…</span></div></div>`;
   msgs?.appendChild(thk);msgs&&(msgs.scrollTop=msgs.scrollHeight);
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:AI_SYS(),messages:S.aiHistory.filter(m=>typeof m.content==='string').map(m=>({role:m.role,content:m.content}))})});
+    const aih={'Content-Type':'application/json'};
+    if(aiKey()){aih['x-api-key']=aiKey();aih['anthropic-version']='2023-06-01';aih['anthropic-dangerous-direct-browser-access']='true';}
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:aih,body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:AI_SYS(),messages:S.aiHistory.filter(m=>typeof m.content==='string').map(m=>({role:m.role,content:m.content}))})});
     const data=await res.json();
     const reply=data.content?.[0]?.text||'Error — please retry.';
     thk.remove();S.aiHistory.push({role:'assistant',content:reply});
@@ -2774,7 +4105,7 @@ function showWelcome(){
   ov.style.cssText='position:fixed;inset:0;background:rgba(8,11,20,.92);backdrop-filter:blur(6px);z-index:999;display:flex;align-items:center;justify-content:center;';
   ov.innerHTML=`<div style="background:var(--bg2);border:1px solid var(--b2);border-radius:16px;padding:32px;max-width:420px;text-align:center;">
     <div style="width:48px;height:48px;margin:0 auto 14px;background:linear-gradient(135deg,var(--ind),var(--vio));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;">L</div>
-    <div style="font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:6px;">Welcome to Life OS v6</div>
+    <div style="font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:6px;">Welcome to Life OS v8</div>
     <div style="font-size:11.5px;color:var(--t1);line-height:1.7;margin-bottom:20px;">Your personal intelligence system. With your confirmation, Life OS tracks time, focus and energy — directly (your quick logs) and indirectly (how you use the app) — stored only on your device, and nudges you back to your priorities. Continue to accept & begin.</div>
     <div style="display:flex;gap:10px;justify-content:center;">
       <button class="btn bp" onclick="DB.set('mode','fresh');document.getElementById('welcome-ov').remove();toast('✨','Fresh start — add your first task!')">✨ Start Fresh</button>
@@ -2784,6 +4115,7 @@ function showWelcome(){
   document.body.appendChild(ov);
 }
 function init(){
+  initTheme();
   ACT.init();
   document.addEventListener('focusin',e=>{
     if(e.target&&['INPUT','TEXTAREA'].includes(e.target.tagName))
@@ -2803,9 +4135,17 @@ function init(){
   setInterval(maybePrompt,60*1000);
   setInterval(maybeHourPrompt,60*1000);
   setTimeout(maybeHourPrompt,30*1000);
+  generateRecurring();
+  setInterval(checkReminders,30*1000);
+  setTimeout(checkReminders,5000);
+  setTimeout(maybeBriefing,2500);
+  setInterval(checkFollowUps,3*60*1000);
+  setTimeout(checkFollowUps,60*1000);
+  setInterval(maybeJournalPrompt,5*60*1000);
+  setTimeout(maybeJournalPrompt,45*1000);
   setTimeout(maybePrompt,90*1000);
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden){setTimeout(maybeHourPrompt,1200);setTimeout(maybePrompt,2500);}});
-  if(FRESH===null&&!localStorage.getItem('los_tasks'))showWelcome();
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden){generateRecurring();setTimeout(maybeBriefing,900);setTimeout(maybeHourPrompt,1200);setTimeout(maybeJournalPrompt,1800);setTimeout(maybePrompt,2500);}});
+  if(FRESH===null&&!localStorage.getItem('los_tasks'))setTimeout(showOnboarding,150);
   if(location.protocol!=='file:'&&'serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
   setTimeout(()=>toast('🚀','Life OS ready, '+PROFILE.name+'!'),700);
 }
