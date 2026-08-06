@@ -259,16 +259,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
 .kg-label{font-size:9px;color:var(--t1);font-weight:500}
 .kg-arrow{display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:14px;padding:2px 0}
 
-/* ── LIFE DOMAINS RING ── */
-.domain-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.domain-card{background:var(--bg3);border:1px solid var(--b1);border-radius:8px;padding:10px;text-align:center;cursor:pointer;transition:var(--trans)}
-.domain-card:hover{border-color:var(--b2);transform:translateY(-1px)}
-.domain-icon{font-size:18px;margin-bottom:4px}
-.domain-name{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--t1)}
-.domain-score{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:800;margin-top:2px}
-.domain-bar{margin-top:6px;background:var(--bg4);border-radius:3px;height:3px;overflow:hidden}
-.domain-fill{height:3px;border-radius:3px}
-
 /* ── AI MEMORY ── */
 .mem-item{background:var(--bg3);border:1px solid var(--b1);border-radius:7px;padding:10px 12px;margin-bottom:6px;display:flex;gap:10px;align-items:flex-start}
 .mem-icon{font-size:14px;flex-shrink:0;margin-top:1px}
@@ -406,7 +396,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;heigh
   .g2,.g3,.g4{grid-template-columns:1fr}
   .g4{grid-template-columns:1fr 1fr}
   .mx{min-height:auto}
-  .domain-grid{grid-template-columns:repeat(2,1fr)}
   .hl-grid{grid-template-columns:repeat(4,1fr)}
   .wg{grid-template-columns:1fr;gap:6px}
   .wdc{display:flex;flex-wrap:wrap;align-items:center;gap:6px;text-align:left;padding:9px 11px}
@@ -479,6 +468,300 @@ body.sb-off #sb{display:none!important}
   #sbclose:active{background:var(--bg4)}
 }
 
+
+/* ══════════════════════════════════════════
+   LIFE OS v11 — COMPANION LAYER
+   Ambient time · Right Now · Day Ribbon
+   Reality Check · Garden · Wind-down · Hubs
+══════════════════════════════════════════ */
+
+/* ── Ambient time-of-day wash ───────────── */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  opacity:.85;transition:background 1200ms ease;background:transparent}
+html[data-phase="dawn"] body::before{background:radial-gradient(120% 60% at 50% -10%,rgba(245,158,11,.16),transparent 60%)}
+html[data-phase="day"] body::before{background:radial-gradient(120% 60% at 50% -10%,rgba(56,189,248,.11),transparent 60%)}
+html[data-phase="dusk"] body::before{background:radial-gradient(120% 60% at 50% -10%,rgba(139,92,246,.16),transparent 62%)}
+html[data-phase="night"] body::before{background:radial-gradient(120% 60% at 50% -10%,rgba(99,102,241,.10),transparent 65%)}
+#top,#shell,#bnav,.lifeline{position:relative;z-index:1}
+.phase-chip{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--t2)}
+
+/* ── Command pill ───────────────────────── */
+.cmd-pill{display:flex;align-items:center;gap:9px;background:var(--bg2);border:1px solid var(--b1);
+  border-radius:999px;padding:11px 15px;margin-bottom:13px;cursor:pointer;transition:var(--trans)}
+.cmd-pill:active{background:var(--bg3);transform:scale(.985)}
+.cmd-pill .cp-t{flex:1;font-size:12px;color:var(--t2)}
+.cmd-pill .cp-k{font-size:9px;font-weight:700;color:var(--t3);border:1px solid var(--b1);
+  border-radius:5px;padding:2px 5px;letter-spacing:.06em}
+#cmd-ov{position:fixed;inset:0;background:rgba(8,11,20,.88);backdrop-filter:blur(10px);z-index:700;
+  display:flex;align-items:flex-start;justify-content:center;padding:14vh 16px 16px}
+#cmd-box{background:var(--bg2);border:1px solid var(--b2);border-radius:18px;width:100%;max-width:440px;
+  overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+#cmd-in{width:100%;background:transparent;border:none;border-bottom:1px solid var(--b1);
+  padding:16px 18px;color:var(--t0);font-size:14px}
+#cmd-res{max-height:52vh;overflow-y:auto}
+.cmd-it{display:flex;align-items:center;gap:11px;padding:11px 16px;cursor:pointer;border-bottom:1px solid var(--b1)}
+.cmd-it:last-child{border-bottom:none}
+.cmd-it.sel,.cmd-it:active{background:var(--bg3)}
+.cmd-ic{font-size:15px;width:22px;text-align:center}
+.cmd-nm{flex:1;font-size:12.5px;color:var(--t0)}
+.cmd-hb{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+
+/* ── Right Now card ─────────────────────── */
+.rn-card{background:linear-gradient(150deg,rgba(99,102,241,.17),rgba(139,92,246,.06));
+  border:1px solid rgba(99,102,241,.28);border-radius:18px;padding:16px 17px;margin-bottom:13px}
+.rn-lbl{font-size:8.5px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--ind);margin-bottom:7px;
+  display:flex;justify-content:space-between;align-items:center}
+.rn-why{font-size:10.5px;color:var(--t2);line-height:1.55;margin-bottom:8px}
+.rn-task{font-size:16px;font-weight:600;color:var(--t0);line-height:1.4;margin-bottom:4px}
+.rn-meta{font-size:10.5px;color:var(--t1);margin-bottom:13px}
+.rn-acts{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:7px}
+.rn-b{border-radius:10px;padding:11px 6px;font-size:11px;font-weight:700;text-align:center;cursor:pointer;
+  transition:var(--trans);border:1px solid var(--b1);background:var(--bg2);color:var(--t1)}
+.rn-b:active{transform:scale(.96)}
+.rn-b.go{background:linear-gradient(135deg,var(--ind),var(--vio));color:#fff;border-color:transparent}
+.rn-b.dn{color:var(--em)}
+.rn-empty{font-size:12px;color:var(--t1);line-height:1.6}
+
+/* ── Day Ribbon ─────────────────────────── */
+.ribbon-w{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:13px 14px;margin-bottom:13px}
+.rb-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.rb-t{font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--t2)}
+.rb-v{font-size:10px;color:var(--t1)}
+.rb-bar{display:flex;gap:1.5px;height:26px;border-radius:6px;overflow:hidden}
+.rb-c{flex:1;background:var(--bg4);opacity:.5;cursor:pointer;transition:var(--trans);position:relative}
+.rb-c.filled{opacity:1}
+.rb-c.future{opacity:.22}
+.rb-c.now{box-shadow:inset 0 0 0 1.5px var(--t0)}
+.rb-c:active{transform:scaleY(1.15)}
+.rb-ax{display:flex;justify-content:space-between;margin-top:5px;font-size:8.5px;color:var(--t3);
+  font-family:'JetBrains Mono',monospace}
+.rb-lg{display:flex;flex-wrap:wrap;gap:9px;margin-top:9px}
+.rb-lgi{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--t2)}
+.rb-dot{width:7px;height:7px;border-radius:2px}
+
+/* ── Reality check ──────────────────────── */
+.rc-card{background:var(--bg2);border:1px solid var(--b1);border-left:3px solid var(--cor);
+  border-radius:var(--rl);padding:13px 15px;margin-bottom:13px}
+.rc-l{font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--cor);margin-bottom:5px}
+.rc-t{font-size:12.5px;color:var(--t0);line-height:1.6}
+.rc-a{margin-top:8px;font-size:11px;font-weight:700;color:var(--ind);cursor:pointer}
+
+/* ── Garden ─────────────────────────────── */
+.gd-strip{display:flex;align-items:center;gap:13px;background:var(--bg2);border:1px solid var(--b1);
+  border-radius:var(--rl);padding:12px 15px;margin-bottom:13px;cursor:pointer}
+.gd-strip:active{background:var(--bg3)}
+.gd-name{font-size:12.5px;font-weight:600;color:var(--t0)}
+.gd-sub{font-size:10px;color:var(--t2);margin-top:2px}
+.gd-hero{background:linear-gradient(180deg,rgba(16,185,129,.10),transparent);border:1px solid var(--b1);
+  border-radius:18px;padding:20px;text-align:center;margin-bottom:14px}
+.gd-dots{display:grid;grid-template-columns:repeat(15,1fr);gap:4px;margin-top:6px}
+.gd-d{aspect-ratio:1;border-radius:3px;background:var(--bg4)}
+.gd-d.on{background:var(--em)}
+.gd-d.half{background:rgba(16,185,129,.45)}
+
+/* ── Wind-down ──────────────────────────── */
+#wd-ov{position:fixed;inset:0;background:rgba(8,11,20,.93);backdrop-filter:blur(10px);z-index:650;
+  display:flex;align-items:center;justify-content:center;padding:18px}
+.wd-box{background:var(--bg2);border:1px solid var(--b2);border-radius:20px;padding:22px 20px;
+  max-width:390px;width:100%;max-height:86vh;overflow-y:auto}
+.wd-step{font-size:8.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--vio);margin-bottom:10px}
+.wd-moods{display:flex;gap:7px;margin-bottom:16px}
+.wd-m{flex:1;background:var(--bg3);border:1px solid var(--b1);border-radius:12px;padding:11px 2px;
+  text-align:center;font-size:20px;cursor:pointer;transition:var(--trans)}
+.wd-m.on{border-color:var(--vio);background:var(--vs)}
+.wd-t3{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:34vh;overflow-y:auto}
+.wd-ti{display:flex;align-items:center;gap:9px;background:var(--bg3);border:1px solid var(--b1);
+  border-radius:10px;padding:10px 12px;font-size:11.5px;color:var(--t1);cursor:pointer}
+.wd-ti.on{border-color:var(--em);color:var(--t0);background:var(--es)}
+.wd-num{width:17px;height:17px;border-radius:50%;background:var(--bg4);font-size:9px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;color:var(--t2);flex-shrink:0}
+.wd-ti.on .wd-num{background:var(--em);color:#04160f}
+
+/* ── Hub sheet ──────────────────────────── */
+.hub-card{background:var(--bg3);border:1px solid var(--b1);border-radius:14px;margin-bottom:8px;overflow:hidden}
+.hub-hd{display:flex;align-items:center;gap:11px;padding:13px 15px;cursor:pointer}
+.hub-ic{font-size:17px}
+.hub-nm{flex:1;font-size:12.5px;font-weight:600;color:var(--t0)}
+.hub-ct{font-size:9.5px;color:var(--t3)}
+.hub-bd{display:none;padding:0 11px 11px}
+.hub-card.open .hub-bd{display:block}
+.hub-row{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.hub-it{background:var(--bg2);border:1px solid var(--b1);border-radius:11px;padding:11px 4px;text-align:center;cursor:pointer}
+.hub-it:active{background:var(--bg4)}
+.hub-it .hi-ic{font-size:16px;margin-bottom:4px}
+.hub-it .hi-lb{font-size:9px;color:var(--t1);font-weight:600}
+.hub-more{margin-top:8px;font-size:10px;font-weight:700;color:var(--ind);cursor:pointer;text-align:center;padding:5px}
+.hub-extra{display:none;margin-top:7px}
+.hub-card.exp .hub-extra{display:block}
+.ng-more{font-size:9.5px;font-weight:700;color:var(--t2);cursor:pointer;padding:5px 14px;letter-spacing:.04em}
+.ng-more:hover{color:var(--ind)}
+.ng-extra{display:none}
+.ng.exp .ng-extra{display:block}
+
+/* ── Week Story ─────────────────────────── */
+#ws-ov{position:fixed;inset:0;background:rgba(8,11,20,.92);backdrop-filter:blur(10px);z-index:660;
+  display:flex;align-items:center;justify-content:center;padding:18px;overflow-y:auto}
+.ws-box{max-width:340px;width:100%}
+.ws-box canvas{width:100%;border-radius:16px;display:block;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.ws-acts{display:flex;gap:8px;margin-top:12px}
+
+
+/* ══════════════════════════════════════════
+   LIFE OS v2.1 — FOCUS LAYER
+   Doomscroll Rescue · Peak-hour intelligence
+   Hourly reminder · Local backups · Install guide
+══════════════════════════════════════════ */
+.snap-row{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--b1);
+  border-radius:10px;padding:10px 12px;margin-bottom:6px}
+.snap-nm{flex:1;font-size:11.5px;color:var(--t0);font-weight:600}
+.snap-sub{font-size:9.5px;color:var(--t2);margin-top:1px;font-weight:400}
+.sw-toggle{width:38px;height:21px;border-radius:999px;background:var(--bg4);position:relative;cursor:pointer;flex-shrink:0;transition:var(--trans)}
+.sw-toggle::after{content:'';position:absolute;top:2.5px;left:2.5px;width:16px;height:16px;border-radius:50%;
+  background:var(--t1);transition:var(--trans)}
+.sw-toggle.on{background:var(--ind)}
+.sw-toggle.on::after{left:19.5px;background:#fff}
+.set-row{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--b1)}
+.set-row:last-child{border-bottom:none}
+.set-nm{flex:1;font-size:11.5px;color:var(--t0)}
+.set-sub{font-size:9.5px;color:var(--t2);margin-top:2px;line-height:1.5}
+
+/* Doomscroll Rescue */
+#ds-ov{position:fixed;inset:0;background:rgba(30,4,12,.94);backdrop-filter:blur(10px);z-index:680;
+  display:flex;align-items:center;justify-content:center;padding:18px}
+.ds-box{background:var(--bg1);border:1.5px solid rgba(244,63,94,.45);border-radius:20px;padding:22px 20px;
+  max-width:380px;width:100%;text-align:center;box-shadow:0 0 60px rgba(244,63,94,.25)}
+.ds-ring{font-family:'JetBrains Mono',monospace;font-size:34px;font-weight:700;color:var(--ros);margin:6px 0 2px}
+.ds-t{font-size:16px;font-weight:700;color:var(--t0);margin-bottom:6px}
+.ds-s{font-size:11.5px;color:var(--t1);line-height:1.65;margin-bottom:16px}
+.ds-b{display:block;width:100%;border-radius:12px;padding:13px;font-size:12px;font-weight:700;
+  margin-bottom:8px;cursor:pointer;border:1px solid var(--b1);background:var(--bg3);color:var(--t1)}
+.ds-b.go{background:linear-gradient(135deg,var(--ros),var(--cor));color:#fff;border-color:transparent}
+.ds-b.alt{background:var(--bg3);color:var(--t0)}
+
+/* Peak hours */
+.pk-bars{display:flex;gap:2px;align-items:flex-end;height:46px;margin:9px 0 4px}
+.pk-b{flex:1;background:var(--bg4);border-radius:2px 2px 0 0;min-height:2px}
+.pk-b.top{background:var(--saf)}
+.pk-b.now{outline:1.5px solid var(--t0);outline-offset:1px}
+.pk-ax{display:flex;justify-content:space-between;font-size:8.5px;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.pk-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--b1);font-size:11.5px}
+.pk-row:last-child{border-bottom:none}
+.pk-time{font-family:'JetBrains Mono',monospace;color:var(--saf);font-size:11px;width:52px;flex-shrink:0}
+
+/* Install guide */
+#inst-ov{position:fixed;inset:0;background:rgba(8,11,20,.9);backdrop-filter:blur(8px);z-index:640;
+  display:flex;align-items:center;justify-content:center;padding:18px}
+.inst-box{background:var(--bg2);border:1px solid var(--b2);border-radius:20px;padding:22px 20px;max-width:390px;width:100%;max-height:86vh;overflow-y:auto}
+.inst-step{display:flex;gap:11px;margin-bottom:12px}
+.inst-n{width:22px;height:22px;border-radius:50%;background:var(--is);color:var(--ind);font-size:10px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.inst-tx{font-size:11.5px;color:var(--t1);line-height:1.6}
+
+
+/* ══════════════════════════════════════════
+   LIFE OS v2.2 — accents · install · rewards
+══════════════════════════════════════════ */
+.acc-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 4px}
+.acc-b{border:1px solid var(--b1);border-radius:11px;padding:9px 5px;text-align:center;cursor:pointer;background:var(--bg2)}
+.acc-b.on{border-color:var(--t0)}
+.acc-dot{width:19px;height:19px;border-radius:50%;margin:0 auto 5px}
+.acc-l{font-size:9px;font-weight:700;color:var(--t1)}
+.acc-b.on .acc-l{color:var(--t0)}
+
+#instbar{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(16,185,129,.16),rgba(99,102,241,.08));
+  border:1px solid rgba(16,185,129,.3);border-radius:var(--rl);padding:11px 13px;margin-bottom:13px}
+#instbar .ib-t{flex:1;font-size:11.5px;color:var(--t0);font-weight:600}
+#instbar .ib-s{font-size:9.5px;color:var(--t2);font-weight:400;margin-top:2px}
+#instbar .ib-x{color:var(--t2);font-size:15px;cursor:pointer;padding:0 3px}
+
+#simbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(70px + env(safe-area-inset-bottom));
+  z-index:320;background:var(--saf);color:#1a1200;border-radius:999px;padding:7px 14px;font-size:10.5px;
+  font-weight:800;letter-spacing:.04em;box-shadow:0 6px 20px rgba(245,158,11,.35);cursor:pointer}
+
+.lvl-card{background:linear-gradient(135deg,rgba(245,158,11,.13),rgba(139,92,246,.07));
+  border:1px solid rgba(245,158,11,.25);border-radius:16px;padding:16px;margin-bottom:13px;text-align:center}
+.lvl-title{font-family:'DM Serif Display',serif;font-size:23px;color:var(--saf);line-height:1.2}
+.lvl-sub{font-size:10px;color:var(--t2);margin-top:4px;letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+.lvl-bar{height:5px;border-radius:3px;background:var(--bg4);margin:12px 0 5px;overflow:hidden}
+.lvl-fill{height:5px;border-radius:3px;background:linear-gradient(90deg,var(--saf),var(--vio))}
+.bdg-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.bdg{background:var(--bg2);border:1px solid var(--b1);border-radius:12px;padding:11px;display:flex;gap:9px;align-items:center;opacity:.42}
+.bdg.on{opacity:1;border-color:var(--b2)}
+.bdg-i{font-size:19px}
+.bdg-t{font-size:11px;font-weight:700;color:var(--t0)}
+.bdg-d{font-size:9px;color:var(--t2);margin-top:1px;line-height:1.4}
+.hb-test{background:var(--bg3);border:1px solid var(--b1);border-radius:7px;color:var(--t2);
+  font-size:9px;font-weight:700;padding:4px 7px;cursor:pointer}
+.hb-test:active{background:var(--bg4)}
+
+
+/* ══════════════════════════════════════════
+   LIFE OS v2.3 — MERGE COMPLETION LAYER
+   Phases 1–5 · Project B UI parity
+══════════════════════════════════════════ */
+
+/* P1 · Priority Focus + Timeline */
+.pf-card,.tl-card{background:var(--bg2);border:1px solid var(--b1);border-radius:var(--rl);padding:13px 15px;margin-bottom:13px}
+.pf-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+.pf-t{font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--ros)}
+.tl-card .pf-t{color:var(--sky)}
+.pf-all{font-size:10px;font-weight:700;color:var(--ind);cursor:pointer}
+.pf-row{display:flex;align-items:center;gap:9px;background:var(--bg1);border:1px solid var(--b1);
+  border-left:2.5px solid var(--ros);border-radius:9px;padding:10px 11px;margin-bottom:6px}
+.pf-row:last-child{margin-bottom:0}
+.pf-tx{flex:1;font-size:11.5px;color:var(--t0);line-height:1.45}
+.pf-due{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--sky)}
+.pf-do{background:var(--es);border:1px solid rgba(16,185,129,.3);color:var(--em);border-radius:7px;
+  font-size:9.5px;font-weight:700;padding:5px 8px;cursor:pointer;white-space:nowrap}
+.pf-do:active{background:var(--bg4)}
+.tl-row{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--b1)}
+.tl-row:last-child{border-bottom:none}
+.tl-bar{width:2.5px;height:26px;border-radius:2px;flex-shrink:0}
+.tl-ty{font-size:8.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.tl-dt{font-size:11px;color:var(--t0);margin-top:2px;line-height:1.4}
+.tl-tm{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--t2)}
+
+/* P1 · Rescue Shield chip */
+#rescuechip{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;border-radius:999px;
+  padding:5px 10px;cursor:pointer;border:1px solid var(--b1);background:var(--bg2);color:var(--t1)}
+#rescuechip.ok{border-color:rgba(16,185,129,.35);color:var(--em)}
+#rescuechip.warn{border-color:rgba(245,158,11,.4);color:var(--saf)}
+#rescuechip.over{border-color:rgba(244,63,94,.45);color:var(--ros);background:var(--rs)}
+@media(max-width:520px){#rescuechip .rc-lb{display:none}}
+
+/* P2 · Task search + filters */
+.tf-row{display:flex;gap:7px;margin-bottom:9px;align-items:center}
+.tf-search{flex:1;background:var(--bg2);border:1px solid var(--b1);border-radius:9px;padding:9px 12px;
+  color:var(--t0);font-size:11.5px;margin:0}
+.tf-chip{background:var(--bg2);border:1px solid var(--b1);border-radius:999px;padding:7px 13px;
+  font-size:10px;font-weight:700;color:var(--t2);cursor:pointer}
+.tf-chip.on{background:var(--is);border-color:var(--ind);color:var(--t0)}
+.tf-none{padding:18px;text-align:center;color:var(--t2);font-size:11.5px}
+
+/* P3 · Screen time presets */
+.st-presets{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:9px 0}
+.st-p{background:var(--bg2);border:1px solid var(--b1);border-radius:10px;padding:9px 4px;text-align:center;cursor:pointer}
+.st-p.on{border-color:var(--ros);background:var(--rs)}
+.st-p .sp-n{font-size:10px;font-weight:800;color:var(--t0)}
+.st-p .sp-d{font-size:8.5px;color:var(--t2);margin-top:2px}
+.ds-proj{background:var(--rs);border:1px solid rgba(244,63,94,.25);border-radius:10px;padding:10px;
+  margin:10px 0 4px;font-size:10.5px;color:var(--t1);line-height:1.6}
+.ds-proj b{color:var(--ros);font-family:'JetBrains Mono',monospace}
+
+/* P4 · Habit peak cards */
+.pk3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 2px}
+.pk3-c{background:var(--bg2);border:1px solid var(--b1);border-radius:11px;padding:10px}
+.pk3-l{font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.pk3-v{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:var(--t0)}
+.pk3-b{display:inline-block;font-size:8.5px;font-weight:800;letter-spacing:.06em;background:var(--es);
+  color:var(--em);border-radius:999px;padding:3px 8px;margin-left:7px;vertical-align:middle}
+
+/* P5 · Demo mode */
+#demobar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(110px + env(safe-area-inset-bottom));
+  z-index:321;background:var(--ros);color:#fff;border-radius:999px;padding:7px 14px;font-size:10.5px;
+  font-weight:800;letter-spacing:.03em;box-shadow:0 6px 20px rgba(244,63,94,.4);cursor:pointer}
+
 </style>
 </head>
 <body>
@@ -487,17 +770,13 @@ body.sb-off #sb{display:none!important}
 <div id="top">
   <div id="sbtog" onclick="toggleSidebar()" title="Show/hide menu">☰</div>
   <div id="thtog" onclick="cycleTheme()" title="Switch theme">🌙</div>
-  <div class="logo">L</div>
+  <div class="logo">🌱</div>
   <div class="brand">Life OS</div>
-  <span class="ver">v10</span>
+  <span class="ver">v2.5</span>
   <div class="sp"></div>
   <div class="tnav" id="tnav"></div>
   <div class="tright">
     <div id="clk"></div>
-    <div class="ebadge" id="ebadge" onclick="cycleEnergy()">
-      <div class="epulse" id="epulse"></div>
-      <span id="elbl">High Energy</span>
-    </div>
     <button class="btn bp bsm" onclick="openFocus()">⏱ Focus</button>
   </div>
 </div>
@@ -603,7 +882,7 @@ const escH=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/
 // ── ACTIVITY TRACKING ENGINE ───────────────────
 // Tracks WHERE attention goes (panel/module time), WHAT you do (hourly+events),
 // and the FOCUS/ENERGY behind it — all local-first, exportable.
-const PANEL_CAT={expenses:'Logging',feedback:'System',insights:'Analytics',capture:'Logging',sleep:'Wellness',screentime:'Wellness',rewards:'Discipline',dashboard:'Overview',planner:'Planning',tasks:'Execution',goals:'Planning',habits:'Discipline',events:'Logging',hourly:'Logging',decisions:'Reflection',ai:'AI Coaching',memory:'AI Coaching',domains:'Analytics',knowledge:'Analytics',weekly:'Planning',burnout:'Wellness',audit:'Analytics',journal:'Reflection',procrastination:'Wellness',settings:'System',focus:'Deep Work'};
+const PANEL_CAT={expenses:'Logging',feedback:'System',insights:'Analytics',capture:'Logging',sleep:'Wellness',screentime:'Wellness',rewards:'Discipline',dashboard:'Overview',planner:'Planning',tasks:'Execution',goals:'Planning',habits:'Discipline',events:'Logging',hourly:'Logging',decisions:'Reflection',ai:'AI Coaching',memory:'AI Coaching',knowledge:'Analytics',weekly:'Planning',burnout:'Wellness',audit:'Analytics',journal:'Reflection',procrastination:'Wellness',settings:'System',focus:'Deep Work'};
 const ACT={
   data:DB.get('activity',{}),
   cur:'dashboard',curStart:Date.now(),
@@ -742,16 +1021,7 @@ const S = {
   expenses: DB.get('expenses',[]),
   burnout: DB.get('burnout',{energy:65,clarity:72,sleep:78,motivation:68,stress:35}),
   weekOffset:0, habitWeekOffset:0,
-  aiHistory:[],
-  domains: DB.get('domains') || {
-    health:{score:82,color:'var(--em)',icon:'💪'},
-    learning:{score:68,color:'var(--ind)',icon:'📚'},
-    trading:{score:75,color:'var(--saf)',icon:'📈'},
-    mindfulness:{score:90,color:'var(--vio)',icon:'🧘'},
-    relationships:{score:65,color:'var(--pin)',icon:'❤️'},
-    finance:{score:70,color:'var(--cor)',icon:'💰'},
-    recovery:{score:72,color:'var(--sky)',icon:'♾️'},
-  }
+  aiHistory:[]
 };
 
 function save(){
@@ -764,7 +1034,7 @@ function save(){
   DB.set('focusSessions',S.focusSessions);
   DB.set('goals',S.goals);DB.set('nextGoalId',S.nextGoalId);
   DB.set('weekPlans',S.weekPlans);DB.set('weekReviews',S.weekReviews);
-  DB.set('domains',S.domains);DB.set('screenTime',S.screenTime);DB.set('sleep',S.sleep);DB.set('reminders',S.reminders);DB.set('recurring',S.recurring);DB.set('expenses',S.expenses);
+  DB.set('screenTime',S.screenTime);DB.set('sleep',S.sleep);DB.set('reminders',S.reminders);DB.set('recurring',S.recurring);DB.set('expenses',S.expenses);
   checkStorage();
 }
 
@@ -1458,7 +1728,7 @@ function sanitizeParsed(arr){
   if(!Array.isArray(arr))return null;
   const out=arr.map((x,i)=>({
     id:i,include:true,
-    type:['task','goal','idea','memory','expense','journal'].includes(x.type)?x.type:'task',
+    type:['task','goal','journal'].includes(x.type)?x.type:(['idea','memory','expense'].includes(x.type)?'journal':'task'),
     amount:(typeof x.amount==='number'&&x.amount>0)?x.amount:0,
     text:String(x.text||'').slice(0,200).trim(),
     due:T(x.due)?x.due:'',
@@ -1596,7 +1866,7 @@ function renderCapPreview(){
             <input class="ti" value="${escH(it.text)}" style="margin:0 0 6px;font-size:12.5px;" onchange="capParsed[${i}].text=this.value">
             <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;">
               <select onchange="capParsed[${i}].type=this.value;renderCapPreview()" style="background:var(--bg3);border:1px solid var(--b2);border-radius:6px;padding:4px 6px;color:var(--t1);font-size:10px;">
-                ${[['task','✓ Task'],['goal','◎ Goal'],['idea','💡 Idea'],['memory','🧠 Memory'],['expense','💰 Expense'],['journal','✍️ Journal']].map(o=>`<option value="${o[0]}"${it.type===o[0]?' selected':''}>${o[1]}</option>`).join('')}
+                ${[['task','✓ Task'],['goal','◎ Goal'],['journal','✍️ Journal']].map(o=>`<option value="${o[0]}"${it.type===o[0]?' selected':''}>${o[1]}</option>`).join('')}
               </select>
               ${it.type==='task'?`
               <select onchange="capParsed[${i}].pri=+this.value" style="background:var(--bg3);border:1px solid var(--b2);border-radius:6px;padding:4px 6px;color:var(--t1);font-size:10px;">
@@ -1888,7 +2158,7 @@ function detectType(line){
   const l=normalizeSpeech(line).toLowerCase().trim();
   const hasAction=ACTION_W.some(w=>l.includes(w));
   // 1 Expense — an amount plus a spending verb
-  if(parseAmount(line)>0&&SPEND_W.some(w=>l.includes(w)))return 'expense';
+  if(parseAmount(line)>0&&SPEND_W.some(w=>l.includes(w)))return 'journal';
   // 2 Explicit idea
   if(/\b(i have an idea|idea for|idea about|idea regarding|idea is|idea on|new idea|concept for|what if we|thought of)\b/.test(l)||/^ideas?\b/.test(l))return 'idea';
   // 3 Explicit goal
@@ -1896,7 +2166,7 @@ function detectType(line){
   // 4 Journal — a feeling or reflection, with nothing to do in it
   if(FEEL_W.some(w=>l.includes(w))&&!hasAction)return 'journal';
   // 5 Memory — a fact about someone, not a task
-  if(MEM_W.some(w=>l.includes(w))&&!hasAction&&!/\bremind me\b/.test(l))return 'memory';
+  if(MEM_W.some(w=>l.includes(w))&&!hasAction&&!/\bremind me\b/.test(l))return 'journal';
   if(IDEA_WORDS.some(w=>l.startsWith(w)))return 'idea';
   return 'task';
 }
@@ -2433,16 +2703,13 @@ function onViewportChange(){
 const MORE_ITEMS=[
   {id:'capture',icon:'🎤',name:'Capture'},
   {id:'insights',icon:'💡',name:'Insights'},
-  {id:'expenses',icon:'💰',name:'Expenses'},
   {id:'feedback',icon:'🙏',name:'Feedback'},
   {id:'screentime',icon:'📱',name:'Screen Time'},{id:'sleep',icon:'😴',name:'Sleep'},{id:'rewards',icon:'⭐',name:'Rewards'},
   {id:'habits',icon:'✦',name:'Habits'},{id:'planner',icon:'⏱',name:'Planner'},{id:'goals',icon:'◎',name:'Goals'},
   {id:'events',icon:'⚡',name:'Events'},{id:'decisions',icon:'⚖',name:'Decisions'},
-  {id:'ai',icon:'✦',name:'AI Coach'},{id:'memory',icon:'🧠',name:'Memory'},
   {id:'weekly',icon:'⊟',name:'Weekly'},{id:'audit',icon:'⏲',name:'Time Audit'},
-  {id:'domains',icon:'◈',name:'Domains'},{id:'burnout',icon:'♥',name:'Burnout'},
   {id:'journal',icon:'✎',name:'Journal'},{id:'procrastination',icon:'⚠',name:'Unstuck'},
-  {id:'knowledge',icon:'⊕',name:'Graph'},{id:'settings',icon:'⚙',name:'Settings'},
+  {id:'settings',icon:'⚙',name:'Settings'},
 ];
 function goPanelB(id){
   goPanel(id);
@@ -2490,7 +2757,7 @@ function buildNudge(){
     if(missed>0&&S.habits.length)return{lbl:'Streak Protection',txt:`${missed} habit${missed>1?'s':''} not logged today. 30 seconds now keeps your streaks alive.`,act:'Log habits →',go:'habits'};}
   if(h>=6&&h<22&&(gap===null||gap>120))return{lbl:'Check-in',txt:gap===null?'No log yet today. What are you doing right now, and how is your energy?':`${Math.floor(gap/60)}h since your last check-in. A 10-second log keeps your pattern data honest.`,act:'Quick log →',go:'hourly'};
   if(h>=11&&h<18&&(!act||act.focusMin===0)&&pri)return{lbl:'Deep Work Nudge',txt:`No focus session yet today. Your priority: “${pri.txt}”. One Pomodoro moves it forward.`,act:'Start focus →',go:'focus'};
-  if(act&&act.avgE!==null&&act.avgE<4.5)return{lbl:'Energy Care',txt:`Average energy today is ${act.avgE.toFixed(1)}/10. A short walk, water, or 5 minutes of pranayama before pushing harder.`,act:'Burnout check →',go:'burnout'};
+  if(act&&act.avgE!==null&&act.avgE<4.5)return{lbl:'Energy Care',txt:`Average energy today is ${act.avgE.toFixed(1)}/10. A short walk, water, or 5 minutes of pranayama before pushing harder.`,act:'Check your sleep →',go:'sleep'};
   if(pri)return{lbl:'Priority',txt:`“${pri.txt}” — this is your #1 right now. ${QUOTES[new Date().getDate()%QUOTES.length]}`,act:pri.kind==='goal'?'Open goals →':'Open tasks →',go:pri.kind==='goal'?'goals':'tasks'};
   return{lbl:'Today',txt:QUOTES[new Date().getDate()%QUOTES.length],act:'Set a goal →',go:'goals'};
 }
@@ -2520,8 +2787,9 @@ function toggleNotifs(){
 // ── CLOCK ──────────────────────────────────────
 function initClock(){
   function tick(){
-    const n=new Date(),h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');
-    document.getElementById('clk').textContent=h+':'+m+':'+s;
+    const n=new Date(),h24=n.getHours(),h=String(h24%12||12).padStart(2,'0'),
+      m=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');
+    document.getElementById('clk').textContent=`${h}:${m}:${s} ${h24<12?'AM':'PM'}`;
     const gr=n.getHours()<5?'Good night':n.getHours()<12?'Good morning':n.getHours()<17?'Good afternoon':n.getHours()<21?'Good evening':'Good night';
     const el=document.getElementById('dash-greet');if(el)el.textContent=gr+', '+PROFILE.name+' · Life OS running';
     updateHourlyHighlight(n.getHours());
@@ -2550,21 +2818,15 @@ const NAV_GROUPS = [
     {id:'events',icon:'⚡',name:'Event Logger',badge:'NEW',bc:'s'},
     {id:'capture',icon:'🎤',name:'Quick Capture',badge:'NEW',bc:'s'},
     {id:'insights',icon:'💡',name:'Insights',badge:'NEW',bc:'s'},
-    {id:'expenses',icon:'💰',name:'Expenses',badge:'NEW',bc:'s'},
     {id:'feedback',icon:'🙏',name:'Feedback'},
     {id:'hourly',icon:'⏲',name:'Hourly Logger'},
     {id:'screentime',icon:'📱',name:'Screen Time',badge:'NEW',bc:'s'},
     {id:'sleep',icon:'😴',name:'Sleep Log',badge:'NEW',bc:'s'},
     {id:'rewards',icon:'⭐',name:'Focus Rewards'},
     {id:'decisions',icon:'⚖',name:'Decision Journal'},
-    {id:'ai',icon:'✦',name:'AI Coach',badge:'AI'},
-    {id:'memory',icon:'🧠',name:'AI Memory'},
   ]},
   {label:'Analytics',items:[
-    {id:'domains',icon:'◈',name:'Life Domains'},
-    {id:'knowledge',icon:'⊕',name:'Knowledge Graph'},
     {id:'weekly',icon:'⊟',name:'Weekly View'},
-    {id:'burnout',icon:'♥',name:'Burnout Check'},
     {id:'audit',icon:'⏲',name:'Time Audit'},
   ]},
   {label:'Reflection',items:[
@@ -2573,7 +2835,7 @@ const NAV_GROUPS = [
     {id:'settings',icon:'⚙',name:'Settings'},
   ]}
 ];
-const PANELS_DEF = ['dashboard','planner','tasks','goals','habits','events','hourly','capture','screentime','sleep','rewards','insights','expenses','feedback','decisions','ai','memory','domains','knowledge','weekly','burnout','audit','journal','procrastination','settings'];
+const PANELS_DEF = ['dashboard','planner','tasks','goals','habits','events','hourly','capture','screentime','sleep','rewards','insights','feedback','decisions','weekly','audit','journal','procrastination','settings','garden'];
 
 function buildNav(){
   const sb=document.getElementById('sb-nav'),tnav=document.getElementById('tnav');
@@ -2614,11 +2876,10 @@ function renderPanel(id){
   const fns={
     dashboard:renderDashboard,planner:renderPlanner,tasks:renderTasks,
     goals:renderGoals,habits:renderHabits,events:renderEvents,
-    hourly:renderHourly,decisions:renderDecisions,ai:renderAI,
-    memory:renderMemory,domains:renderDomains,knowledge:renderKnowledge,
-    weekly:renderWeekly,burnout:renderBurnout,audit:renderAudit,
+    hourly:renderHourly,decisions:renderDecisions,
+    weekly:renderWeekly,audit:renderAudit,
     journal:renderJournal,procrastination:renderProcrastination,settings:renderSettings,
-    screentime:renderScreentime,rewards:renderRewards,sleep:renderSleep,capture:renderCapture,insights:renderInsights,feedback:renderFeedback,expenses:renderExpenses
+    screentime:renderScreentime,rewards:renderRewards,sleep:renderSleep,capture:renderCapture,insights:renderInsights,feedback:renderFeedback,garden:renderGarden
   };
   if(fns[id])fns[id]();
 }
@@ -2718,7 +2979,8 @@ function renderDashboard(){
     </div>
     <div class="g2">
       <div class="card">
-        <div class="chd"><span class="ct">Priority Matrix</span><span class="ca" onclick="goPanel('goals')">Full →</span></div>
+        <div class="chd"><span class="ct">Priority Matrix</span><span class="ca" onclick="goPanel('tasks')">Full →</span></div>
+        <div style="font-size:9.5px;color:var(--t2);line-height:1.5;margin-bottom:8px;">Filled automatically from each task's <b>category</b>: Trading &amp; Deep Work → Do Now · Learning, Body &amp; Mind → Schedule · Admin → Delegate</div>
         <div class="mx">
           ${(()=>{const und=S.tasks.filter(t=>!t.done);
             const q=[{cls:'mx1',q:'DO NOW',c:'var(--ind)',items:und.filter(t=>['trade','deep'].includes(t.cat)).slice(0,2)},
@@ -2748,16 +3010,7 @@ function renderDashboard(){
         </div>
       </div>
     </div>
-    <div class="sdiv2"><div class="sdiv2-l"></div><div class="sdiv2-t">Life Domains</div><div class="sdiv2-l"></div></div>
-    <div class="domain-grid">
-      ${Object.entries(S.domains).map(([k,d])=>`
-        <div class="domain-card" onclick="goPanel('domains')">
-          <div class="domain-icon">${d.icon}</div>
-          <div class="domain-name">${k}</div>
-          <div class="domain-score" style="color:${d.color}">${d.score}</div>
-          <div class="domain-bar"><div class="domain-fill" style="width:${d.score}%;background:${d.color}"></div></div>
-        </div>`).join('')}
-    </div>`;
+    `;
   nudgeTick();
 }
 
@@ -3084,64 +3337,25 @@ function deleteMemory(id){
   S.aiMemory=S.aiMemory.filter(m=>m.id!==id);save();renderMemList();toast('🗑','Memory removed');
 }
 
-// ── LIFE DOMAINS ───────────────────────────────
-function renderDomains(){
-  const p=document.getElementById('p-domains');
-  p.innerHTML=`
-    <div class="ph"><div><div class="ph-t">Life Score Domains</div><div class="ph-s">7-domain life balance score · Drag sliders to update</div></div></div>
-    <div class="g2">
-      <div>
-        <div class="domain-grid" style="margin-bottom:14px;">
-          ${Object.entries(S.domains).map(([k,d])=>`
-            <div class="domain-card">
-              <div class="domain-icon">${d.icon}</div>
-              <div class="domain-name">${k}</div>
-              <div class="domain-score" style="color:${d.color}">${d.score}</div>
-              <div class="domain-bar"><div class="domain-fill" style="width:${d.score}%;background:${d.color}"></div></div>
-            </div>`).join('')}
-        </div>
-        <div class="card">
-          <div class="chd"><span class="ct">Adjust Domain Scores</span></div>
-          ${Object.entries(S.domains).map(([k,d])=>`
-            <div class="pr">
-              <div class="pr-hd"><span class="pr-n">${d.icon} ${k}</span><span class="pr-p" id="dom-${k}-val">${d.score}%</span></div>
-              <input type="range" min="0" max="100" value="${d.score}" style="accent-color:${d.color}" oninput="updateDomain('${k}',this.value)">
-            </div>`).join('')}
-        </div>
-      </div>
-      <div class="card">
-        <div class="chd"><span class="ct">Balance Analysis</span></div>
-        ${Object.entries(S.domains).map(([k,d])=>`
-          <div class="pr"><div class="pr-hd"><span class="pr-n">${d.icon} ${k}</span><span class="pr-p">${d.score}%</span></div>
-          <div class="pr-bg"><div class="pr-f" id="dombar-${k}" style="width:${d.score}%;background:${d.color}"></div></div></div>`).join('')}
-        <div style="margin-top:14px;padding:10px;background:var(--ss);border-radius:7px;font-size:11px;color:var(--t1);line-height:1.7;">
-          <strong style="color:var(--saf)">Weakest Domain:</strong> Relationships (65) — schedule family time<br>
-          <strong style="color:var(--em)">Strongest:</strong> Mindfulness (90) — your anchor<br>
-          <strong style="color:var(--ind)">Recommendation:</strong> Raise Learning to 75+ by adding daily reading
-        </div>
-      </div>
-    </div>`;
-}
-function updateDomain(k,v){
-  S.domains[k].score=parseInt(v);
-  const el=document.getElementById('dom-'+k+'-val');if(el)el.textContent=v+'%';
-  const bar=document.getElementById('dombar-'+k);if(bar)bar.style.width=v+'%';
-  computeLifeScore();
-}
-
 // ── KNOWLEDGE GRAPH ────────────────────────────
+// Replaces the old manual domain sliders: progress comes from real goals now.
+function goalProgress(domain){
+  const g=S.goals.filter(x=>(x.domain||'').toLowerCase()===domain.toLowerCase());
+  if(!g.length)return 50;
+  return Math.round(g.reduce((a,x)=>a+(x.progress||0),0)/g.length);
+}
 function renderKnowledge(){
   const p=document.getElementById('p-knowledge');
   const nodes=[
     {label:'Sleep Quality',icon:'😴',color:'var(--sky)',score:S.burnout.sleep},
     {label:'Energy Level',icon:'⚡',color:'var(--em)',score:S.burnout.energy},
     {label:'Focus / Deep Work',icon:'🎯',color:'var(--ind)',score:S.burnout.clarity},
-    {label:'Trading Performance',icon:'📈',color:'var(--saf)',score:S.domains.trading.score},
-    {label:'P&L Outcome',icon:'💰',color:'var(--cor)',score:Math.round(S.domains.trading.score*.9)},
+    {label:'Trading Performance',icon:'📈',color:'var(--saf)',score:goalProgress('Trading')},
+    {label:'P&L Outcome',icon:'💰',color:'var(--cor)',score:Math.round(goalProgress('Trading')*.9)},
     {label:'Life Score',icon:'⬡',color:'var(--vio)',score:computeLifeScore()},
   ];
   p.innerHTML=`
-    <div class="ph"><div><div class="ph-t">Knowledge Graph</div><div class="ph-s">Causal relationship map — how your life domains connect and influence each other</div></div></div>
+    <div class="ph"><div><div class="ph-t">Knowledge Graph</div><div class="ph-s">Causal map — how sleep, energy, focus and outcomes feed each other</div></div></div>
     <div class="g2">
       <div class="card">
         <div class="chd"><span class="ct">Causal Chain · Sleep → Performance</span></div>
@@ -3724,16 +3938,6 @@ function renderSettings(){
         <button class="btn bp bsm" onclick="saveFocusCfg()">Save Settings</button>
       </div>
       <div class="card">
-        <div class="chd"><span class="ct">🧠 AI Assistant</span></div>
-        <div style="font-size:11.5px;color:var(--t1);line-height:1.7;margin-bottom:10px;"><strong style="color:var(--em)">Life OS is completely free and works fully without this.</strong> The built-in engine parses your speech, and Insights, briefings and reminders are all computed on-device at zero cost.<br><br>Optional: adding your own Anthropic API key lets Capture understand any phrasing or language mix, and enables the AI Coach. You pay Anthropic directly (a few paise per capture). Stored only on this device.</div>
-        <div class="inrow" style="margin-bottom:8px;">
-          <input type="password" class="ti" id="ai-key" value="${aiKey()?'••••••••••••':''}" placeholder="sk-ant-…  (console.anthropic.com)">
-          <button class="btn bp bsm" onclick="saveAIKey()">Save</button>
-          ${aiKey()?'<button class="btn bg bsm" onclick="DB.del(\'aiKey\');renderSettings();toast(\'🧠\',\'Key removed\')">✕</button>':''}
-        </div>
-        <div style="font-size:10px;color:var(--t2);line-height:1.6;">Status: <strong style="color:${aiKey()?'var(--em)':'var(--t1)'}">${aiKey()?'AI brain active':'Local rule engine'}</strong> · For a future public version this must move to a server — fine for personal use.</div>
-      </div>
-      <div class="card">
         <div class="chd"><span class="ct">Share & Help</span></div>
         <div style="font-size:11.5px;color:var(--t1);line-height:1.7;margin-bottom:12px;">Life OS is free with no account and no ads. Share it with anyone.</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -3835,11 +4039,11 @@ function renderSettings(){
         </div>
       </div>
       <div class="card">
-        <div class="chd"><span class="ct">About Life OS v10</span></div>
+        <div class="chd"><span class="ct">About Life OS</span></div>
         <div style="font-size:11.5px;color:var(--t1);line-height:1.9;">
-          <strong style="color:var(--t0)">Life OS v10</strong> — Personal Intelligence System<br>
+          <strong style="color:var(--t0)">Life OS</strong> — Personal Intelligence System<br>
           Built for: ${escH(PROFILE.name)} · ${escH(PROFILE.location)}<br>
-          Layers: Event Store · Activity Tracker · Metrics Engine · AI Memory · Knowledge Graph<br>
+          Layers: Event Store · Activity Tracker · Metrics Engine<br>
           <span style="color:var(--t2)">Local-first · Auto time/focus/energy tracking · Data stays with you</span>
         </div>
       </div>
@@ -3913,7 +4117,7 @@ function importData(inp){
   r.readAsText(f);
 }
 function clearAllData(){
-  ['tasks','nextTaskId','habits','events','nextEventId','aiMemory','nextMemoryId','decisions','nextDecisionId','journalEntries','hourlyLog','burnout','focusSessions','goals','nextGoalId','weekPlans','weekReviews','activity','domains','mode','screenTime','rewards','chkCfg','nudgeCfg','ftasks','sleep','lastHourPrompt','hourCfg','journalCfg','theme','journalPrompted','recurring','recurGen','briefCfg','briefShown','followAsked','reminders','aiKey','feedback','schedMode','voiceLang','expenses'].forEach(k=>DB.del(k));
+  ['tasks','nextTaskId','habits','events','nextEventId','aiMemory','nextMemoryId','decisions','nextDecisionId','journalEntries','hourlyLog','burnout','focusSessions','goals','nextGoalId','weekPlans','weekReviews','activity','mode','screenTime','rewards','chkCfg','nudgeCfg','ftasks','sleep','lastHourPrompt','hourCfg','journalCfg','theme','journalPrompted','recurring','recurGen','briefCfg','briefShown','followAsked','reminders','aiKey','feedback','schedMode','voiceLang','expenses'].forEach(k=>DB.del(k));
   location.reload();
 }
 
@@ -4149,7 +4353,1341 @@ function init(){
   if(location.protocol!=='file:'&&'serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
   setTimeout(()=>toast('🚀','Life OS ready, '+PROFILE.name+'!'),700);
 }
+
+/* ═══════════════════════════════════════════════
+   LIFE OS v11 — COMPANION LAYER
+   Everything below is additive. It overrides a few
+   v10 functions at the end of the script so the
+   original code is untouched and reversible.
+   1 · Six themed hubs (rare panels behind "More")
+   2 · Right Now card       3 · Command bar
+   4 · Day Ribbon           5 · Reality Check
+   6 · Life Garden          7 · Ambient time theme
+   8 · Wind-down ritual     9 · Week Story card
+═══════════════════════════════════════════════ */
+
+/* ── 1 · HUBS ─────────────────────────────── */
+const HUBS = [
+  {k:'today', icon:'⬡', label:'Today', color:'var(--ind)',
+   items:[{id:'dashboard',icon:'⬡',name:'Home'},{id:'capture',icon:'🎤',name:'Capture'},{id:'hourly',icon:'⏲',name:'Hour Log'}],
+   more:[{id:'planner',icon:'⏱',name:'Planner'},{id:'events',icon:'⚡',name:'Events'},{id:'weekly',icon:'⊟',name:'Weekly'}]},
+  {k:'do', icon:'✓', label:'Do', color:'var(--em)',
+   items:[{id:'tasks',icon:'✓',name:'Tasks'},{id:'goals',icon:'◎',name:'Goals'},{id:'habits',icon:'✦',name:'Habits'}],
+   more:[{id:'procrastination',icon:'⚠',name:'Unstuck'}]},
+  {k:'body', icon:'♥', label:'Body', color:'var(--ros)',
+   items:[{id:'screentime',icon:'📱',name:'Screen'},{id:'sleep',icon:'😴',name:'Sleep'}],
+   more:[]},
+  {k:'mind', icon:'✎', label:'Mind', color:'var(--vio)',
+   items:[{id:'journal',icon:'✎',name:'Journal'},{id:'decisions',icon:'⚖',name:'Decisions'}],
+   more:[]},
+  {k:'grow', icon:'🌱', label:'Grow', color:'var(--saf)',
+   items:[{id:'garden',icon:'🌱',name:'Garden'},{id:'rewards',icon:'⭐',name:'Rewards'}],
+   more:[]},
+  {k:'review', icon:'📊', label:'Review', color:'var(--sky)',
+   items:[{id:'audit',icon:'⏲',name:'Time Audit'},{id:'settings',icon:'⚙',name:'Settings'}],
+   more:[{id:'feedback',icon:'🙏',name:'Feedback'}]}
+];
+const HUB_OF = {}; HUBS.forEach(h=>[...h.items,...h.more].forEach(i=>{if(i.id)HUB_OF[i.id]=h.label;}));
+
+function hubItemHTML(it){
+  const go = it.fn ? it.fn : `goPanelB('${it.id}')`;
+  return `<div class="hub-it" onclick="closeMore();${go}"><div class="hi-ic">${it.icon}</div><div class="hi-lb">${it.name}</div></div>`;
+}
+// Sidebar (tablet/desktop): hubs with a collapsible "more" tail
+buildNav = function(){
+  const sb=document.getElementById('sb-nav'), tnav=document.getElementById('tnav');
+  let sbH='', tH='';
+  HUBS.forEach((h,hi)=>{
+    sbH+=`<div class="ng" id="ng-${h.k}"><div class="ngl">${h.icon} ${h.label}</div>`;
+    h.items.forEach(it=>{
+      sbH+=`<div class="ni${it.id===S.panel?' on':''}" data-p="${it.id}" onclick="goPanel('${it.id}')"><span class="nic">${it.icon}</span>${it.name}</div>`;
+    });
+    if(h.more.length){
+      sbH+=`<div class="ng-extra">`+h.more.map(it=>it.fn
+        ? `<div class="ni" onclick="${it.fn}"><span class="nic">${it.icon}</span>${it.name}</div>`
+        : `<div class="ni${it.id===S.panel?' on':''}" data-p="${it.id}" onclick="goPanel('${it.id}')"><span class="nic">${it.icon}</span>${it.name}</div>`).join('')+`</div>`;
+      sbH+=`<div class="ng-more" onclick="document.getElementById('ng-${h.k}').classList.toggle('exp');this.textContent=document.getElementById('ng-${h.k}').classList.contains('exp')?'− less':'＋ ${h.more.length} more'">＋ ${h.more.length} more</div>`;
+    }
+    sbH+='</div><div class="sdiv"></div>';
+    if(hi<4) tH+=`<button class="tnb${h.items[0].id===S.panel?' on':''}" data-p="${h.items[0].id}" onclick="goPanel('${h.items[0].id}')">${h.icon} ${h.label}</button>`;
+  });
+  sb.innerHTML=sbH; tnav.innerHTML=tH;
+};
+// Bottom bar (phone): 4 hubs + command
+function buildBottomNav(){
+  const b=document.getElementById('bnav'); if(!b)return;
+  b.innerHTML=`
+    <div class="bni on" data-b="dashboard" onclick="goPanelB('dashboard')"><span class="bni-ic">⬡</span><span class="bni-lb">Today</span></div>
+    <div class="bni" data-b="tasks" onclick="goPanelB('tasks')"><span class="bni-ic">✓</span><span class="bni-lb">Do</span></div>
+    <div class="bni" onclick="openCmd()"><span class="bni-ic">⌕</span><span class="bni-lb">Find</span></div>
+    <div class="bni" data-b="garden" onclick="goPanelB('garden')"><span class="bni-ic">🌱</span><span class="bni-lb">Grow</span></div>
+    <div class="bni" data-b="more" onclick="openMore()"><span class="bni-ic">☰</span><span class="bni-lb">Hubs</span></div>`;
+}
+// "More" is now a hub sheet: tap a hub to open it, "more" inside each hub for the rare panels
+openMore = function(){
+  const g=document.getElementById('ms-grid');
+  g.style.display='block';
+  g.innerHTML = HUBS.map(h=>`
+    <div class="hub-card" id="hub-${h.k}">
+      <div class="hub-hd" onclick="document.getElementById('hub-${h.k}').classList.toggle('open')">
+        <span class="hub-ic">${h.icon}</span><span class="hub-nm">${h.label}</span>
+        <span class="hub-ct">${h.items.length+h.more.length}</span>
+      </div>
+      <div class="hub-bd">
+        <div class="hub-row">${h.items.map(hubItemHTML).join('')}</div>
+        ${h.more.length?`<div class="hub-extra"><div class="hub-row">${h.more.map(hubItemHTML).join('')}</div></div>
+        <div class="hub-more" onclick="document.getElementById('hub-${h.k}').classList.toggle('exp')">More in ${h.label} ▾</div>`:''}
+      </div>
+    </div>`).join('');
+  const cur=HUBS.find(h=>[...h.items,...h.more].some(i=>i.id===S.panel));
+  document.getElementById('moresheet').classList.add('on');
+  if(cur){const c=document.getElementById('hub-'+cur.k);if(c)c.classList.add('open');}
+};
+
+/* ── 2 · AMBIENT TIME-OF-DAY ──────────────── */
+function ambPhase(d=new Date()){
+  const h=d.getHours();
+  if(h>=4&&h<8)return 'dawn';
+  if(h>=8&&h<16)return 'day';
+  if(h>=16&&h<20)return 'dusk';
+  return 'night';
+}
+const PHASE_MSG={
+  dawn:{ic:'🌅',lbl:'Dawn',line:'The quiet hours — best for the thing you keep postponing.'},
+  day:{ic:'☀️',lbl:'Day',line:'Peak hours. Protect them like capital.'},
+  dusk:{ic:'🌆',lbl:'Dusk',line:'Energy is dropping — good for light, finishing work.'},
+  night:{ic:'🌙',lbl:'Night',line:'Close the day. Tomorrow starts tonight.'}
+};
+function applyAmbient(){
+  const p=ambPhase();
+  document.documentElement.setAttribute('data-phase',p);
+  const g=document.getElementById('dash-greet');
+  if(g){
+    const hi=p==='dawn'?'Good morning':p==='day'?'Good day':p==='dusk'?'Good evening':'Winding down';
+    g.innerHTML=`${PHASE_MSG[p].ic} ${hi}, ${PROFILE.name} · <span class="phase-chip">${PHASE_MSG[p].lbl}</span>`;
+  }
+}
+
+/* ── 3 · COMMAND BAR ──────────────────────── */
+function cmdIndex(){
+  const list=[];
+  HUBS.forEach(h=>[...h.items,...h.more].forEach(it=>{
+    list.push({icon:it.icon,name:it.name,hub:h.label,run:it.fn?it.fn:`goPanelB('${it.id}')`,kw:(it.id||'')+' '+it.name});
+  }));
+  list.push({icon:'⏱',name:'Start focus session',hub:'Action',run:'openFocus()',kw:'focus pomodoro timer deep work'});
+  list.push({icon:'🎤',name:'Voice capture',hub:'Action',run:'openCaptureVoice()',kw:'speak dictate voice capture note'});
+  list.push({icon:'🌙',name:'Wind down now',hub:'Action',run:'showWindDown()',kw:'wind down evening close day review'});
+  list.push({icon:'🌗',name:'Switch theme',hub:'Action',run:'cycleTheme()',kw:'theme dark light'});
+  return list;
+}
+let CMD_SEL=0, CMD_LIST=[];
+function openCmd(){
+  if(document.getElementById('cmd-ov'))return;
+  const ov=document.createElement('div'); ov.id='cmd-ov';
+  ov.onclick=e=>{if(e.target===ov)closeCmd();};
+  ov.innerHTML=`<div id="cmd-box">
+    <input id="cmd-in" placeholder="Go anywhere, or just say what happened…" autocomplete="off">
+    <div id="cmd-res"></div>
+  </div>`;
+  document.body.appendChild(ov);
+  const inp=document.getElementById('cmd-in');
+  inp.addEventListener('input',renderCmd);
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Escape')return closeCmd();
+    if(e.key==='ArrowDown'){CMD_SEL=Math.min(CMD_SEL+1,CMD_LIST.length-1);paintCmdSel();e.preventDefault();}
+    if(e.key==='ArrowUp'){CMD_SEL=Math.max(CMD_SEL-1,0);paintCmdSel();e.preventDefault();}
+    if(e.key==='Enter'){runCmd(CMD_SEL);e.preventDefault();}
+  });
+  renderCmd();
+  setTimeout(()=>inp.focus(),60);
+}
+function closeCmd(){const o=document.getElementById('cmd-ov');if(o)o.remove();}
+function renderCmd(){
+  const q=(document.getElementById('cmd-in').value||'').trim().toLowerCase();
+  const all=cmdIndex();
+  let hits = q ? all.filter(x=>x.kw.toLowerCase().includes(q)||x.name.toLowerCase().includes(q)) : all.slice(0,8);
+  CMD_LIST=hits.slice(0,9);
+  // Anything that isn't a panel name becomes a capture — the app logs it for you
+  if(q && q.length>3 && (hits.length===0 || q.split(' ').length>2)){
+    CMD_LIST.unshift({icon:'✨',name:`Log: “${document.getElementById('cmd-in').value.trim()}”`,hub:'Capture',capture:true});
+  }
+  CMD_SEL=0;
+  document.getElementById('cmd-res').innerHTML = CMD_LIST.length
+    ? CMD_LIST.map((x,i)=>`<div class="cmd-it${i===0?' sel':''}" onclick="runCmd(${i})">
+        <span class="cmd-ic">${x.icon}</span><span class="cmd-nm">${escH(x.name)}</span><span class="cmd-hb">${x.hub}</span></div>`).join('')
+    : `<div class="cmd-it"><span class="cmd-ic">·</span><span class="cmd-nm" style="color:var(--t2)">Keep typing — anything unrecognised gets captured</span></div>`;
+}
+function paintCmdSel(){document.querySelectorAll('#cmd-res .cmd-it').forEach((e,i)=>e.classList.toggle('sel',i===CMD_SEL));}
+async function runCmd(i){
+  const x=CMD_LIST[i]; if(!x)return;
+  const raw=(document.getElementById('cmd-in').value||'').trim();
+  closeCmd();
+  if(x.capture){
+    let parsed=await smartParse(raw); if(!parsed)parsed=parseBrainDump(raw);
+    if(!parsed||!parsed.length){toast('⚠️','Nothing recognised in that');return;}
+    capParsed=parsed; autoSaveCapture(false); return;
+  }
+  try{ (new Function(x.run))(); }catch(e){ console.warn(e); }
+}
+
+/* ── 4 · RIGHT NOW ────────────────────────── */
+function minsNow(){const d=new Date();return d.getHours()*60+d.getMinutes();}
+function dueMins(t){if(!t.due)return null;const[h,m]=t.due.split(':').map(Number);return h*60+(m||0);}
+function rightNowPick(){
+  const open=S.tasks.filter(t=>!t.done&&!(t.snooze&&t.snooze>Date.now()));
+  if(!open.length)return null;
+  const now=minsNow();
+  const soon=open.filter(t=>t.due!==undefined&&dueMins(t)!==null&&dueMins(t)-now>=-15&&dueMins(t)-now<=120)
+                 .sort((a,b)=>dueMins(a)-dueMins(b));
+  if(soon.length){
+    const t=soon[0], d=dueMins(t)-now;
+    return {t, why: d<0?`Was due at ${t.due} — still open.`:d<=15?`Starts in ${d} min.`:`Due at ${t.due} · ${d} minutes from now.`};
+  }
+  const ph=ambPhase();
+  const sorted=open.sort((a,b)=>(a.pri||2)-(b.pri||2)||a.ts-b.ts);
+  const t=sorted[0];
+  const nextTimed=open.filter(x=>dueMins(x)!==null&&dueMins(x)>now).sort((a,b)=>dueMins(a)-dueMins(b))[0];
+  const gap=nextTimed?dueMins(nextTimed)-now:null;
+  let why = gap!==null && gap<=180
+    ? `${gap} free minutes before “${nextTimed.text}” at ${nextTimed.due}.`
+    : PHASE_MSG[ph].line;
+  if(S.energy===2) why += ' Energy is low — pick the smallest version of it.';
+  return {t, why};
+}
+function renderRightNow(){
+  const pick=rightNowPick();
+  const openCount=S.tasks.filter(t=>!t.done).length;
+  if(!pick){
+    return `<div class="rn-card"><div class="rn-lbl">Right now</div>
+      <div class="rn-empty">${openCount?'Everything open is snoozed. Enjoy the gap.':'Nothing on the list. Tap the mic and say what needs doing — I’ll sort it into tasks, ideas or expenses.'}</div>
+      <div class="rn-acts" style="margin-top:12px;"><div class="rn-b go" onclick="openCaptureVoice()">🎤 Capture</div>
+      <div class="rn-b" onclick="goPanelB('tasks')">Tasks</div><div class="rn-b" onclick="openFocus()">Focus</div></div></div>`;
+  }
+  const t=pick.t, pri=['','🔴 Priority 1','🟠 Priority 2','⚪ Priority 3'][t.pri||2];
+  return `<div class="rn-card">
+    <div class="rn-lbl"><span>Right now</span><span style="color:var(--t2);font-weight:600;letter-spacing:.04em;text-transform:none;">${openCount} open</span></div>
+    <div class="rn-why">${escH(pick.why)}</div>
+    <div class="rn-task">${escH(t.text)}</div>
+    <div class="rn-meta">${pri}${t.due?' · due '+t.due:''}</div>
+    <div class="rn-acts">
+      <div class="rn-b go" onclick="rnStart(${t.id})">▶ Start focus</div>
+      <div class="rn-b dn" onclick="rnDone(${t.id})">✓ Done</div>
+      <div class="rn-b" onclick="rnLater(${t.id})">↷ Later</div>
+    </div></div>`;
+}
+function rnStart(id){const t=S.tasks.find(x=>x.id===id);if(!t)return;openFocusTask(t.text);}
+function rnDone(id){
+  const t=S.tasks.find(x=>x.id===id);if(!t)return;
+  t.done=true;save();logEvent('task',`Completed: ${t.text}`,7,7,t.cat||'general');
+  updateTaskStats();toast('✓','Done — nice');
+  if(S.panel==='dashboard')renderDashboard();
+}
+function rnLater(id){
+  const t=S.tasks.find(x=>x.id===id);if(!t)return;
+  t.snooze=Date.now()+90*60*1000;save();toast('↷','Back in 90 minutes');
+  if(S.panel==='dashboard')renderDashboard();
+}
+
+/* ── 5 · DAY RIBBON ───────────────────────── */
+const RB_CATS=[
+  {k:'deep', c:'var(--ind)', l:'Deep work', w:['deep','work','office','study','code','coding','analysis','trade','trading','meeting','email','learn','read','course','project']},
+  {k:'body', c:'var(--em)',  l:'Body',      w:['exercise','workout','gym','yoga','walk','run','strength','asana','sadhana','meditat','pranayam','cycle']},
+  {k:'drain',c:'var(--ros)', l:'Drain',     w:['social','instagram','youtube','reels','scroll','video','netflix','ott','news','browsing','whatsapp','phone']},
+  {k:'life', c:'var(--pin)', l:'Life',      w:['family','daughter','wife','friend','cook','eat','lunch','dinner','breakfast','chore','shopping','commute','travel','temple']},
+  {k:'rest', c:'var(--sky)', l:'Rest',      w:['sleep','nap','rest','relax','break']}
+];
+function ribbonCat(txt){
+  const s=(txt||'').toLowerCase();
+  for(const c of RB_CATS) if(c.w.some(w=>s.includes(w))) return c;
+  return {k:'other',c:'var(--vio)',l:'Other'};
+}
+function renderRibbon(){
+  const tk=today(), hNow=new Date().getHours();
+  let logged=0;
+  const cells=[...Array(24)].map((_,h)=>{
+    const rec=S.hourlyLog[tk+'|'+String(h).padStart(2,'0')];
+    const future=h>hNow;
+    if(rec)logged++;
+    const cat=rec?ribbonCat(rec.activity):null;
+    const cls='rb-c'+(rec?' filled':'')+(future?' future':'')+(h===hNow?' now':'');
+    const title=rec?`${String(h).padStart(2,'0')}:00 — ${rec.activity}`:`${String(h).padStart(2,'0')}:00 — not logged`;
+    const click=future?'':`ribbonTap(${h})`;
+    return `<div class="${cls}" style="${cat?`background:${cat.c}`:''}" title="${escH(title)}" onclick="${click}"></div>`;
+  }).join('');
+  const awake=Math.max(1,Math.min(hNow+1,24));
+  return `<div class="ribbon-w">
+    <div class="rb-hd"><div class="rb-t">Your day so far</div><div class="rb-v">${logged}/${awake} hours logged · tap a gap</div></div>
+    <div class="rb-bar">${cells}</div>
+    <div class="rb-ax"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>
+    <div class="rb-lg">${RB_CATS.map(c=>`<div class="rb-lgi"><span class="rb-dot" style="background:${c.c}"></span>${c.l}</div>`).join('')}</div>
+  </div>`;
+}
+function ribbonTap(h){
+  const hk=String(h).padStart(2,'0'), slot=today()+'|'+hk;
+  if(typeof showHourPrompt==='function')showHourPrompt(hk,slot);
+  else goPanelB('hourly');
+}
+
+/* ── 6 · REALITY CHECK ────────────────────── */
+const RC_UNITS=[
+  {min:45, one:'workout', many:'workouts', verb:'is'},
+  {min:25, one:'book chapter', many:'book chapters', verb:'is'},
+  {min:45, one:'study session', many:'study sessions', verb:'is'},
+  {min:60, one:'deep work hour', many:'deep work hours', verb:'is'},
+  {min:50, one:'episode', many:'episodes', verb:'is'}
+];
+function renderRealityCheck(){
+  let waste=0, days=0;
+  for(let i=0;i<7;i++){
+    const r=S.screenTime[dkey(addDays(new Date(),-i))];
+    if(r){days++;waste+=(r.social||0)+(r.video||0)+(r.ott||0)+(r.news||0);}
+  }
+  if(!days){
+    return `<div class="rc-card"><div class="rc-l">Reality check</div>
+      <div class="rc-t">Twenty seconds from your phone's Digital Wellbeing screen, and this app can show you exactly what your scrolling costs — in workouts, chapters and study sessions.</div>
+      <div class="rc-a" onclick="goPanelB('screentime')">Add today's numbers ›</div></div>`;
+  }
+  if(waste<20)return '';
+  const u=RC_UNITS[new Date().getDate()%RC_UNITS.length];
+  const n=Math.floor(waste/u.min);
+  const hrs=(waste/60).toFixed(1);
+  const line = n>=1
+    ? `<b>${hrs} hours</b> of scrolling in the last ${days} day${days>1?'s':''} — that's <b>${n} ${n===1?u.one:u.many}</b> you didn't get.`
+    : `<b>${hrs} hours</b> of scrolling in the last ${days} day${days>1?'s':''}. Under an hour a day — that's already better than most.`;
+  return `<div class="rc-card"><div class="rc-l">Reality check</div><div class="rc-t">${line}</div>
+    <div class="rc-a" onclick="goPanelB('screentime')">See the trend ›</div></div>`;
+}
+
+/* ── 7 · LIFE GARDEN ──────────────────────── */
+function dayActive(dk){
+  if(S.habits.some(h=>h.log&&h.log[dk]))return true;
+  if(Object.keys(S.hourlyLog).some(k=>k.startsWith(dk+'|')))return true;
+  if(S.events.some(e=>e.ts&&e.ts.startsWith(dk)))return true;
+  return false;
+}
+function gardenState(){
+  const daysBack=[...Array(30)].map((_,i)=>dkey(addDays(new Date(),-i)));
+  const active=daysBack.filter(dayActive).length;
+  let streak=0, i=0;
+  if(!dayActive(daysBack[0]))i=1;                    // today isn't over yet
+  while(i<daysBack.length && dayActive(daysBack[i])){streak++;i++;}
+  const stage = streak>=25?6:streak>=15?5:streak>=10?4:streak>=6?3:streak>=3?2:streak>=1?1:0;
+  const wilt = streak===0;
+  const names=['Seed','Sprout','Seedling','Young plant','Leafy','Flowering','Tree'];
+  return {active,streak,stage,wilt,name:names[stage],days:daysBack};
+}
+function gardenSVG(g,size=96){
+  const s=g.stage, h=30+s*22, leaves=Math.min(s*2,10);
+  const col=g.wilt?'var(--t2)':'var(--em)';
+  let parts=`<line x1="60" y1="110" x2="60" y2="${110-h}" stroke="${col}" stroke-width="4" stroke-linecap="round"/>`;
+  for(let i=0;i<leaves;i++){
+    const y=104-(i+1)*(h/(leaves+1)), side=i%2?1:-1, w=13+ (leaves-i);
+    parts+=`<ellipse cx="${60+side*(w-2)}" cy="${y}" rx="${w}" ry="6.5" fill="${col}" opacity="${g.wilt?.35:.55+i*0.04}" transform="rotate(${side*(g.wilt?28:-16)} ${60+side*(w-2)} ${y})"/>`;
+  }
+  if(s>=5&&!g.wilt){
+    [[-16,-4],[16,2],[0,-14]].forEach(([dx,dy])=>{
+      parts+=`<circle cx="${60+dx}" cy="${110-h+dy}" r="5.5" fill="var(--saf)" opacity=".85"/>`;
+    });
+  }
+  if(s>=6&&!g.wilt)parts+=`<circle cx="60" cy="${110-h-6}" r="22" fill="var(--em)" opacity=".18"/>`;
+  parts+=`<ellipse cx="60" cy="112" rx="26" ry="5" fill="var(--bg4)"/>`;
+  return `<svg viewBox="0 0 120 120" width="${size}" height="${size}">${parts}</svg>`;
+}
+function renderGardenStrip(){
+  const g=gardenState();
+  return `<div class="gd-strip" onclick="goPanelB('garden')">
+    ${gardenSVG(g,52)}
+    <div style="flex:1;">
+      <div class="gd-name">${g.name}${g.wilt?' · thirsty':''}</div>
+      <div class="gd-sub">${g.streak?`${g.streak}-day streak · ${g.active}/30 days active`:'Log one thing today and it starts growing again'}</div>
+    </div><span style="color:var(--t2);font-size:13px;">›</span></div>`;
+}
+function renderGarden(){
+  const p=document.getElementById('p-garden'); if(!p)return;
+  const g=gardenState();
+  const next=[1,3,6,10,15,25,999][Math.min(g.stage,6)];
+  p.innerHTML=`
+    <div class="ph"><div><div class="ph-t">Life Garden</div>
+      <div class="ph-s">Your consistency, as something alive</div></div></div>
+    <div class="gd-hero">
+      ${gardenSVG(g,180)}
+      <div style="font-size:17px;font-weight:600;color:var(--t0);margin-top:6px;">${g.name}</div>
+      <div style="font-size:11.5px;color:var(--t1);margin-top:5px;line-height:1.6;">
+        ${g.wilt
+          ? 'Nothing logged yesterday, so it’s wilting a little. One habit tick or one hour logged brings it back — it never dies.'
+          : `${g.streak} day${g.streak===1?'':'s'} in a row. ${g.stage<6?`${next-g.streak} more day${next-g.streak===1?'':'s'} to the next stage.`:'Fully grown — now keep it alive.'}`}
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:14px;">
+      <div class="ct" style="margin-bottom:9px;">Last 30 days</div>
+      <div class="gd-dots">${g.days.slice().reverse().map(d=>`<div class="gd-d${dayActive(d)?' on':''}" title="${d}"></div>`).join('')}</div>
+      <div style="display:flex;justify-content:space-between;margin-top:7px;font-size:9px;color:var(--t3);">
+        <span>30 days ago</span><span>${g.active} active days</span><span>today</span></div>
+    </div>
+    <div class="card">
+      <div class="ct" style="margin-bottom:9px;">What waters it</div>
+      <div style="font-size:11.5px;color:var(--t1);line-height:1.9;">
+        ✦ Tick any habit &nbsp;·&nbsp; ⏲ Log an hour &nbsp;·&nbsp; ⚡ Log an event<br>
+        Any one of those counts. It grows on showing up, not on doing everything.
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn bp bsm" style="flex:1;" onclick="goPanelB('habits')">✦ Habits</button>
+        <button class="btn bg bsm" style="flex:1;" onclick="goPanelB('hourly')">⏲ Log an hour</button>
+      </div>
+    </div>`;
+}
+
+/* ── 8 · WIND-DOWN RITUAL ─────────────────── */
+let WDN={mood:0,picks:[]};
+function sleepTargetMins(){
+  const s=(PROFILE.sleep||'22:30').split(':').map(Number);
+  return s[0]*60+(s[1]||0);
+}
+function maybeWindDown(){
+  if(!DB.get('wdOn',true))return;
+  if(typeof isTyping==='function'&&isTyping())return;
+  if(document.getElementById('wd-ov')||document.getElementById('hp-ov')||document.getElementById('chk-ov'))return;
+  if(DB.get('wdShown','')===today())return;
+  const now=minsNow(), target=sleepTargetMins()-45;
+  if(now<target||now>target+150)return;
+  showWindDown();
+}
+function showWindDown(){
+  if(document.getElementById('wd-ov'))return;
+  WDN={mood:0,picks:[]};
+  const open=S.tasks.filter(t=>!t.done).sort((a,b)=>(a.pri||2)-(b.pri||2)).slice(0,8);
+  const done=S.tasks.filter(t=>t.done).length;
+  const ov=document.createElement('div'); ov.id='wd-ov';
+  ov.innerHTML=`<div class="wd-box">
+    <div style="text-align:center;font-size:26px;margin-bottom:4px;">🌙</div>
+    <div style="text-align:center;font-size:14px;font-weight:600;color:var(--t0);margin-bottom:3px;">Close the day</div>
+    <div style="text-align:center;font-size:10.5px;color:var(--t2);margin-bottom:18px;">Four taps. ${done} task${done===1?'':'s'} done today.</div>
+
+    <div class="wd-step">1 · How did today feel?</div>
+    <div class="wd-moods">${['😞','😕','😐','🙂','😄'].map((e,i)=>`<div class="wd-m" id="wdm-${i+1}" onclick="wdMood(${i+1})">${e}</div>`).join('')}</div>
+
+    <div class="wd-step">2 · Tomorrow's top 3</div>
+    <div class="wd-t3">${open.length?open.map(t=>`<div class="wd-ti" id="wdt-${t.id}" onclick="wdPick(${t.id})"><span class="wd-num">·</span>${escH(t.text)}</div>`).join('')
+      :'<div style="font-size:11px;color:var(--t2);padding:8px;">No open tasks — you can add them in the morning.</div>'}</div>
+
+    <div class="wd-step">3 · One line for the journal</div>
+    <div class="inrow" style="margin-bottom:16px;">
+      <input type="text" class="ti" id="wd-note" placeholder="What mattered today?">${typeof micBtn==='function'?micBtn('wd-note'):''}
+    </div>
+
+    <div style="display:flex;gap:8px;">
+      <button class="btn bg" style="flex:1;padding:12px;" onclick="wdClose(true)">Not tonight</button>
+      <button class="btn bp" style="flex:2;padding:12px;" onclick="wdSave()">Save &amp; sleep</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  if(navigator.vibrate)try{navigator.vibrate(30)}catch(e){}
+}
+function wdMood(n){WDN.mood=n;for(let i=1;i<=5;i++)document.getElementById('wdm-'+i).classList.toggle('on',i===n);}
+function wdPick(id){
+  const i=WDN.picks.indexOf(id);
+  if(i>=0)WDN.picks.splice(i,1);
+  else{ if(WDN.picks.length>=3){toast('⚠️','Three is the point — deselect one first');return;} WDN.picks.push(id); }
+  S.tasks.forEach(t=>{const el=document.getElementById('wdt-'+t.id);if(!el)return;
+    const k=WDN.picks.indexOf(t.id);
+    el.classList.toggle('on',k>=0);
+    el.querySelector('.wd-num').textContent = k>=0 ? (k+1) : '·';});
+}
+function wdClose(snooze){
+  const o=document.getElementById('wd-ov'); if(o)o.remove();
+  if(snooze)DB.set('wdShown',today());
+}
+function wdSave(){
+  const note=(document.getElementById('wd-note').value||'').trim();
+  const moodTxt=['','Rough','Heavy','Ordinary','Good','Excellent'][WDN.mood]||'';
+  WDN.picks.forEach(id=>{const t=S.tasks.find(x=>x.id===id);if(t){t.pri=1;t.tomorrow=true;}});
+  if(note||moodTxt){
+    S.journalEntries.unshift({
+      date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),
+      wins:note, drain:'', tomorrow:WDN.picks.map(id=>(S.tasks.find(t=>t.id===id)||{}).text).filter(Boolean).join(' · '),
+      insight:moodTxt?`Day felt: ${moodTxt}`:''
+    });
+  }
+  if(WDN.mood)S.burnout.motivation=Math.round((S.burnout.motivation*0.7)+(WDN.mood*20*0.3));
+  save();
+  DB.set('wdShown',today());
+  logEvent('review',`Wind-down · ${moodTxt||'logged'} · ${WDN.picks.length} picked for tomorrow`,5,5,'mind');
+  wdClose(false);
+  toast('🌙',`Day closed${WDN.picks.length?` · ${WDN.picks.length} ready for tomorrow`:''}`);
+  if(S.panel==='dashboard')renderDashboard();
+}
+
+/* ── DASHBOARD PATCH ──────────────────────── */
+const _v10Dashboard = renderDashboard;
+renderDashboard = function(){
+  _v10Dashboard();
+  applyAmbient();
+  const p=document.getElementById('p-dashboard'); if(!p)return;
+  const anchor=p.querySelector('.ph'); if(!anchor)return;
+  const html = `
+    <div class="cmd-pill" onclick="openCmd()">
+      <span style="font-size:14px;">⌕</span>
+      <span class="cp-t">Go anywhere, or say what happened…</span>
+      <span class="cp-k">Find</span>
+    </div>
+    ${renderRightNow()}
+    ${renderGardenStrip()}
+    ${renderRibbon()}
+    ${renderRealityCheck()}`;
+  anchor.insertAdjacentHTML('afterend',html);
+};
+
+/* ── v11 BOOT ─────────────────────────────── */
+function v11Init(){
+  applyAmbient();
+  buildBottomNav();
+  setInterval(applyAmbient,5*60*1000);
+  setInterval(maybeWindDown,60*1000);
+  setTimeout(maybeWindDown,20*1000);
+  document.addEventListener('keydown',e=>{
+    if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openCmd();}
+  });
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden){applyAmbient();setTimeout(maybeWindDown,3000);}});
+}
+
+
+/* ═══════════════════════════════════════════════
+   LIFE OS v2.1 — FOCUS LAYER
+   Local-only. No server, no vault key, no account.
+   A · Local snapshot backups (3 rolling, on-device)
+   B · Doomscroll Rescue guard
+   C · Peak-hour intelligence (smart habit times)
+   D · Hourly audit notification + chime
+   E · Install guide
+═══════════════════════════════════════════════ */
+
+/* ── E · DOOMSCROLL RESCUE ────────────────── */
+const DS=Object.assign({on:true,limit:45},DB.get('dsCfg',{}));
+function saveDS(){DB.set('dsCfg',DS);}
+function todayScrollMins(){
+  const r=S.screenTime[today()]||{};
+  return (r.social||0)+(r.video||0);
+}
+function dsCheck(){
+  if(!DS.on)return;
+  if(document.getElementById('ds-ov')||document.getElementById('wd-ov')||document.getElementById('hp-ov'))return;
+  if(typeof isTyping==='function'&&isTyping())return;
+  const mins=todayScrollMins();
+  if(mins<DS.limit)return;
+  const step=Math.floor(mins/DS.limit);
+  if(DB.get('dsFired','')===today()+'|'+step)return;
+  DB.set('dsFired',today()+'|'+step);
+  showDoomscroll(mins);
+}
+function dsTone(){
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+    const c=new AC(),o=c.createOscillator(),g=c.createGain();
+    o.type='sawtooth';o.frequency.setValueAtTime(440,c.currentTime);
+    o.frequency.exponentialRampToValueAtTime(880,c.currentTime+.3);
+    g.gain.setValueAtTime(.12,c.currentTime);g.gain.exponentialRampToValueAtTime(.01,c.currentTime+.3);
+    o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.35);
+  }catch(e){}
+}
+let DS_TIMER=null;
+function showDoomscroll(mins){
+  if(document.getElementById('ds-ov'))return;
+  mins=mins||todayScrollMins();
+  const top=(typeof topPriorityTask==='function')?topPriorityTask():null;
+  const hrs=(mins/60).toFixed(1);
+  const ov=document.createElement('div');ov.id='ds-ov';
+  ov.innerHTML=`<div class="ds-box">
+    <div style="font-size:30px;">🛑</div>
+    <div class="ds-ring" id="ds-count">15</div>
+    <div class="ds-t">${hrs} hours gone today</div>
+    <div class="ds-s">Social and short video have crossed your ${DS.limit}-minute line. Not a lecture — just the number, while you can still do something about it.</div>
+    ${top?`<div class="ds-b go" onclick="dsRescue(${JSON.stringify(top.text).replace(/"/g,'&quot;')},10)">▶ Focus on “${escH(top.text.slice(0,34))}${top.text.length>34?'…':''}”</div>`:''}
+    <div class="ds-b ${top?'alt':'go'}" onclick="dsRescue('5-minute reclaim sprint',15)">⚡ 5-minute reclaim sprint</div>
+    <div class="ds-b" onclick="dsLater()">Not now</div>
+  </div>`;
+  document.body.appendChild(ov);
+  dsTone();
+  if(navigator.vibrate)try{navigator.vibrate([60,50,60])}catch(e){}
+  let n=15;
+  DS_TIMER=setInterval(()=>{
+    n--;const el=document.getElementById('ds-count');
+    if(!el){clearInterval(DS_TIMER);return;}
+    el.textContent=n>0?n:'⏱';
+    if(n<=0){clearInterval(DS_TIMER);dsTone();el.style.color='var(--saf)';}
+  },1000);
+}
+function dsClose(){
+  const o=document.getElementById('ds-ov');if(o)o.remove();
+  if(DS_TIMER)clearInterval(DS_TIMER);
+}
+function dsRescue(taskName,stars){
+  dsClose();
+  RW.stars+=stars;RW.history.unshift({t:Date.now(),type:'rescue',detail:'Escaped the scroll · +'+stars});
+  if(RW.history.length>60)RW.history=RW.history.slice(0,60);
+  saveRW();
+  logEvent('review',`Doomscroll rescue → ${taskName}`,6,7,'mind');
+  toast('⭐','+'+stars+' stars — back on it');
+  if(typeof openFocusTask==='function')openFocusTask(taskName);
+}
+function dsLater(){dsClose();toast('👍','Fine — the number is in Screen Time when you want it');}
+
+/* ── F · PEAK-HOUR INTELLIGENCE ───────────── */
+function analyzePeak(){
+  const score={};for(let i=0;i<24;i++)score[i]=0;
+  let n=0;
+  // Scored relative to a neutral 5/10 so an hour you log often but always at
+  // low energy is pushed DOWN, not up — the difference from raw volume scoring.
+  Object.values(S.hourlyLog).forEach(l=>{
+    const h=parseInt(l.hour,10);
+    if(!isNaN(h)&&h>=0&&h<24){score[h]+=((l.energy||5)-5)*2.5;n++;}
+  });
+  S.events.forEach(ev=>{
+    if(!ev.ts)return;
+    const d=new Date(ev.ts);if(isNaN(d.getTime()))return;
+    score[d.getHours()]+=((ev.energy||5)-5)*2+((ev.focus||5)-5)*1.5;n++;
+  });
+  const wake=parseInt((PROFILE.wake||'06:00').split(':')[0],10)||6;
+  const sleep=parseInt((PROFILE.sleep||'22:00').split(':')[0],10)||22;
+  for(let h=wake;h<sleep;h++)score[h]+=3;
+  const sorted=Object.keys(score).map(Number).sort((a,b)=>score[b]-score[a]);
+  const morning=sorted.filter(h=>h>=wake&&h<12)[0] ?? Math.min(wake+1,9);
+  const afternoon=sorted.filter(h=>h>=12&&h<17)[0] ?? 14;
+  const evening=sorted.filter(h=>h>=17&&h<=sleep)[0] ?? Math.min(sleep-2,20);
+  const confidence=Math.min(95,Math.max(60,n*5+60));
+  return {score,peaks:sorted.slice(0,3),morning,afternoon,evening,samples:n,confidence,
+    reason:n>5?`Learned from ${n} hour logs and events.`:'Mostly your wake/sleep window so far — log a few hours and this sharpens.'};
+}
+function habitSmartTime(h,a){
+  const cat=(h.cat||'').toLowerCase(), nm=(h.name||'').toLowerCase();
+  const isMorning=cat.includes('morning')||/meditat|wake|water|stretch|yoga|sadhana/.test(nm);
+  const isEvening=cat.includes('night')||cat.includes('evening')||/journal|read|sleep|reflect|review/.test(nm);
+  const hour=isMorning?a.morning:isEvening?a.evening:a.afternoon;
+  const why=isMorning?'Peak morning readiness':isEvening?'Evening wind-down window':'Your highest-energy working hour';
+  return {hour,label:String(hour).padStart(2,'0')+':00',why};
+}
+function renderPeakCard(){
+  const a=analyzePeak();
+  const vals=Object.values(a.score), max=Math.max(...vals), min=Math.min(...vals), span=Math.max(max-min,1);
+  const nowH=new Date().getHours();
+  const bars=[...Array(24)].map((_,h)=>`<div class="pk-b${a.peaks.includes(h)?' top':''}${h===nowH?' now':''}" style="height:${Math.max(4,(a.score[h]-min)/span*100)}%" title="${String(h).padStart(2,'0')}:00"></div>`).join('');
+  const rows=S.habits.slice(0,6).map(h=>{const t=habitSmartTime(h,a);
+    return `<div class="pk-row"><span class="pk-time">${t.label}</span><span style="flex:1;color:var(--t0);">${escH(h.name)}</span><span style="font-size:9.5px;color:var(--t2);">${t.why}</span></div>`;}).join('');
+  return `<div class="card" style="margin-bottom:14px;">
+    <div class="ct" style="margin-bottom:2px;">Your energy by hour</div>
+    <div style="font-size:10px;color:var(--t2);">${escH(a.reason)} Confidence ${a.confidence}%.</div>
+    <div class="pk-bars">${bars}</div>
+    <div class="pk-ax"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>
+    <div style="font-size:9.5px;font-weight:800;letter-spacing:.12em;color:var(--saf);margin:13px 0 3px;">SUGGESTED TIMES</div>
+    ${rows||'<div style="font-size:10.5px;color:var(--t2);">Add a habit and this fills in.</div>'}
+  </div>`;
+}
+function isPeakHourNow(){
+  const a=analyzePeak();
+  return a.samples>5&&a.peaks.includes(new Date().getHours());
+}
+
+/* ── G · HOURLY AUDIT NOTIFICATION ────────── */
+const HRN=Object.assign({on:false},DB.get('hourlyNotif',{}));
+function saveHRN(){DB.set('hourlyNotif',HRN);}
+function chime(){
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+    const c=new AC(),o=c.createOscillator(),g=c.createGain();
+    o.frequency.setValueAtTime(587.33,c.currentTime);
+    g.gain.setValueAtTime(.18,c.currentTime);g.gain.exponentialRampToValueAtTime(.01,c.currentTime+.45);
+    o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.5);
+  }catch(e){}
+}
+function pushNote(title,body){
+  try{
+    if('Notification' in window && Notification.permission==='granted')
+      new Notification(title,{body,icon:'./icon-192.png'});
+  }catch(e){}
+}
+async function toggleHourlyNotif(){
+  HRN.on=!HRN.on;
+  if(HRN.on&&'Notification' in window&&Notification.permission==='default'){
+    try{await Notification.requestPermission();}catch(e){}
+  }
+  saveHRN();
+  toast(HRN.on?'🔔':'🔕',HRN.on?'Hourly audit reminders on':'Hourly reminders off');
+  if(S.panel==='settings')renderSettings();
+}
+function testHourlyNotif(){
+  if('Notification' in window&&Notification.permission!=='granted'){
+    Notification.requestPermission().catch(()=>{});
+  }
+  pushNote('⏰ Hourly energy audit','Log what you did this hour and how your energy was.');
+  chime();
+  toast('🔔','Test sent — in-app alerts work either way');
+}
+let LAST_HR_NOTE=-1;
+function hourlyNotifTick(){
+  if(!HRN.on)return;
+  const d=new Date();
+  if(d.getMinutes()>2)return;
+  if(d.getHours()===LAST_HR_NOTE)return;
+  const h=d.getHours();
+  if(typeof HRCFG==='object'&&HRCFG.from!==undefined&&(h<HRCFG.from||h>=HRCFG.to))return;
+  LAST_HR_NOTE=h;
+  pushNote(`⏰ Hourly audit · ${String(h).padStart(2,'0')}:00`,'What did the last hour go to?');
+  chime();
+}
+
+/* ── H · INSTALL GUIDE ────────────────────── */
+function showInstallGuide(){
+  if(document.getElementById('inst-ov'))return;
+  const ua=navigator.userAgent;
+  const android=/Android/i.test(ua), ios=/iPhone|iPad|iPod/i.test(ua);
+  const steps = android?[
+    'Open this page in <b>Chrome</b> (not an in-app browser).',
+    'Tap the <b>⋮</b> menu, top right.',
+    'Choose <b>Add to Home screen</b> → <b>Install</b>.',
+    'Launch it from the home screen — it runs full-screen and offline.'
+  ]:ios?[
+    'Open this page in <b>Safari</b> (Chrome on iOS can’t install PWAs).',
+    'Tap the <b>Share</b> button at the bottom.',
+    'Scroll down, tap <b>Add to Home Screen</b> → <b>Add</b>.',
+    'Needs iOS 16.4+ for notifications; everything else works below that.'
+  ]:[
+    'In Chrome or Edge, look for the <b>install icon</b> in the address bar.',
+    'Or open the <b>⋮</b> menu → <b>Install Life OS</b>.',
+    'It opens in its own window and keeps working offline.',
+    'Export a backup from Settings if you also use it on another device.'
+  ];
+  const ov=document.createElement('div');ov.id='inst-ov';
+  ov.onclick=e=>{if(e.target===ov)ov.remove();};
+  ov.innerHTML=`<div class="inst-box">
+    <div style="text-align:center;font-size:26px;margin-bottom:5px;">📲</div>
+    <div style="text-align:center;font-size:14px;font-weight:600;margin-bottom:3px;">Install on ${android?'Android':ios?'iPhone / iPad':'this computer'}</div>
+    <div style="text-align:center;font-size:10.5px;color:var(--t2);margin-bottom:16px;">Free · no store · no account</div>
+    ${steps.map((s,i)=>`<div class="inst-step"><div class="inst-n">${i+1}</div><div class="inst-tx">${s}</div></div>`).join('')}
+    <button class="btn bp" style="width:100%;padding:12px;" onclick="document.getElementById('inst-ov').remove()">Got it</button>
+  </div>`;
+  document.body.appendChild(ov);
+}
+
+/* ── PATCHES INTO EXISTING PANELS ─────────── */
+const _v11Habits = renderHabits;
+renderHabits = function(){
+  _v11Habits();
+  const p=document.getElementById('p-habits'), a=p&&p.querySelector('.ph');
+  if(a)a.insertAdjacentHTML('afterend',renderPeakCard());
+};
+const _v11Settings = renderSettings;
+renderSettings = function(){
+  _v11Settings();
+  const p=document.getElementById('p-settings');if(!p)return;
+  p.insertAdjacentHTML('beforeend',`
+    <div class="card" style="margin-top:14px;">
+      <div class="ct" style="margin-bottom:6px;">Focus &amp; Reminders</div>
+      <div class="set-row">
+        <div><div class="set-nm">Doomscroll rescue</div>
+        <div class="set-sub">Interrupt at <b>${DS.limit} min</b> of social + short video in a day</div></div>
+        <div class="sw-toggle${DS.on?' on':''}" onclick="DS.on=!DS.on;saveDS();renderSettings()"></div>
+      </div>
+      <div class="set-row">
+        <div style="flex:1;"><div class="set-nm">Rescue threshold</div>
+        <input type="range" min="15" max="180" step="15" value="${DS.limit}" style="width:100%;margin-top:6px;"
+          oninput="DS.limit=parseInt(this.value);saveDS();this.nextElementSibling.textContent=DS.limit+' min'">
+        <div style="font-size:10px;color:var(--saf);font-family:'JetBrains Mono',monospace;">${DS.limit} min</div></div>
+      </div>
+      <div class="set-row">
+        <div><div class="set-nm">Hourly audit reminder</div>
+        <div class="set-sub">Notification + chime at the top of each hour, inside your logging window</div></div>
+        <div class="sw-toggle${HRN.on?' on':''}" onclick="toggleHourlyNotif()"></div>
+      </div>
+      <button class="btn bg bsm" style="width:100%;margin-top:10px;" onclick="testHourlyNotif()">🔔 Test reminder</button>
+    </div>`);
+};
+const _v11SaveScreenTime = saveScreenTime;
+saveScreenTime = function(){ _v11SaveScreenTime(); setTimeout(dsCheck,400); };
+// Right Now gains a peak-hour line
+const _v21RightNow = renderRightNow;
+renderRightNow = function(){
+  let html=_v21RightNow();
+  if(isPeakHourNow()&&html.includes('rn-why'))
+    html=html.replace('<div class="rn-why">','<div class="rn-why">This is one of your peak hours. ');
+  return html;
+};
+
+/* ── v2.1 BOOT ────────────────────────────── */
+function v21Init(){
+  setInterval(dsCheck,5*60*1000);
+  setTimeout(dsCheck,15000);
+  setInterval(hourlyNotifTick,60*1000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(dsCheck,2000);});
+}
+
+
+/* ═══════════════════════════════════════════════
+   LIFE OS v2.2 — remaining AI Studio parity
+   1 · Accent palette (theme.ts layer 2)
+   2 · Simulated time override
+   3 · Real install prompt (beforeinstallprompt)
+   4 · Level titles + badges + voice encouragement
+   5 · Smart habit reminders (learned times)
+   6 · Rescue intervention test
+   Life Domains was removed in this build.
+═══════════════════════════════════════════════ */
+
+/* ── 1 · ACCENT PALETTE ───────────────────── */
+const ACCENTS={
+  indigo:{name:'Royal Indigo',   p:'#6366f1', s:'#8b5cf6'},
+  emerald:{name:'Emerald Green', p:'#10b981', s:'#34d399'},
+  amber:{name:'Warm Amber',      p:'#f59e0b', s:'#fbbf24'},
+  rose:{name:'Rose Crimson',     p:'#f43f5e', s:'#fb7185'},
+  violet:{name:'Electric Violet',p:'#8b5cf6', s:'#a78bfa'},
+  cyan:{name:'Cyberpunk Cyan',   p:'#06b6d4', s:'#38bdf8'}
+};
+let ACCENT=DB.get('accent','indigo');
+function hexRGBA(hex,a){
+  const n=parseInt(hex.slice(1),16);
+  return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+}
+function applyAccent(k){
+  if(!ACCENTS[k])k='indigo';
+  ACCENT=k;DB.set('accent',k);
+  const a=ACCENTS[k];
+  let el=document.getElementById('accent-css');
+  if(!el){el=document.createElement('style');el.id='accent-css';document.head.appendChild(el);}
+  el.textContent=`:root{--ind:${a.p};--vio:${a.s};--is:${hexRGBA(a.p,.15)};--vs:${hexRGBA(a.s,.13)};}`;
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta&&document.documentElement.getAttribute('data-theme')!=='light')meta.setAttribute('content','#0a0d17');
+}
+function pickAccent(k){
+  applyAccent(k);
+  toast('🎨',ACCENTS[k].name);
+  if(S.panel==='settings')renderSettings();
+}
+
+/* ── 2 · SIMULATED TIME ───────────────────── */
+let SIMTIME=DB.get('simTime','');
+function simNow(){
+  if(!SIMTIME)return new Date();
+  const [h,m]=SIMTIME.split(':').map(Number);
+  const d=new Date();d.setHours(h||0,m||0,0,0);
+  return d;
+}
+const _v11AmbPhase=ambPhase;
+ambPhase=function(d){return _v11AmbPhase(d||simNow());};
+const _v11MinsNow=minsNow;
+minsNow=function(){const d=simNow();return d.getHours()*60+d.getMinutes();};
+function setSimTime(v){
+  SIMTIME=v||'';DB.set('simTime',SIMTIME);
+  applyAmbient();paintSimBar();
+  if(S.panel==='settings')renderSettings();else if(S.panel==='dashboard')renderDashboard();
+  toast(SIMTIME?'🕐':'✅',SIMTIME?`Previewing ${SIMTIME}`:'Back to real time');
+}
+function paintSimBar(){
+  let b=document.getElementById('simbar');
+  if(!SIMTIME){if(b)b.remove();return;}
+  if(!b){b=document.createElement('div');b.id='simbar';b.onclick=()=>setSimTime('');document.body.appendChild(b);}
+  b.textContent=`🕐 Previewing ${SIMTIME} · tap to reset`;
+}
+
+/* ── 3 · REAL INSTALL PROMPT ──────────────── */
+let INSTALL_EVT=null;
+function isStandalone(){
+  return window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+}
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();INSTALL_EVT=e;
+  if(S.panel==='dashboard')renderDashboard();
+});
+window.addEventListener('appinstalled',()=>{
+  INSTALL_EVT=null;DB.set('instDismissed',true);
+  toast('✅','Installed — open it from your home screen');
+});
+async function doInstall(){
+  if(INSTALL_EVT){
+    INSTALL_EVT.prompt();
+    try{
+      const {outcome}=await INSTALL_EVT.userChoice;
+      if(outcome==='accepted')toast('📲','Installing…');
+    }catch(e){}
+    INSTALL_EVT=null;
+    const b=document.getElementById('instbar');if(b)b.remove();
+    return;
+  }
+  showInstallGuide();
+}
+function dismissInstall(){
+  DB.set('instDismissed',true);
+  const b=document.getElementById('instbar');if(b)b.remove();
+}
+function renderInstallBar(){
+  if(isStandalone()||DB.get('instDismissed',false))return '';
+  if(!INSTALL_EVT&&!/Android|iPhone|iPad/i.test(navigator.userAgent))return '';
+  return `<div id="instbar">
+    <span style="font-size:17px;">📲</span>
+    <div class="ib-t">Install Life OS on this device
+      <div class="ib-s">Full screen, works offline, and reminders can reach you</div></div>
+    <button class="btn bp bsm" onclick="doInstall()">${INSTALL_EVT?'Install':'How'}</button>
+    <span class="ib-x" onclick="dismissInstall()">×</span>
+  </div>`;
+}
+
+/* ── 4 · LEVELS, BADGES, ENCOURAGEMENT ────── */
+const LEVEL_TITLES=['Initiate Seeker','Focus Novice','Task Warrior','Momentum Master','Zenith Achiever','Apex Performer','Grand Champion'];
+function levelInfo(){
+  const level=Math.floor(RW.stars/5)+1;
+  return {level, title:LEVEL_TITLES[Math.min(level-1,LEVEL_TITLES.length-1)],
+          inLevel:RW.stars%5, next:5-(RW.stars%5)};
+}
+function badgeList(){
+  const done=S.tasks.filter(t=>t.done).length;
+  const g=(typeof gardenState==='function')?gardenState():{streak:0,stage:0};
+  const li=levelInfo();
+  return [
+    {i:'✅',t:'Task Warrior',   d:'10 tasks completed',      on:done>=10},
+    {i:'🔥',t:'Streak Titan',   d:'7-day active streak',     on:g.streak>=7},
+    {i:'⚡',t:'Deep Focused',   d:'25 stars earned',         on:RW.stars>=25},
+    {i:'🏆',t:'Level 5 Elite',  d:'Reached level 5',         on:li.level>=5},
+    {i:'🌳',t:'Full Bloom',     d:'Garden at flowering+',    on:(g.stage||0)>=5},
+    {i:'🛡',t:'Scroll Escapee', d:'Used a doomscroll rescue',on:(RW.history||[]).some(h=>h.type==='rescue')}
+  ];
+}
+function speakEncouragement(){
+  if(!('speechSynthesis' in window)){toast('⚠️','This browser has no text-to-speech');return;}
+  const li=levelInfo(), done=S.tasks.filter(t=>t.done).length;
+  const g=(typeof gardenState==='function')?gardenState():{streak:0};
+  const open=S.tasks.filter(t=>!t.done).sort((a,b)=>(a.pri||2)-(b.pri||2))[0];
+  const text=`Hello ${PROFILE.name||'there'}. You are at level ${li.level}, ${li.title}, with ${RW.stars} stars`+
+    `${g.streak?` and a ${g.streak} day streak`:''}. You have completed ${done} task${done===1?'':'s'} so far.`+
+    `${open?` Your next one is: ${open.text}.`:''} Take one honest step now.`;
+  try{
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.rate=.95;u.pitch=1.05;
+    if(DB.get('voiceLang',''))u.lang=DB.get('voiceLang','');
+    window.speechSynthesis.speak(u);
+    toast('🔊','Playing');
+  }catch(e){toast('⚠️','Could not play audio');}
+}
+const _v21Rewards = renderRewards;
+renderRewards = function(){
+  _v21Rewards();
+  const p=document.getElementById('p-rewards'), a=p&&p.querySelector('.ph');
+  if(!a)return;
+  const li=levelInfo();
+  a.insertAdjacentHTML('afterend',`
+    <div class="lvl-card">
+      <div class="lvl-sub">Level ${li.level}</div>
+      <div class="lvl-title">${li.title}</div>
+      <div class="lvl-bar"><div class="lvl-fill" style="width:${li.inLevel/5*100}%"></div></div>
+      <div style="font-size:10.5px;color:var(--t1);">${li.next} more star${li.next===1?'':'s'} to level ${li.level+1}</div>
+      <button class="btn bg bsm" style="margin-top:11px;" onclick="speakEncouragement()">🔊 Say it out loud</button>
+    </div>
+    <div class="card" style="margin-bottom:13px;">
+      <div class="ct" style="margin-bottom:9px;">Badges</div>
+      <div class="bdg-grid">${badgeList().map(b=>`
+        <div class="bdg${b.on?' on':''}"><span class="bdg-i">${b.i}</span>
+        <div><div class="bdg-t">${b.t}</div><div class="bdg-d">${b.d}</div></div></div>`).join('')}</div>
+    </div>`);
+};
+
+/* ── 5 · SMART HABIT REMINDERS ────────────── */
+const HBR=Object.assign({on:false},DB.get('habitRemind',{}));
+function saveHBR(){DB.set('habitRemind',HBR);}
+async function toggleHabitRemind(){
+  HBR.on=!HBR.on;
+  if(HBR.on&&'Notification' in window&&Notification.permission==='default'){
+    try{await Notification.requestPermission();}catch(e){}
+  }
+  saveHBR();
+  toast(HBR.on?'🔔':'🔕',HBR.on?'Habit reminders follow your learned times':'Habit reminders off');
+  if(S.panel==='habits')renderHabits();
+  if(S.panel==='settings')renderSettings();
+}
+function habitRemindTick(){
+  if(!HBR.on||!S.habits.length)return;
+  const d=new Date();
+  if(d.getMinutes()>2)return;
+  const slot=today()+'|'+d.getHours();
+  if(DB.get('hbrLast','')===slot)return;
+  const a=analyzePeak();
+  const due=S.habits.filter(h=>habitSmartTime(h,a).hour===d.getHours()&&!(h.log&&h.log[today()]));
+  if(!due.length)return;
+  DB.set('hbrLast',slot);
+  pushNote(due.length===1?`✦ ${due[0].name}`:`✦ ${due.length} habits due now`,
+           due.map(h=>h.name).join(' · '));
+  chime();
+}
+function testHabitNote(name,label){
+  if('Notification' in window&&Notification.permission!=='granted')Notification.requestPermission().catch(()=>{});
+  pushNote('✦ '+name,`This is how your ${label} reminder will look.`);
+  chime();
+  toast('🔔','Test sent for '+name);
+}
+// Peak card gains per-habit test buttons and the reminder switch
+const _v21PeakCard = renderPeakCard;
+renderPeakCard = function(){
+  const a=analyzePeak();
+  let html=_v21PeakCard();
+  const rows=S.habits.slice(0,6).map(h=>{
+    const t=habitSmartTime(h,a);
+    return `<div class="pk-row"><span class="pk-time">${t.label}</span>
+      <span style="flex:1;color:var(--t0);">${escH(h.name)}</span>
+      <button class="hb-test" onclick="testHabitNote(${JSON.stringify(h.name).replace(/"/g,'&quot;')},'${t.label}')">Test</button></div>`;
+  }).join('');
+  if(rows){
+    html=html.replace(/(<div style="font-size:9.5px;font-weight:800;letter-spacing:.12em;color:var\(--saf\);margin:13px 0 3px;">SUGGESTED TIMES<\/div>)[\s\S]*?(<\/div>\s*)$/,
+      `$1${rows}
+      <div class="set-row" style="margin-top:6px;">
+        <div><div class="set-nm">Remind me at these times</div>
+        <div class="set-sub">Only for habits still unticked when the hour arrives</div></div>
+        <div class="sw-toggle${HBR.on?' on':''}" onclick="toggleHabitRemind()"></div>
+      </div>$2`);
+  }
+  return html;
+};
+
+/* ── 6 · SETTINGS ADDITIONS ───────────────── */
+const _v21Settings2 = renderSettings;
+renderSettings = function(){
+  _v21Settings2();
+  const p=document.getElementById('p-settings');if(!p)return;
+  p.insertAdjacentHTML('beforeend',`
+    <div class="card" style="margin-top:14px;">
+      <div class="ct" style="margin-bottom:4px;">Accent &amp; Preview</div>
+      <div style="font-size:10px;color:var(--t2);">Dark/light is layer one — this is the accent on top of it.</div>
+      <div class="acc-row">${Object.entries(ACCENTS).map(([k,a])=>`
+        <div class="acc-b${ACCENT===k?' on':''}" onclick="pickAccent('${k}')">
+          <div class="acc-dot" style="background:linear-gradient(135deg,${a.p},${a.s})"></div>
+          <div class="acc-l">${a.name}</div></div>`).join('')}</div>
+      <div class="set-row" style="margin-top:10px;">
+        <div style="flex:1;"><div class="set-nm">Preview a different time of day</div>
+        <div class="set-sub">Changes the ambient theme, greeting and Right Now reasoning — nothing is logged</div>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <input type="time" class="ti" style="margin:0;flex:1;" value="${SIMTIME}" onchange="setSimTime(this.value)">
+          <button class="btn bg bsm" onclick="setSimTime('')">Reset</button>
+        </div></div>
+      </div>
+      <div class="set-row">
+        <div><div class="set-nm">Smart habit reminders</div>
+        <div class="set-sub">Notifies at each habit's learned hour, only if still unticked</div></div>
+        <div class="sw-toggle${HBR.on?' on':''}" onclick="toggleHabitRemind()"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn bg bsm" style="flex:1;" onclick="showDoomscroll()">🛑 Test rescue</button>
+        <button class="btn bg bsm" style="flex:1;" onclick="speakEncouragement()">🔊 Test voice</button>
+      </div>
+    </div>`);
+};
+
+/* ── DASHBOARD: install bar on top ────────── */
+const _v21Dashboard = renderDashboard;
+renderDashboard = function(){
+  _v21Dashboard();
+  const bar=renderInstallBar();
+  if(!bar)return;
+  const p=document.getElementById('p-dashboard'), a=p&&p.querySelector('.ph');
+  if(a)a.insertAdjacentHTML('afterend',bar);
+};
+
+/* ── v2.2 BOOT ────────────────────────────── */
+function v22Init(){
+  applyAccent(ACCENT);
+  paintSimBar();
+  if(SIMTIME)applyAmbient();
+  setInterval(habitRemindTick,60*1000);
+}
+
+
+/* ═══════════════════════════════════════════════
+   LIFE OS v2.3 — MERGE COMPLETION LAYER
+   All five approved phases, each in its own block
+   so any one can be removed independently.
+   P1: Priority Focus card · Timeline · Rescue chip
+   P2: Task search + priority filters
+   P3: Rescue presets · yearly projection · follow-ups
+   P4: Habit peak cards (morning/afternoon/evening)
+   P5: Demo data (sandboxed) · download app file
+═══════════════════════════════════════════════ */
+
+/* ══ PHASE 1 ════════════════════════════════ */
+function openP1s(){
+  return S.tasks.filter(t=>!t.done&&(t.pri||2)===1&&!(t.snooze&&t.snooze>Date.now()))
+    .sort((a,b)=>(a.due||'~').localeCompare(b.due||'~')||a.ts-b.ts);
+}
+function renderPriorityFocus(){
+  const p1=openP1s();
+  if(p1.length<2)return '';                       // Right Now already covers a single P1
+  let shown=p1;
+  try{const rn=rightNowPick();if(rn&&rn.t)shown=p1.filter(t=>t.id!==rn.t.id);}catch(e){}
+  if(!shown.length)return '';
+  return `<div class="pf-card">
+    <div class="pf-hd"><span class="pf-t">P1 · Must do today</span>
+      <span class="pf-all" onclick="goPanelB('tasks')">View all ›</span></div>
+    ${shown.slice(0,4).map(t=>`<div class="pf-row">
+      <div class="pf-tx">${escH(t.text)}</div>
+      ${t.due?`<span class="pf-due">${t.due}</span>`:''}
+      <button class="pf-do" onclick="pfComplete(${t.id})">✓ Done</button>
+    </div>`).join('')}
+    ${shown.length>4?`<div style="font-size:10px;color:var(--t2);margin-top:7px;text-align:center;">+${shown.length-4} more in Tasks</div>`:''}
+  </div>`;
+}
+function pfComplete(id){
+  const t=S.tasks.find(x=>x.id===id);if(!t)return;
+  t.done=true;save();
+  logEvent('task',`Completed: ${t.text}`,7,7,t.cat||'general');
+  updateTaskStats();awardFollowUp(t);
+  if(S.panel==='dashboard')renderDashboard();else if(S.panel==='rewards')renderRewards();
+}
+function renderTimelineCard(){
+  const evs=S.events.slice(0,4);
+  if(!evs.length)return `<div class="tl-card">
+    <div class="pf-hd"><span class="pf-t">Recent activity</span>
+      <span class="pf-all" onclick="goPanelB('events')">Log one ›</span></div>
+    <div style="font-size:11px;color:var(--t2);padding:6px 0;">Nothing logged yet. Every habit tick, focus session and hour log lands here.</div></div>`;
+  return `<div class="tl-card">
+    <div class="pf-hd"><span class="pf-t">Recent activity</span>
+      <span class="pf-all" onclick="goPanelB('events')">View events ›</span></div>
+    ${evs.map(e=>{
+      const c=(typeof EV_COLORS==='object'&&EV_COLORS[e.type])||'var(--ind)';
+      const tm=(e.ts&&e.ts.length>=16)?e.ts.slice(11,16):'';
+      return `<div class="tl-row"><div class="tl-bar" style="background:${c}"></div>
+        <div style="flex:1;"><div class="tl-ty" style="color:${c}">${escH(String(e.type||'').replace(/_/g,' '))}</div>
+        <div class="tl-dt">${escH(e.detail||'')}</div></div>
+        <span class="tl-tm">${tm}</span></div>`;
+    }).join('')}
+  </div>`;
+}
+function rescueChipState(){
+  const mins=todayScrollMins(), limit=DS.limit||45;
+  const pct=limit?mins/limit:0;
+  return {mins,limit,cls:!DS.on?'':pct>=1?'over':pct>=.5?'warn':'ok',
+          label:!DS.on?'Shield off':`${mins}/${limit}m`};
+}
+function paintRescueChip(){
+  const el=document.getElementById('rescuechip');if(!el)return;
+  const s=rescueChipState();
+  el.className=s.cls;
+  el.innerHTML=`<span>🛡</span><span class="rc-lb">${s.label}</span>`;
+  el.title=`Doomscroll shield · ${s.mins} min of social + short video today (limit ${s.limit})`;
+}
+
+/* ══ PHASE 2 ════════════════════════════════ */
+let TF={q:'',pri:0};
+function setTaskFilter(pri){TF.pri=pri;renderTasks();}
+function setTaskQuery(v){
+  TF.q=v;
+  const open=applyTaskFilter(S.tasks.filter(t=>!t.done));
+  const box=document.getElementById('t-open');
+  if(box)box.innerHTML=open.length?renderTaskList(sortOpen(open)):`<div class="tf-none">Nothing matches “${escH(TF.q)}”</div>`;
+  const c=document.getElementById('tf-count');
+  if(c)c.textContent=open.length;
+}
+function applyTaskFilter(list){
+  const q=(TF.q||'').trim().toLowerCase();
+  return list.filter(t=>{
+    if(TF.pri&&(t.pri||2)!==TF.pri)return false;
+    if(q&&!(t.text||'').toLowerCase().includes(q))return false;
+    return true;
+  });
+}
+function sortOpen(list){
+  return list.slice().sort((a,b)=>{
+    const pd=(a.pri||2)-(b.pri||2);if(pd)return pd;
+    if(a.due&&b.due)return a.due.localeCompare(b.due);
+    return a.due?-1:b.due?1:0;
+  });
+}
+const _v22Tasks = renderTasks;
+renderTasks = function(){
+  _v22Tasks();
+  const p=document.getElementById('p-tasks');if(!p)return;
+  const box=document.getElementById('t-open');if(!box)return;
+  const filtered=applyTaskFilter(S.tasks.filter(t=>!t.done));
+  box.innerHTML=filtered.length?renderTaskList(sortOpen(filtered))
+    :`<div class="tf-none">${TF.q||TF.pri?'Nothing matches this filter':'No tasks · Add one above'}</div>`;
+  const chips=[[0,'All'],[1,'P1'],[2,'P2'],[3,'P3']].map(([v,l])=>
+    `<div class="tf-chip${TF.pri===v?' on':''}" onclick="setTaskFilter(${v})">${l}</div>`).join('');
+  box.insertAdjacentHTML('beforebegin',`<div class="tf-row">
+    <input class="tf-search" id="tf-q" placeholder="Search tasks…" value="${escH(TF.q)}" oninput="setTaskQuery(this.value)">
+    ${chips}</div>
+    <div style="font-size:9.5px;color:var(--t2);margin-bottom:6px;"><span id="tf-count">${filtered.length}</span> shown · tap a priority badge to change it</div>`);
+};
+
+/* ══ PHASE 3 ════════════════════════════════ */
+const DS_PRESETS=[{v:20,n:'Strict',d:'20 min/day'},{v:45,n:'Balanced',d:'45 min/day'},{v:90,n:'Relaxed',d:'90 min/day'}];
+function setDSLimit(v){
+  DS.limit=v;DS.on=true;saveDS();DB.del('dsFired');
+  toast('🛡','Shield at '+v+' min/day');
+  paintRescueChip();
+  if(S.panel==='screentime')renderScreentime();
+  if(S.panel==='settings')renderSettings();
+}
+function renderShieldCard(){
+  const s=rescueChipState();
+  const pct=Math.min(100,Math.round(s.mins/(s.limit||1)*100));
+  return `<div class="card" style="margin-bottom:13px;">
+    <div class="pf-hd" style="margin-bottom:4px;"><span class="pf-t" style="color:var(--ros);">Doomscroll rescue shield</span>
+      <span class="pf-all" style="color:var(--ros);" onclick="showDoomscroll()">Rescue me now ›</span></div>
+    <div style="font-size:11px;color:var(--t1);line-height:1.6;">${s.mins} of ${s.limit} min used today${pct>=100?' — over the line':''}. The intervention fires automatically when you cross it.</div>
+    <div class="st-presets">${DS_PRESETS.map(p=>`
+      <div class="st-p${DS.limit===p.v?' on':''}" onclick="setDSLimit(${p.v})">
+        <div class="sp-n">${p.n}</div><div class="sp-d">${p.d}</div></div>`).join('')}</div>
+    <div class="set-row"><div><div class="set-nm">Shield enabled</div>
+      <div class="set-sub">Turn off and nothing interrupts you</div></div>
+      <div class="sw-toggle${DS.on?' on':''}" onclick="DS.on=!DS.on;saveDS();paintRescueChip();renderScreentime()"></div></div>
+  </div>`;
+}
+const _v22Screentime = renderScreentime;
+renderScreentime = function(){
+  _v22Screentime();
+  const p=document.getElementById('p-screentime'), a=p&&p.querySelector('.ph');
+  if(a)a.insertAdjacentHTML('afterend',renderShieldCard());
+  paintRescueChip();
+};
+// Yearly projection inside the rescue modal
+const _v21ShowDoom = showDoomscroll;
+showDoomscroll = function(mins){
+  _v21ShowDoom(mins);
+  const ov=document.getElementById('ds-ov');if(!ov)return;
+  const m=(mins||todayScrollMins());
+  const yrH=Math.round(m*365/60), yrD=Math.round(yrH/24);
+  const s=ov.querySelector('.ds-s');
+  if(s)s.insertAdjacentHTML('afterend',`<div class="ds-proj">
+    At today's rate that is <b>${yrH} hours</b> a year — <b>${yrD} full days</b> of your life, every year.</div>`);
+};
+// Task follow-ups in Rewards
+const FU=Object.assign({date:'',given:0},DB.get('followUpStars',{}));
+function awardFollowUp(t){
+  if((t.pri||2)!==1)return;
+  const tk=today();
+  if(FU.date!==tk){FU.date=tk;FU.given=0;}
+  if(FU.given>=3)return;                          // caps the economy: 3 bonus stars a day
+  FU.given++;DB.set('followUpStars',FU);
+  RW.stars+=1;
+  RW.history.unshift({t:Date.now(),type:'p1',detail:'P1 finished · +1'});
+  if(RW.history.length>60)RW.history=RW.history.slice(0,60);
+  saveRW();
+  toast('⭐','P1 done · +1 star');
+}
+const _v22Rewards2 = renderRewards;
+renderRewards = function(){
+  _v22Rewards2();
+  const p=document.getElementById('p-rewards');if(!p)return;
+  const p1=openP1s();
+  const left=Math.max(0,3-(FU.date===today()?FU.given:0));
+  const card=`<div class="card" style="margin-bottom:13px;">
+    <div class="pf-hd" style="margin-bottom:6px;"><span class="pf-t" style="color:var(--saf);">Task follow-ups</span>
+      <span style="font-size:9.5px;color:var(--t2);">${left} bonus star${left===1?'':'s'} left today</span></div>
+    ${p1.length?p1.slice(0,3).map(t=>`<div class="pf-row">
+        <div class="pf-tx">${escH(t.text)}${t.due?` <span class="pf-due">${t.due}</span>`:''}</div>
+        <button class="pf-do" onclick="pfComplete(${t.id})">Complete +1★</button>
+      </div>`).join('')
+      :'<div style="font-size:11px;color:var(--t2);padding:4px 0;">No P1s open. Finishing a P1 earns a bonus star, up to three a day.</div>'}
+  </div>`;
+  const anchor=p.querySelector('.lvl-card');
+  if(anchor)anchor.insertAdjacentHTML('afterend',card);else p.insertAdjacentHTML('beforeend',card);
+};
+
+/* ══ PHASE 4 ════════════════════════════════ */
+const _v22PeakCard = renderPeakCard;
+renderPeakCard = function(){
+  const a=analyzePeak();
+  const fmt=h=>String(h).padStart(2,'0')+':00';
+  const three=`<div class="pk3">
+    <div class="pk3-c"><div class="pk3-l" style="color:var(--saf);">Morning focus peak</div><div class="pk3-v">${fmt(a.morning)}</div></div>
+    <div class="pk3-c"><div class="pk3-l" style="color:var(--ind);">Afternoon peak energy</div><div class="pk3-v">${fmt(a.afternoon)}</div></div>
+    <div class="pk3-c"><div class="pk3-l" style="color:var(--vio);">Evening reflection</div><div class="pk3-v">${fmt(a.evening)}</div></div>
+  </div>`;
+  let html=_v22PeakCard();
+  html=html.replace('<div class="ct" style="margin-bottom:2px;">Your energy by hour</div>',
+    `<div class="ct" style="margin-bottom:2px;">Your energy by hour<span class="pk3-b">${a.confidence}% confidence</span></div>`);
+  html=html.replace('<div class="pk-bars">',three+'<div class="pk-bars">');
+  return html;
+};
+
+/* ══ DASHBOARD + BOOT ═══════════════════════ */
+const _v22Dashboard2 = renderDashboard;
+renderDashboard = function(){
+  _v22Dashboard2();
+  const p=document.getElementById('p-dashboard');if(!p)return;
+  const anchor=p.querySelector('.rn-card')||p.querySelector('.ph');
+  if(!anchor)return;
+  anchor.insertAdjacentHTML('afterend',renderPriorityFocus()+renderTimelineCard());
+};
+const _v21SaveScreen2 = saveScreenTime;
+saveScreenTime = function(){ _v21SaveScreen2(); paintRescueChip(); };
+
+function v23Init(){
+  const tr=document.querySelector('#top .tright');
+  if(tr&&!document.getElementById('rescuechip')){
+    const el=document.createElement('div');
+    el.id='rescuechip';el.onclick=()=>goPanelB('screentime');
+    tr.insertBefore(el,tr.firstChild);
+  }
+  paintRescueChip();
+  setInterval(paintRescueChip,60*1000);
+}
+
+
+/* ═══════════════════════════════════════════════
+   LIFE OS v2.5 — INSIGHTS GATE
+   Insights stays hidden until there is a week of
+   data behind it. Before that it can only guess,
+   and a confident guess from three days of logs is
+   worse than no insight at all. At 7 days it
+   unlocks and a one-line summary appears on the
+   dashboard.
+═══════════════════════════════════════════════ */
+const INSIGHT_MIN_DAYS = 7;
+function insightsReady(){ return daysOfData() >= INSIGHT_MIN_DAYS; }
+
+// Insights joins the Grow hub only once it has earned its place.
+function syncInsightHub(){
+  const grow = HUBS.find(h=>h.k==='grow'); if(!grow) return;
+  const has = grow.items.some(i=>i.id==='insights');
+  if(insightsReady() && !has){
+    grow.items.push({id:'insights',icon:'💡',name:'Insights'});
+    buildNav();
+  }else if(!insightsReady() && has){
+    grow.items = grow.items.filter(i=>i.id!=='insights');
+    buildNav();
+  }
+}
+
+// One short line on the dashboard — the headline only, not the full panel.
+function renderInsightLine(){
+  const days = daysOfData();
+  if(days < INSIGHT_MIN_DAYS) return '';
+  let line = '', a = null;
+  try{ a = analyzePeak(); }catch(e){}
+  const scroll = (()=>{ let m=0,n=0;
+    for(let i=0;i<7;i++){ const r=S.screenTime[dkey(addDays(new Date(),-i))];
+      if(r){n++;m+=(r.social||0)+(r.video||0);} }
+    return n?Math.round(m/n):null; })();
+  const done = S.tasks.filter(t=>t.done).length;
+  if(a && a.samples>5) line = `Your sharpest hour is <b>${String(a.morning).padStart(2,'0')}:00</b>.`;
+  if(scroll!==null) line += ` Scrolling averages <b>${scroll} min</b> a day.`;
+  if(done) line += ` ${done} task${done===1?'':'s'} finished so far.`;
+  if(!line.trim()) return '';
+  return `<div class="rc-card" style="border-left-color:var(--saf);">
+    <div class="rc-l" style="color:var(--saf);">This week</div>
+    <div class="rc-t">${line.trim()}</div>
+    <div class="rc-a" onclick="goPanelB('insights')">Full insights ›</div></div>`;
+}
+const _v23Dashboard = renderDashboard;
+renderDashboard = function(){
+  _v23Dashboard();
+  syncInsightHub();
+  const html = renderInsightLine(); if(!html) return;
+  const p = document.getElementById('p-dashboard'); if(!p) return;
+  const anchor = p.querySelector('.gd-strip') || p.querySelector('.rn-card');
+  if(anchor) anchor.insertAdjacentHTML('afterend', html);
+};
+function v25Init(){ syncInsightHub(); }
+
 init();
+v11Init();
+v21Init();
+v22Init();
+v23Init();
+v25Init();
 </script>
 </body>
 </html>
