@@ -476,13 +476,18 @@ body.sb-off #sb{display:none!important}
 ══════════════════════════════════════════ */
 
 /* ── Ambient time-of-day wash ───────────── */
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+/* z-index:-1, NOT 0. At 0 this wash sat in the positioned layer, which forced
+   #shell to z-index:1 to stay visible — and that stacking context trapped the
+   mobile sidebar drawer (z-index:350) BELOW the backdrop (340), so opening the
+   menu showed a blurred screen with no menu on it. At -1 the wash paints behind
+   all content and no wrapper needs a z-index at all. */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:-1;
   opacity:.85;transition:background 1200ms ease;background:transparent}
 html[data-phase="dawn"] body::before{background:radial-gradient(120% 60% at 50% -10%,rgba(245,158,11,.16),transparent 60%)}
 html[data-phase="day"] body::before{background:radial-gradient(120% 60% at 50% -10%,rgba(56,189,248,.11),transparent 60%)}
 html[data-phase="dusk"] body::before{background:radial-gradient(120% 60% at 50% -10%,rgba(139,92,246,.16),transparent 62%)}
 html[data-phase="night"] body::before{background:radial-gradient(120% 60% at 50% -10%,rgba(99,102,241,.10),transparent 65%)}
-#top,#shell,#bnav,.lifeline{position:relative;z-index:1}
+#top,#shell,#bnav,.lifeline{position:relative}
 .phase-chip{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:700;
   letter-spacing:.1em;text-transform:uppercase;color:var(--t2)}
 
@@ -840,7 +845,7 @@ html[data-phase="night"] body::before{background:radial-gradient(120% 60% at 50%
   <div id="thtog" onclick="cycleTheme()" title="Switch theme">🌙</div>
   <div class="logo">🌱</div>
   <div class="brand">Life OS</div>
-  <span class="ver">v2.7</span>
+  <span class="ver">v2.9</span>
   <div class="sp"></div>
   <div class="tnav" id="tnav"></div>
   <div class="tright">
@@ -6048,10 +6053,10 @@ function showBootOrb(force){
   // gentle idle breathing that lifts while the text types
   BOOT_ORB.setLevel(0.25);
 
-  const name=(PROFILE.name||'').trim();
-  typeInto(document.getElementById('nx-hello'), `${greetWord()}${name?', '+name:''}.`, 34, ()=>{
+  const G=currentGreeting();
+  typeInto(document.getElementById('nx-hello'), G.display, 34, ()=>{
     const sub=document.getElementById('nx-sub');
-    if(sub)sub.innerHTML=bootBrief();
+    if(sub)sub.innerHTML=`<b>${escH(G.hook)}</b><br>`+bootBrief();
     BOOT_ORB&&BOOT_ORB.setLevel(0.12);
     speakBrief();
   });
@@ -6082,12 +6087,7 @@ function typeInto(el,text,ms,done){
 function speakBrief(){
   if(!DB.get('neuroVoice',true))return;
   if(!('speechSynthesis' in window))return;
-  const name=(PROFILE.name||'').trim();
-  const open=S.tasks.filter(t=>!t.done);
-  const p1=open.filter(t=>(t.pri||2)===1);
-  let txt=`${greetWord()}${name?', '+name:''}. `;
-  txt+= open.length ? `You have ${open.length} task${open.length===1?'':'s'} open${p1.length?`, ${p1.length} marked priority one`:''}.`
-                    : 'Your list is clear.';
+  const txt=greetingSpeech();
   try{ const u=new SpeechSynthesisUtterance(txt); u.rate=.98; u.pitch=1.02;
        if(DB.get('voiceLang',''))u.lang=DB.get('voiceLang','');
        window.speechSynthesis.speak(u); }catch(e){}
@@ -6283,6 +6283,428 @@ function v27Init(){
   });
 }
 
+
+/* ═══════════════════════════════════════════════
+   LIFE OS v2.8 — GREETING ENGINE 🎭
+   1 · Identity resolution (4-tier fallback)
+   2 · Time + session awareness
+   3 · Persona voice matrix
+   4 · Rotating honorific bank (shuffle bag)
+   5 · Emotional hooks from real data
+═══════════════════════════════════════════════ */
+
+/* ── 1 · IDENTITY RESOLUTION ──────────────────
+   The old code trusted PROFILE.name blindly, so an empty field or a
+   leftover placeholder became "Good morning, default." Every value now
+   passes through sanitise → validate → fallback. */
+
+// Values that are technically strings but nobody's actual name.
+const PLACEHOLDER_NAMES = new Set([
+  'default','user','username','name','your name','test','testing','admin',
+  'na','n/a','none','null','undefined','nil','me','myself','anonymous',
+  'guest','unknown','xxx','asdf','qwerty','abc','profile','person','sample'
+]);
+
+// Strip anything that would render badly, read badly aloud, or inject markup.
+function sanitizeName(raw){
+  if(raw===null||raw===undefined)return '';
+  let s=String(raw);
+  s=s.replace(/<[^>]*>/g,'');                    // markup
+  s=s.replace(/[\u0000-\u001F\u007F\u200B-\u200D\uFEFF]/g,''); // control + zero-width
+  s=s.replace(/[<>{}[\]\\|`^~=+*/@#$%&_]/g,' '); // symbols that read as noise in TTS
+  s=s.replace(/\s+/g,' ').trim();
+  return s;
+}
+// A name has to be pronounceable and human-shaped, not just non-empty.
+function isUsableName(s){
+  if(!s)return false;
+  if(s.length<2||s.length>60)return false;
+  if(PLACEHOLDER_NAMES.has(s.toLowerCase()))return false;
+  if(!/\p{L}/u.test(s))return false;             // must contain a letter (any script)
+  if(/^\d+$/.test(s))return false;
+  if(/(.)\1{4,}/.test(s))return false;           // "aaaaaa"
+  return true;
+}
+// Long names get shortened to the first given name rather than truncated
+// mid-word — "Venkatasubramanian R." greets as "Venkatasubramanian", and a
+// 40-character single token becomes an honorific instead of a mouthful.
+function displayForm(s){
+  const first=s.split(' ')[0];
+  if(first.length<=18)return first;
+  if(s.length<=18)return s;
+  return '';                                     // unusable → caller falls back
+}
+// TTS reads punctuation and emoji literally; strip them for the spoken form.
+function speechForm(s){
+  return s.replace(/\p{Extended_Pictographic}/gu,'')
+          .replace(/[.,;:!?()"']/g,'')
+          .replace(/\s+/g,' ').trim();
+}
+// Tier 1 profile name → 2 display name → 3 email prefix → 4 honorific.
+function resolveIdentity(){
+  const tiers=[
+    {src:'profile',  raw:PROFILE.name},
+    {src:'display',  raw:PROFILE.displayName||DB.get('displayName','')},
+    {src:'email',    raw:(PROFILE.email||DB.get('email','')||'').split('@')[0].replace(/[._-]+/g,' ')}
+  ];
+  for(const t of tiers){
+    const clean=sanitizeName(t.raw);
+    if(!isUsableName(clean))continue;
+    const disp=displayForm(clean);
+    if(!disp)continue;
+    return {name:disp, speech:speechForm(disp)||disp, isReal:true, source:t.src};
+  }
+  const h=honorificNext();
+  return {name:h, speech:speechForm(h)||h, isReal:false, source:'honorific'};
+}
+
+/* ── 2 · HONORIFIC BANK (shuffle bag) ─────────
+   Random selection repeats — you'd see "Boss" twice in a row and the
+   illusion dies. A shuffle bag guarantees every title is used once before
+   any repeats, and the bag persists so it survives a reload. */
+const HONORIFICS=[
+  'Boss','my hero','superstar','captain','legend','maestro','chief','VIP',
+  'trailblazer','the chosen one','commander','champ','ace','virtuoso',
+  'mastermind','skipper','the one and only','architect','sensei','thalaiva'
+];
+function honorificNext(){
+  let bag=DB.get('honorificBag',[]);
+  if(!Array.isArray(bag)||!bag.length){
+    bag=HONORIFICS.slice();
+    for(let i=bag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]];}
+    const last=DB.get('honorificLast','');
+    if(bag[0]===last&&bag.length>1)[bag[0],bag[1]]=[bag[1],bag[0]];  // no seam repeat
+  }
+  const pick=bag.shift();
+  DB.set('honorificBag',bag);
+  DB.set('honorificLast',pick);
+  return pick;
+}
+
+/* ── 3 · TIME + SESSION AWARENESS ─────────────
+   Bands use the device clock (which already carries the correct timezone
+   and DST) rather than a stored offset, and respect the simulated-time
+   preview so you can check every band without waiting for 3am. */
+function timeBand(d){
+  const h=(d||(typeof simNow==='function'?simNow():new Date())).getHours();
+  if(h<4)  return 'latenight';   // 00:00–03:59 — still up, not "morning"
+  if(h<7)  return 'dawn';
+  if(h<12) return 'morning';
+  if(h<17) return 'afternoon';
+  if(h<21) return 'evening';
+  return 'night';
+}
+// "Welcome back" only means something if you actually went away. A reload
+// two minutes later is a resume, not a return.
+function sessionKind(){
+  const now=Date.now();
+  const last=DB.get('lastSeenAt',0);
+  const lastDay=DB.get('lastSeenDay','');
+  const gapMin=last?(now-last)/60000:Infinity;
+  let kind;
+  if(!last)                       kind='first-ever';
+  else if(gapMin<25)              kind='resume';
+  else if(lastDay===today())      kind='return-today';
+  else if(gapMin>60*24*3)         kind='return-after-gap';
+  else                            kind='first-today';
+  return {kind, gapMin, daysAway:last?Math.floor(gapMin/1440):0};
+}
+function markSeen(){ DB.set('lastSeenAt',Date.now()); DB.set('lastSeenDay',today()); }
+
+/* ── 4 · PERSONA VOICE MATRIX ─────────────────
+   {N} is the resolved name or honorific. Each persona rewrites the same
+   moment — the data underneath is identical, only the delivery changes. */
+const PERSONAS={
+  butler:{label:'Loyal butler', icon:'🎩', lines:{
+    latenight:['Still awake, {N}. I shall keep the lights on.','A late hour, {N}. Everything is in order.'],
+    dawn:['Good morning, {N}. The day is prepared.','Early as ever, {N}. Shall we begin?'],
+    morning:['Good morning, {N}. Everything is ready for you.','Good morning, {N}. Your day awaits.'],
+    afternoon:['Good afternoon, {N}. Right on schedule.','Good afternoon, {N}. Shall we continue?'],
+    evening:['Good evening, {N}. A fine time to finish well.','Good evening, {N}. The evening is yours.'],
+    night:['Good night, {N}. Let us close the day properly.','Good night, {N}. Almost time to rest.'],
+    back:['Welcome back, {N}. Nothing has moved in your absence.','Welcome back, {N}. Everything as you left it.']}},
+  sidekick:{label:'Enthusiastic sidekick', icon:'⚡', lines:{
+    latenight:['Still going, {N}? Absolute machine.','It is past midnight, {N}, and here you are. Respect.'],
+    dawn:['Rise and shine, {N}! We are early and unstoppable.','Up before the sun, {N}? Let us go!'],
+    morning:['Good morning, {N}! Today looks winnable.','Morning, {N}! Let us make this one count.'],
+    afternoon:['Afternoon, {N}! Plenty of day left.','Good afternoon, {N}! Second wind time.'],
+    evening:['Evening, {N}! Strong finish incoming.','Good evening, {N}! Let us land this day well.'],
+    night:['Late one, {N}? Let us wrap it up strong.','Good night, {N}! Big day tomorrow.'],
+    back:['Look who is back! Good to see you, {N}.','There you are, {N}! Let us pick up where we left off.']}},
+  deadpan:{label:'Deadpan observer', icon:'🫥', lines:{
+    latenight:['It is after midnight, {N}. Noted.','Sleep is also an option, {N}.'],
+    dawn:['Morning, {N}. Very early. Suspiciously so.','You are up, {N}. The sun is not.'],
+    morning:['Morning, {N}. The day exists.','Good morning, {N}. Statistically, it should go fine.'],
+    afternoon:['Afternoon, {N}. Half the day survived.','Good afternoon, {N}. Still here. Good.'],
+    evening:['Evening, {N}. The day is nearly over. Congratulations.','Good evening, {N}. Almost done.'],
+    night:['Night, {N}. Tomorrow will arrive regardless.','Good night, {N}. This is your reminder that beds exist.'],
+    back:['You are back, {N}. I did not go anywhere.','Welcome back, {N}. Nothing happened without you.']}},
+  narrator:{label:'Dramatic narrator', icon:'🎬', lines:{
+    latenight:['The city sleeps. {N} does not.','Past midnight, and {N} is still in the arena.'],
+    dawn:['Dawn breaks. {N} is already moving.','The sun has not risen. {N} has.'],
+    morning:['A new morning, and {N} steps into it.','The day opens. {N} takes the first move.'],
+    afternoon:['Midday. The story continues, {N}.','The afternoon turns, and {N} presses on.'],
+    evening:['The light fades, {N}, but the work does not.','Evening falls. {N} is not finished yet.'],
+    night:['Night settles. Even {N} must rest eventually.','The day closes its final chapter, {N}.'],
+    back:['And so {N} returns.','The story resumes. {N} is back.']}}
+};
+function personaKey(){
+  const p=DB.get('persona','butler');
+  return PERSONAS[p]?p:'butler';
+}
+// Rotate within a persona's variants so the same line doesn't greet you twice.
+function pickLine(arr,bandKey){
+  if(!arr||!arr.length)return '';
+  const seen=DB.get('lineIdx',{});
+  const i=((seen[bandKey]||0))%arr.length;
+  seen[bandKey]=i+1; DB.set('lineIdx',seen);
+  return arr[i];
+}
+
+/* ── 5 · EMOTIONAL HOOKS ──────────────────────
+   One hook, chosen by priority — the rarest, most specific thing true
+   right now. Stacking three makes it read as a report, not a greeting. */
+function greetingHook(ident,band,sess){
+  const open=S.tasks.filter(t=>!t.done);
+  const p1=open.filter(t=>(t.pri||2)===1);
+  const g=(typeof gardenState==='function')?gardenState():null;
+  const doneToday=S.tasks.filter(t=>t.done).length;
+
+  if(sess.kind==='first-ever')
+    return 'First time here — tell me what needs doing and I will keep track of it.';
+  if(sess.kind==='return-after-gap'&&sess.daysAway>=3)
+    return `${sess.daysAway} days away. Nothing was lost — it is all still here.`;
+  if(g&&g.streak>=30) return `${g.streak} days unbroken. That is not a streak any more, that is a habit.`;
+  if(g&&g.streak>=7)  return `${g.streak} days in a row — you are building something.`;
+  if(g&&g.streak===0&&g.active>3) return 'The garden is thirsty. One log today brings it back.';
+  if(band==='latenight'&&open.length) return 'Burning the midnight oil again?';
+  if(band==='dawn') return 'Early start. The quiet hours are the good ones.';
+  if(p1.length>=3) return `${p1.length} P1s open — that is more "must do" than a day usually holds.`;
+  if(!open.length&&doneToday) return `Everything is cleared. ${doneToday} done today.`;
+  if(!open.length) return 'Your list is clear.';
+  if(g&&g.streak>=3) return `${g.streak}-day streak going.`;
+  return `${open.length} task${open.length===1?'':'s'} waiting.`;
+}
+
+/* ── ASSEMBLY ─────────────────────────────────
+   Client-side assembly, deliberately. A server round trip would let us
+   personalise harder, but it adds a network dependency to the very first
+   frame — and an offline-first app that cannot greet you offline has its
+   priorities backwards. Everything here is derived from local state. */
+let GREETING_CACHE=null;
+// The greeting is a moment, not a ticker. Build it once per session so the
+// header doesn't silently rewrite itself every five minutes — and so the
+// honorific bag isn't drained by background repaints.
+function currentGreeting(){
+  if(!GREETING_CACHE)GREETING_CACHE=buildGreeting();
+  return GREETING_CACHE;
+}
+function resetGreeting(){GREETING_CACHE=null;}
+function buildGreeting(){
+  const ident=resolveIdentity();
+  const sess=sessionKind();
+  const band=timeBand();
+  const pk=personaKey();
+  const lines=PERSONAS[pk].lines;
+  const useBack=(sess.kind==='return-today'||sess.kind==='return-after-gap');
+  const bandKey=useBack?'back':band;
+  const tmpl=pickLine(lines[bandKey]||lines[band],pk+':'+bandKey);
+  const display=tmpl.replace(/\{N\}/g,ident.name);
+  const speech=tmpl.replace(/\{N\}/g,ident.speech);
+  return {display, speech, hook:greetingHook(ident,band,sess), ident, band, sess, persona:pk};
+}
+// Spoken form: greeting + hook + the brief, as one utterance so the TTS
+// engine paces it naturally instead of three clipped fragments.
+function greetingSpeech(){
+  const g=currentGreeting();
+  const open=S.tasks.filter(t=>!t.done);
+  const p1=open.filter(t=>(t.pri||2)===1);
+  let s=g.speech+' ';
+  s+= open.length ? `You have ${open.length} task${open.length===1?'':'s'} open${p1.length?`, ${p1.length} marked priority one`:''}.`
+                  : 'Your list is clear.';
+  return s;
+}
+
+/* ── WIRING ───────────────────────────────────*/
+// Dashboard header greeting now uses the same resolution chain.
+const _v27ApplyAmbient = applyAmbient;
+applyAmbient = function(){
+  _v27ApplyAmbient();
+  const el=document.getElementById('dash-greet');
+  if(!el)return;
+  const g=currentGreeting();
+  const p=(typeof ambPhase==='function')?ambPhase():'day';
+  const ic=(typeof PHASE_MSG==='object'&&PHASE_MSG[p])?PHASE_MSG[p].ic:'✨';
+  el.innerHTML=`${ic} ${escH(g.display)} <span class="phase-chip">${escH(g.hook)}</span>`;
+};
+const _v27Settings = renderSettings;
+renderSettings = function(){
+  _v27Settings();
+  const p=document.getElementById('p-settings');if(!p)return;
+  const cur=personaKey();
+  const ident=resolveIdentity();
+  p.insertAdjacentHTML('beforeend',`
+    <div class="card" style="margin-top:14px;">
+      <div class="ct" style="margin-bottom:4px;">🎭 Assistant voice</div>
+      <div style="font-size:10px;color:var(--t2);line-height:1.6;">
+        ${ident.isReal?`Greeting you as <b>${escH(ident.name)}</b>.`
+        :`No name saved, so you get a rotating title — today: <b>${escH(ident.name)}</b>. Set a name in your profile above to use it instead.`}
+      </div>
+      <div class="mode-row" style="grid-template-columns:repeat(2,1fr);margin-top:10px;">
+        ${Object.entries(PERSONAS).map(([k,v])=>`
+          <div class="mode-b${cur===k?' on':''}" onclick="setPersona('${k}')">
+            <div class="mb-i">${v.icon}</div><div class="mb-l">${v.label}</div></div>`).join('')}
+      </div>
+      <div style="font-size:10.5px;color:var(--t1);line-height:1.6;background:var(--bg1);
+        border-radius:10px;padding:11px;margin-top:10px;" id="persona-preview">${escH(currentGreeting().display)}</div>
+    </div>`);
+};
+function setPersona(k){
+  if(!PERSONAS[k])return;
+  DB.set('persona',k);
+  resetGreeting();
+  toast(PERSONAS[k].icon,PERSONAS[k].label);
+  renderSettings();
+  applyAmbient();
+}
+function v28Init(){
+  currentGreeting();          // freeze the greeting while lastSeenAt is still the OLD value
+  setTimeout(markSeen,8000);  // only then stamp this session
+  setInterval(markSeen,60*1000);
+  window.addEventListener('pagehide',markSeen);
+}
+
+
+/* ═══════════════════════════════════════════════
+   LIFE OS v2.9 — SITUATIONAL GREETINGS 🎯
+   1 · "Boss" is the default title, not one of twenty
+   2 · Greetings react to what you actually did
+═══════════════════════════════════════════════ */
+
+/* ── 1 · BOSS-FIRST HONORIFIC ─────────────────
+   v2.8 rotated all twenty titles equally, so "Boss" showed up 5% of the
+   time. Boss is now the house default and the others are seasoning —
+   frequent enough to stay fresh, rare enough that Boss is your name. */
+const BOSS_SHARE = 0.7;      // 70% of unnamed greetings say "Boss"
+honorificNext = function(){
+  if(Math.random() < BOSS_SHARE){ DB.set('honorificLast','Boss'); return 'Boss'; }
+  let bag=DB.get('honorificBag',[]);
+  if(!Array.isArray(bag)||!bag.length){
+    bag=HONORIFICS.filter(x=>x!=='Boss');
+    for(let i=bag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]];}
+  }
+  const pick=bag.shift();
+  DB.set('honorificBag',bag);
+  DB.set('honorificLast',pick);
+  return pick;
+};
+
+/* ── 2 · SITUATIONAL GREETINGS ────────────────
+   A greeting that only knows the clock says the same thing every morning.
+   These read the app's own record — streaks, focus sessions, scroll time,
+   what you finished yesterday — and lead with whatever is actually true
+   right now. The clock-based persona line is the fallback, not the norm. */
+function greetingFacts(){
+  const open=S.tasks.filter(t=>!t.done);
+  const p1=open.filter(t=>(t.pri||2)===1);
+  const done=S.tasks.filter(t=>t.done).length;
+  const g=(typeof gardenState==='function')?gardenState():{streak:0,active:0,stage:0};
+  const scroll=(typeof todayScrollMins==='function')?todayScrollMins():0;
+  const limit=(typeof DS==='object'&&DS.limit)?DS.limit:45;
+  const band=timeBand();
+  const sess=sessionKind();
+  const jr=S.journalEntries[0]||null;
+  const woundDown=jr&&jr.date===new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  return {open:open.length,p1:p1.length,done,streak:g.streak,active:g.active,stage:g.stage,
+          scroll,limit,band,sess,focus:S.focusSessions||0,stars:(typeof RW==='object'?RW.stars:0),
+          woundDown,firstTask:(p1[0]||open[0]||{}).text||''};
+}
+// Each situation carries its own lines. Highest priority match wins; among
+// its lines, one is chosen at random so the same situation doesn't produce
+// the same sentence twice.
+const SITUATIONS=[
+  {k:'firstEver', pri:100, when:f=>f.sess.kind==='first-ever', lines:[
+    "Right then, {N}. Let's set this up.",
+    "New system, {N}. Tell me what needs doing and I'll hold on to it."]},
+  {k:'longGap', pri:95, when:f=>f.sess.kind==='return-after-gap'&&f.sess.daysAway>=3, lines:[
+    "{N}. {D} days. I kept everything exactly where you left it.",
+    "Look who's back. {D} days away, {N}, and nothing's lost."]},
+  {k:'bigStreak', pri:90, when:f=>f.streak>=30, lines:[
+    "{S} days unbroken, {N}. That's not discipline any more, that's just who you are.",
+    "Day {S}, {N}. At this point the streak is running you."]},
+  {k:'weekStreak', pri:80, when:f=>f.streak>=7, lines:[
+    "{S} days straight, {N}. The machine is running.",
+    "Day {S} and counting, {N}. Let's not break it today.",
+    "{S} in a row, {N}. Whatever you're doing, keep doing it."]},
+  {k:'streakBroken', pri:75, when:f=>f.streak===0&&f.active>5, lines:[
+    "The garden's gone dry, {N}. One log today and it's back.",
+    "Missed yesterday, {N}. Not a problem — one entry restarts it."]},
+  {k:'lateNight', pri:70, when:f=>f.band==='latenight', lines:[
+    "Still up, {N}? The tasks will keep until morning.",
+    "Past midnight, {N}. I'm here, but so is your bed.",
+    "Burning it late again, {N}."]},
+  {k:'overScroll', pri:65, when:f=>f.scroll>=f.limit, lines:[
+    "{M} minutes gone to the scroll today, {N}. Shall we get something back?",
+    "The phone's winning today, {N}. {M} minutes. Your move."]},
+  {k:'deepDay', pri:60, when:f=>f.focus>=3, lines:[
+    "{F} focus sessions today, {N}. That's a serious day's work.",
+    "{F} sprints deep, {N}. You're in the zone — mind if I stay out of the way?"]},
+  {k:'heavyP1', pri:55, when:f=>f.p1>=3, lines:[
+    "{P} things marked must-do, {N}. That's a lot of must. Pick one.",
+    "{P} P1s waiting, {N}. Start with: {T}."]},
+  {k:'allClear', pri:50, when:f=>f.open===0&&f.done>0, lines:[
+    "Board's clear, {N}. {C} done. Enjoy it.",
+    "Nothing left on the list, {N}. That's a rare sight."]},
+  {k:'emptyStart', pri:45, when:f=>f.open===0, lines:[
+    "Clean slate, {N}. What are we doing today?",
+    "Nothing on the list, {N}. Tap the mic and fill it."]},
+  {k:'woundDown', pri:40, when:f=>f.woundDown&&f.band!=='morning', lines:[
+    "Day's already closed off, {N}. Anything else, or are we done?",
+    "You've wound down already, {N}. This is bonus time."]},
+  {k:'dawn', pri:35, when:f=>f.band==='dawn', lines:[
+    "Up before the rest of it, {N}. Best hours of the day.",
+    "Early one, {N}. Nothing's happened yet to get in your way."]},
+  {k:'oneLeft', pri:30, when:f=>f.open===1, lines:[
+    "One thing left, {N}: {T}.",
+    "Just the one, {N}. {T} and you're clear."]},
+  {k:'backToday', pri:20, when:f=>f.sess.kind==='return-today', lines:[
+    "Back again, {N}. {O} still open.",
+    "Round two, {N}. {O} on the list."]}
+];
+function fillTokens(s,name,f){
+  return s.replace(/\{N\}/g,name)
+          .replace(/\{S\}/g,f.streak).replace(/\{D\}/g,f.sess.daysAway)
+          .replace(/\{M\}/g,f.scroll).replace(/\{F\}/g,f.focus)
+          .replace(/\{P\}/g,f.p1).replace(/\{C\}/g,f.done)
+          .replace(/\{O\}/g,f.open).replace(/\{T\}/g,f.firstTask);
+}
+// Avoid repeating the same situation two opens running when another applies —
+// a streak that lasts 40 days shouldn't say the same thing 40 times.
+function pickSituation(f){
+  const matches=SITUATIONS.filter(s=>{try{return s.when(f);}catch(e){return false;}})
+                          .sort((a,b)=>b.pri-a.pri);
+  if(!matches.length)return null;
+  const last=DB.get('lastSituation','');
+  const chosen=(matches.length>1&&matches[0].k===last)?matches[1]:matches[0];
+  DB.set('lastSituation',chosen.k);
+  return chosen;
+}
+// Wrap the v2.8 assembler: situational line when one applies, clock line otherwise.
+const _v28BuildGreeting = buildGreeting;
+buildGreeting = function(){
+  const base=_v28BuildGreeting();
+  const f=greetingFacts();
+  const sit=pickSituation(f);
+  if(!sit)return base;
+  const tmpl=sit.lines[Math.floor(Math.random()*sit.lines.length)];
+  return Object.assign(base,{
+    display: fillTokens(tmpl, base.ident.name, f),
+    speech:  fillTokens(tmpl, base.ident.speech, f),
+    situation: sit.k
+  });
+};
+function v29Init(){ resetGreeting(); }
+
 init();
 v11Init();
 v21Init();
@@ -6291,6 +6713,8 @@ v23Init();
 v25Init();
 v26Init();
 v27Init();
+v28Init();
+v29Init();
 </script>
 </body>
 </html>
