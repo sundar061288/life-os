@@ -762,6 +762,74 @@ html[data-phase="night"] body::before{background:radial-gradient(120% 60% at 50%
   z-index:321;background:var(--ros);color:#fff;border-radius:999px;padding:7px 14px;font-size:10.5px;
   font-weight:800;letter-spacing:.03em;box-shadow:0 6px 20px rgba(244,63,94,.4);cursor:pointer}
 
+
+/* ⏱ running-focus chip */
+#focuschip{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;border-radius:999px;
+  padding:5px 10px;cursor:pointer;border:1px solid rgba(139,92,246,.45);background:var(--vs);color:var(--vio)}
+#focuschip .fc-t{font-family:'JetBrains Mono',monospace}
+@media(max-width:400px){#focuschip{padding:5px 8px}}
+
+/* ══════════════════════════════════════════
+   LIFE OS v2.7 — NEURAL INTERFACE 🧠
+   Boot orb · voice orb · ambient HUD
+══════════════════════════════════════════ */
+
+/* ── Boot overlay ─────────────────────────── */
+#neuro-ov{position:fixed;inset:0;z-index:900;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:24px;cursor:pointer;
+  background:radial-gradient(120% 90% at 50% 40%,rgba(24,20,60,.97),rgba(6,8,16,.99));
+  animation:neuroIn .5s ease}
+#neuro-ov.out{animation:neuroOut .55s ease forwards}
+@keyframes neuroIn{from{opacity:0}to{opacity:1}}
+@keyframes neuroOut{to{opacity:0;transform:scale(1.06)}}
+#neuro-cv{width:min(74vw,330px);height:min(74vw,330px);display:block}
+.nx-ring{position:absolute;border-radius:50%;border:1px solid rgba(139,92,246,.16);pointer-events:none}
+.nx-hello{font-family:'DM Serif Display',Georgia,serif;font-size:clamp(24px,7vw,38px);
+  color:var(--t0);text-align:center;line-height:1.25;margin-top:6px;min-height:1.2em}
+.nx-sub{font-size:clamp(11.5px,3.3vw,14px);color:var(--t1);text-align:center;line-height:1.75;
+  margin-top:12px;max-width:340px;min-height:3em}
+.nx-sub b{color:var(--ind)}
+.nx-tag{font-size:8.5px;font-weight:800;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--vio);opacity:.85;margin-bottom:14px}
+.nx-cursor{display:inline-block;width:2px;height:1em;background:var(--ind);
+  vertical-align:-2px;animation:nxBlink .9s steps(1) infinite}
+@keyframes nxBlink{50%{opacity:0}}
+.nx-skip{position:absolute;bottom:calc(26px + env(safe-area-inset-bottom));
+  font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);font-weight:700}
+.nx-acts{display:flex;gap:9px;margin-top:20px;flex-wrap:wrap;justify-content:center}
+.nx-b{border:1px solid rgba(139,92,246,.35);background:rgba(139,92,246,.12);color:var(--t0);
+  border-radius:999px;padding:10px 18px;font-size:11.5px;font-weight:700;cursor:pointer;transition:var(--trans)}
+.nx-b:active{transform:scale(.96)}
+.nx-b.go{background:linear-gradient(135deg,var(--ind),var(--vio));border-color:transparent;color:#fff}
+
+/* ── Voice orb ────────────────────────────── */
+#vorb-ov{position:fixed;inset:0;z-index:910;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:22px;
+  background:radial-gradient(110% 80% at 50% 45%,rgba(20,16,52,.95),rgba(6,8,16,.98));
+  backdrop-filter:blur(14px)}
+#vorb-cv{width:min(52vw,210px);height:min(52vw,210px);display:block}
+.vo-state{font-size:8.5px;font-weight:800;letter-spacing:.3em;text-transform:uppercase;
+  margin-top:16px;transition:var(--trans)}
+.vo-state.listening{color:var(--em)}
+.vo-state.thinking{color:var(--saf)}
+.vo-state.speaking{color:var(--vio)}
+.vo-state.idle{color:var(--t2)}
+.vo-tx{font-size:clamp(13px,4vw,17px);color:var(--t0);text-align:center;line-height:1.55;
+  margin-top:14px;max-width:400px;min-height:2.6em}
+.vo-tx .dim{color:var(--t2)}
+.vo-hint{font-size:10.5px;color:var(--t2);text-align:center;margin-top:10px;line-height:1.6;max-width:330px}
+.vo-acts{display:flex;gap:9px;margin-top:22px}
+.vo-b{border:1px solid var(--b2);background:var(--bg2);color:var(--t1);border-radius:999px;
+  padding:11px 20px;font-size:11.5px;font-weight:700;cursor:pointer}
+.vo-b.go{background:linear-gradient(135deg,var(--ind),var(--vio));border-color:transparent;color:#fff}
+.vo-b.stop{border-color:rgba(244,63,94,.4);color:var(--ros)}
+.vo-res{background:rgba(255,255,255,.05);border:1px solid var(--b1);border-radius:12px;
+  padding:11px 14px;margin-top:14px;max-width:360px;font-size:11.5px;color:var(--t1);line-height:1.7}
+.vo-res b{color:var(--em)}
+@media(prefers-reduced-motion:reduce){
+  #neuro-ov,#neuro-ov.out{animation:none}
+  .nx-cursor{animation:none}
+}
 </style>
 </head>
 <body>
@@ -772,7 +840,7 @@ html[data-phase="night"] body::before{background:radial-gradient(120% 60% at 50%
   <div id="thtog" onclick="cycleTheme()" title="Switch theme">🌙</div>
   <div class="logo">🌱</div>
   <div class="brand">Life OS</div>
-  <span class="ver">v2.5</span>
+  <span class="ver">v2.7</span>
   <div class="sp"></div>
   <div class="tnav" id="tnav"></div>
   <div class="tright">
@@ -836,7 +904,7 @@ html[data-phase="night"] body::before{background:radial-gradient(120% 60% at 50%
   </div>
 </div>
 
-<div id="fab" onclick="openCaptureVoice()" title="Speak to capture">🎤</div>
+<div id="fab" onclick="openVoiceOrb()" title="Talk to Life OS">🎤</div>
 
 <!-- BOTTOM NAV (mobile) -->
 <div id="bnav">
@@ -996,7 +1064,7 @@ function migrateHourly(hl){
 const S = {
   panel:'dashboard',
   energy:0,
-  focusSecs:FCFG.work*60, focusRunning:false, focusInt:null,
+  focusSecs:FCFG.work*60, focusRunning:false, focusInt:null, focusEndsAt:null, _fLast:0,
   focusSessions: DB.get('focusSessions',0),
   deepWorkSecs:0, dwInt:null,
   tasks: DB.get('tasks',SEED.tasks),
@@ -2754,12 +2822,12 @@ function buildNudge(){
   const act=ACT.daySummary(today());
   // Rule order: streak risk (evening) → no check-in 2h+ → no focus by late morning → low energy → priority push → daily quote
   if(h>=20){const missed=S.habits.filter(x=>!x.log[today()]).length;
-    if(missed>0&&S.habits.length)return{lbl:'Streak Protection',txt:`${missed} habit${missed>1?'s':''} not logged today. 30 seconds now keeps your streaks alive.`,act:'Log habits →',go:'habits'};}
-  if(h>=6&&h<22&&(gap===null||gap>120))return{lbl:'Check-in',txt:gap===null?'No log yet today. What are you doing right now, and how is your energy?':`${Math.floor(gap/60)}h since your last check-in. A 10-second log keeps your pattern data honest.`,act:'Quick log →',go:'hourly'};
-  if(h>=11&&h<18&&(!act||act.focusMin===0)&&pri)return{lbl:'Deep Work Nudge',txt:`No focus session yet today. Your priority: “${pri.txt}”. One Pomodoro moves it forward.`,act:'Start focus →',go:'focus'};
-  if(act&&act.avgE!==null&&act.avgE<4.5)return{lbl:'Energy Care',txt:`Average energy today is ${act.avgE.toFixed(1)}/10. A short walk, water, or 5 minutes of pranayama before pushing harder.`,act:'Check your sleep →',go:'sleep'};
-  if(pri)return{lbl:'Priority',txt:`“${pri.txt}” — this is your #1 right now. ${QUOTES[new Date().getDate()%QUOTES.length]}`,act:pri.kind==='goal'?'Open goals →':'Open tasks →',go:pri.kind==='goal'?'goals':'tasks'};
-  return{lbl:'Today',txt:QUOTES[new Date().getDate()%QUOTES.length],act:'Set a goal →',go:'goals'};
+    if(missed>0&&S.habits.length)return{lbl:'🔥 Streak Protection',txt:`${missed} habit${missed>1?'s':''} not logged today. 30 seconds now keeps your streaks alive.`,act:'Log habits →',go:'habits'};}
+  if(h>=6&&h<22&&(gap===null||gap>120))return{lbl:'👋 Check-in',txt:gap===null?'No log yet today. What are you doing right now, and how is your energy?':`${Math.floor(gap/60)}h since your last check-in. A 10-second log keeps your pattern data honest.`,act:'Quick log →',go:'hourly'};
+  if(h>=11&&h<18&&(!act||act.focusMin===0)&&pri)return{lbl:'🧠 Deep Work Nudge',txt:`No focus session yet today. Your priority: “${pri.txt}”. One Pomodoro moves it forward.`,act:'Start focus →',go:'focus'};
+  if(act&&act.avgE!==null&&act.avgE<4.5)return{lbl:'🌿 Energy Care',txt:`Average energy today is ${act.avgE.toFixed(1)}/10. A short walk, water, or 5 minutes of pranayama before pushing harder.`,act:'Check your sleep →',go:'sleep'};
+  if(pri)return{lbl:'🎯 Priority',txt:`“${pri.txt}” — this is your #1 right now. ${QUOTES[new Date().getDate()%QUOTES.length]}`,act:pri.kind==='goal'?'Open goals →':'Open tasks →',go:pri.kind==='goal'?'goals':'tasks'};
+  return{lbl:'☀️ Today',txt:QUOTES[new Date().getDate()%QUOTES.length],act:'Set a goal →',go:'goals'};
 }
 function nudgeAction(go){if(go==='focus')openFocus();else goPanelB(go);}
 let lastNotifAt=DB.get('lastNotifAt',0);
@@ -2979,7 +3047,7 @@ function renderDashboard(){
     </div>
     <div class="g2">
       <div class="card">
-        <div class="chd"><span class="ct">Priority Matrix</span><span class="ca" onclick="goPanel('tasks')">Full →</span></div>
+        <div class="chd"><span class="ct">🧭 Priority Matrix</span><span class="ca" onclick="goPanel('tasks')">Full →</span></div>
         <div style="font-size:9.5px;color:var(--t2);line-height:1.5;margin-bottom:8px;">Filled automatically from each task's <b>category</b>: Trading &amp; Deep Work → Do Now · Learning, Body &amp; Mind → Schedule · Admin → Delegate</div>
         <div class="mx">
           ${(()=>{const und=S.tasks.filter(t=>!t.done);
@@ -2991,7 +3059,7 @@ function renderDashboard(){
         </div>
       </div>
       <div class="card">
-        <div class="chd"><span class="ct">Today's Timeline</span><span class="ca" onclick="goPanel('events')">Add Event →</span></div>
+        <div class="chd"><span class="ct">🕒 Today's Timeline</span><span class="ca" onclick="goPanel('events')">Add Event →</span></div>
         <div style="overflow-y:auto;max-height:280px;">
           ${(todayEvs.length?todayEvs:S.events).slice(0,6).map(ev=>`
             <div class="ev-item">
@@ -4039,7 +4107,7 @@ function renderSettings(){
         </div>
       </div>
       <div class="card">
-        <div class="chd"><span class="ct">About Life OS</span></div>
+        <div class="chd"><span class="ct">🌱 About Life OS</span></div>
         <div style="font-size:11.5px;color:var(--t1);line-height:1.9;">
           <strong style="color:var(--t0)">Life OS</strong> — Personal Intelligence System<br>
           Built for: ${escH(PROFILE.name)} · ${escH(PROFILE.location)}<br>
@@ -4253,7 +4321,8 @@ function openFocusTask(name){
   fillFSel(name);
   document.getElementById('fov').classList.add('on');
 }
-function closeFocus(){if(S.focusRunning)pauseFocus();ACT.switch(S.panel);document.getElementById('fov').classList.remove('on');}
+// 👀 Closing the overlay just hides it — the session keeps running.
+function closeFocus(){ACT.switch(S.panel);document.getElementById('fov').classList.remove('on');if(S.focusRunning)toast('⏱','Focus still running in the background');}
 function ftaskChange(){
   const s=document.getElementById('fsel');
   if(s.value==='__add'){addFTask();return;}
@@ -4261,32 +4330,90 @@ function ftaskChange(){
   document.getElementById('ftask').textContent=s.value;
 }
 function toggleFocus(){S.focusRunning?pauseFocus():startFocus();}
+
+// ⏱ Wall-clock timer. Browsers throttle setInterval to ~1 tick/minute in a
+// background tab, so counting ticks made the session stall while you worked in
+// another tab. We store the finish time instead and derive the remaining
+// seconds from Date.now(), so the clock keeps running no matter what the tab
+// is doing — or whether the app was unloaded and reopened.
+function focusPersist(){
+  DB.set('focusRun',S.focusRunning?{endsAt:S.focusEndsAt,task:(document.getElementById('ftask')||{}).textContent||''}:null);
+}
 function startFocus(){
   const dur=FCFG.work;
   if(!S.focusRunning&&(S.focusSecs<=0||S.focusSecs>dur*60))S.focusSecs=dur*60;
-  S.focusRunning=true;document.getElementById('ftog').textContent='⏸ Pause';
-  S.focusInt=setInterval(()=>{
-    S.deepWorkSecs++;
-    const h=Math.floor(S.deepWorkSecs/3600),m=Math.floor((S.deepWorkSecs%3600)/60);
-    document.getElementById('ss-dw').textContent=`${h}h ${m}m`;
-    S.focusSecs--;updateFocusRing();
-    if(S.focusSecs<=0){
-      clearInterval(S.focusInt);S.focusRunning=false;S.focusSessions++;
-      document.getElementById('fscount').textContent=S.focusSessions;
-      document.getElementById('ss-fs').textContent=S.focusSessions;
-      document.getElementById('ftog').textContent='▶ Start';
-      logEvent('focus_session',`Pomodoro complete: ${document.getElementById('ftask').textContent}`,8,9,'deep');
-      ACT.logFocusMin(FCFG.work);
-      DB.set('focusSessions',S.focusSessions);
-      toast('🎯',`Session ${S.focusSessions} complete! Take a break.`);
-      computeLifeScore();
-    }
-  },1000);
+  S.focusRunning=true;
+  S.focusEndsAt=Date.now()+S.focusSecs*1000;
+  S._fLast=Date.now();
+  const tog=document.getElementById('ftog');if(tog)tog.textContent='⏸ Pause';
+  focusPersist();
+  clearInterval(S.focusInt);
+  S.focusInt=setInterval(focusTick,1000);
+  focusTick();
 }
-function pauseFocus(){clearInterval(S.focusInt);S.focusRunning=false;document.getElementById('ftog').textContent='▶ Resume';}
+function focusTick(){
+  if(!S.focusRunning)return;
+  const now=Date.now();
+  // 🧠 credit real elapsed time, not tick count
+  const elapsed=Math.max(0,Math.round((now-(S._fLast||now))/1000));
+  S._fLast=now;
+  if(elapsed){
+    S.deepWorkSecs+=elapsed;
+    const h=Math.floor(S.deepWorkSecs/3600),m=Math.floor((S.deepWorkSecs%3600)/60);
+    const dw=document.getElementById('ss-dw');if(dw)dw.textContent=`${h}h ${m}m`;
+  }
+  S.focusSecs=Math.max(0,Math.round((S.focusEndsAt-now)/1000));
+  updateFocusRing();
+  if(S.focusSecs<=0)completeFocus();
+}
+function completeFocus(){
+  clearInterval(S.focusInt);
+  S.focusRunning=false;S.focusSecs=0;S.focusEndsAt=null;focusPersist();
+  S.focusSessions++;
+  const fc=document.getElementById('fscount');if(fc)fc.textContent=S.focusSessions;
+  const ss=document.getElementById('ss-fs');if(ss)ss.textContent=S.focusSessions;
+  const tog=document.getElementById('ftog');if(tog)tog.textContent='▶ Start';
+  const task=(document.getElementById('ftask')||{}).textContent||'Deep Focus Session';
+  logEvent('focus_session',`Pomodoro complete: ${task}`,8,9,'deep');
+  ACT.logFocusMin(FCFG.work);
+  DB.set('focusSessions',S.focusSessions);
+  // 🔔 tell you even if the tab is in the background
+  if(typeof pushNote==='function')pushNote('🎯 Focus session complete',`${task} — take a break.`);
+  if(typeof chime==='function')chime();
+  if(navigator.vibrate)try{navigator.vibrate([80,60,80])}catch(e){}
+  toast('🎯',`Session ${S.focusSessions} complete! Take a break. 🌿`);
+  computeLifeScore();
+}
+function pauseFocus(){
+  focusTick();
+  clearInterval(S.focusInt);
+  S.focusRunning=false;S.focusEndsAt=null;focusPersist();
+  const tog=document.getElementById('ftog');if(tog)tog.textContent='▶ Resume';
+}
 function resetFocus(){
-  clearInterval(S.focusInt);S.focusRunning=false;
-  S.focusSecs=FCFG.work*60;document.getElementById('ftog').textContent='▶ Start';updateFocusRing();
+  clearInterval(S.focusInt);
+  S.focusRunning=false;S.focusEndsAt=null;focusPersist();
+  S.focusSecs=FCFG.work*60;
+  const tog=document.getElementById('ftog');if(tog)tog.textContent='▶ Start';
+  updateFocusRing();
+}
+// 🔄 Resync the moment the tab comes back, and after a reload
+function focusResync(){
+  if(!S.focusRunning||!S.focusEndsAt)return;
+  S._fLast=Date.now();
+  focusTick();
+}
+function focusRestore(){
+  const saved=DB.get('focusRun',null);
+  if(!saved||!saved.endsAt)return;
+  if(saved.endsAt<=Date.now()){DB.set('focusRun',null);return;}
+  S.focusRunning=true;S.focusEndsAt=saved.endsAt;S._fLast=Date.now();
+  S.focusSecs=Math.round((saved.endsAt-Date.now())/1000);
+  if(saved.task){const ft=document.getElementById('ftask');if(ft)ft.textContent=saved.task;}
+  const tog=document.getElementById('ftog');if(tog)tog.textContent='⏸ Pause';
+  clearInterval(S.focusInt);S.focusInt=setInterval(focusTick,1000);
+  focusTick();
+  toast('⏱',`Focus session resumed · ${Math.ceil(S.focusSecs/60)} min left`);
 }
 function updateFocusRing(){
   const dur=FCFG.work*60;
@@ -4456,7 +4583,7 @@ const PHASE_MSG={
   dawn:{ic:'🌅',lbl:'Dawn',line:'The quiet hours — best for the thing you keep postponing.'},
   day:{ic:'☀️',lbl:'Day',line:'Peak hours. Protect them like capital.'},
   dusk:{ic:'🌆',lbl:'Dusk',line:'Energy is dropping — good for light, finishing work.'},
-  night:{ic:'🌙',lbl:'Night',line:'Close the day. Tomorrow starts tonight.'}
+  night:{ic:'🌙',lbl:'Night',line:'🌙 Close the day. Tomorrow starts tonight.'}
 };
 function applyAmbient(){
   const p=ambPhase();
@@ -4558,14 +4685,14 @@ function renderRightNow(){
   const pick=rightNowPick();
   const openCount=S.tasks.filter(t=>!t.done).length;
   if(!pick){
-    return `<div class="rn-card"><div class="rn-lbl">Right now</div>
+    return `<div class="rn-card"><div class="rn-lbl">⚡ Right now</div>
       <div class="rn-empty">${openCount?'Everything open is snoozed. Enjoy the gap.':'Nothing on the list. Tap the mic and say what needs doing — I’ll sort it into tasks, ideas or expenses.'}</div>
       <div class="rn-acts" style="margin-top:12px;"><div class="rn-b go" onclick="openCaptureVoice()">🎤 Capture</div>
       <div class="rn-b" onclick="goPanelB('tasks')">Tasks</div><div class="rn-b" onclick="openFocus()">Focus</div></div></div>`;
   }
   const t=pick.t, pri=['','🔴 Priority 1','🟠 Priority 2','⚪ Priority 3'][t.pri||2];
   return `<div class="rn-card">
-    <div class="rn-lbl"><span>Right now</span><span style="color:var(--t2);font-weight:600;letter-spacing:.04em;text-transform:none;">${openCount} open</span></div>
+    <div class="rn-lbl"><span>⚡ Right now</span><span style="color:var(--t2);font-weight:600;letter-spacing:.04em;text-transform:none;">${openCount} open</span></div>
     <div class="rn-why">${escH(pick.why)}</div>
     <div class="rn-task">${escH(t.text)}</div>
     <div class="rn-meta">${pri}${t.due?' · due '+t.due:''}</div>
@@ -4616,7 +4743,7 @@ function renderRibbon(){
   }).join('');
   const awake=Math.max(1,Math.min(hNow+1,24));
   return `<div class="ribbon-w">
-    <div class="rb-hd"><div class="rb-t">Your day so far</div><div class="rb-v">${logged}/${awake} hours logged · tap a gap</div></div>
+    <div class="rb-hd"><div class="rb-t">🎞️ Your day so far</div><div class="rb-v">${logged}/${awake} hours logged · tap a gap</div></div>
     <div class="rb-bar">${cells}</div>
     <div class="rb-ax"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>
     <div class="rb-lg">${RB_CATS.map(c=>`<div class="rb-lgi"><span class="rb-dot" style="background:${c.c}"></span>${c.l}</div>`).join('')}</div>
@@ -4643,7 +4770,7 @@ function renderRealityCheck(){
     if(r){days++;waste+=(r.social||0)+(r.video||0)+(r.ott||0)+(r.news||0);}
   }
   if(!days){
-    return `<div class="rc-card"><div class="rc-l">Reality check</div>
+    return `<div class="rc-card"><div class="rc-l">🪞 Reality check</div>
       <div class="rc-t">Twenty seconds from your phone's Digital Wellbeing screen, and this app can show you exactly what your scrolling costs — in workouts, chapters and study sessions.</div>
       <div class="rc-a" onclick="goPanelB('screentime')">Add today's numbers ›</div></div>`;
   }
@@ -4719,13 +4846,13 @@ function renderGarden(){
       </div>
     </div>
     <div class="card" style="margin-bottom:14px;">
-      <div class="ct" style="margin-bottom:9px;">Last 30 days</div>
+      <div class="ct" style="margin-bottom:9px;">📆 Last 30 days</div>
       <div class="gd-dots">${g.days.slice().reverse().map(d=>`<div class="gd-d${dayActive(d)?' on':''}" title="${d}"></div>`).join('')}</div>
       <div style="display:flex;justify-content:space-between;margin-top:7px;font-size:9px;color:var(--t3);">
         <span>30 days ago</span><span>${g.active} active days</span><span>today</span></div>
     </div>
     <div class="card">
-      <div class="ct" style="margin-bottom:9px;">What waters it</div>
+      <div class="ct" style="margin-bottom:9px;">💧 What waters it</div>
       <div style="font-size:11.5px;color:var(--t1);line-height:1.9;">
         ✦ Tick any habit &nbsp;·&nbsp; ⏲ Log an hour &nbsp;·&nbsp; ⚡ Log an event<br>
         Any one of those counts. It grows on showing up, not on doing everything.
@@ -4827,7 +4954,7 @@ renderDashboard = function(){
   const html = `
     <div class="cmd-pill" onclick="openCmd()">
       <span style="font-size:14px;">⌕</span>
-      <span class="cp-t">Go anywhere, or say what happened…</span>
+      <span class="cp-t">✨ Go anywhere, or say what happened…</span>
       <span class="cp-k">Find</span>
     </div>
     ${renderRightNow()}
@@ -4973,7 +5100,7 @@ function renderPeakCard(){
   const rows=S.habits.slice(0,6).map(h=>{const t=habitSmartTime(h,a);
     return `<div class="pk-row"><span class="pk-time">${t.label}</span><span style="flex:1;color:var(--t0);">${escH(h.name)}</span><span style="font-size:9.5px;color:var(--t2);">${t.why}</span></div>`;}).join('');
   return `<div class="card" style="margin-bottom:14px;">
-    <div class="ct" style="margin-bottom:2px;">Your energy by hour</div>
+    <div class="ct" style="margin-bottom:2px;">🔋 Your energy by hour</div>
     <div style="font-size:10px;color:var(--t2);">${escH(a.reason)} Confidence ${a.confidence}%.</div>
     <div class="pk-bars">${bars}</div>
     <div class="pk-ax"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>
@@ -5080,7 +5207,7 @@ renderSettings = function(){
   const p=document.getElementById('p-settings');if(!p)return;
   p.insertAdjacentHTML('beforeend',`
     <div class="card" style="margin-top:14px;">
-      <div class="ct" style="margin-bottom:6px;">Focus &amp; Reminders</div>
+      <div class="ct" style="margin-bottom:6px;">🔔 Focus &amp; Reminders</div>
       <div class="set-row">
         <div><div class="set-nm">Doomscroll rescue</div>
         <div class="set-sub">Interrupt at <b>${DS.limit} min</b> of social + short video in a day</div></div>
@@ -5280,7 +5407,7 @@ renderRewards = function(){
       <button class="btn bg bsm" style="margin-top:11px;" onclick="speakEncouragement()">🔊 Say it out loud</button>
     </div>
     <div class="card" style="margin-bottom:13px;">
-      <div class="ct" style="margin-bottom:9px;">Badges</div>
+      <div class="ct" style="margin-bottom:9px;">🏆 Badges</div>
       <div class="bdg-grid">${badgeList().map(b=>`
         <div class="bdg${b.on?' on':''}"><span class="bdg-i">${b.i}</span>
         <div><div class="bdg-t">${b.t}</div><div class="bdg-d">${b.d}</div></div></div>`).join('')}</div>
@@ -5350,7 +5477,7 @@ renderSettings = function(){
   const p=document.getElementById('p-settings');if(!p)return;
   p.insertAdjacentHTML('beforeend',`
     <div class="card" style="margin-top:14px;">
-      <div class="ct" style="margin-bottom:4px;">Accent &amp; Preview</div>
+      <div class="ct" style="margin-bottom:4px;">🎨 Accent &amp; Preview</div>
       <div style="font-size:10px;color:var(--t2);">Dark/light is layer one — this is the accent on top of it.</div>
       <div class="acc-row">${Object.entries(ACCENTS).map(([k,a])=>`
         <div class="acc-b${ACCENT===k?' on':''}" onclick="pickAccent('${k}')">
@@ -5418,7 +5545,7 @@ function renderPriorityFocus(){
   try{const rn=rightNowPick();if(rn&&rn.t)shown=p1.filter(t=>t.id!==rn.t.id);}catch(e){}
   if(!shown.length)return '';
   return `<div class="pf-card">
-    <div class="pf-hd"><span class="pf-t">P1 · Must do today</span>
+    <div class="pf-hd"><span class="pf-t">🔴 P1 · Must do today</span>
       <span class="pf-all" onclick="goPanelB('tasks')">View all ›</span></div>
     ${shown.slice(0,4).map(t=>`<div class="pf-row">
       <div class="pf-tx">${escH(t.text)}</div>
@@ -5438,7 +5565,7 @@ function pfComplete(id){
 function renderTimelineCard(){
   const evs=S.events.slice(0,4);
   if(!evs.length)return `<div class="tl-card">
-    <div class="pf-hd"><span class="pf-t">Recent activity</span>
+    <div class="pf-hd"><span class="pf-t">⚡ Recent activity</span>
       <span class="pf-all" onclick="goPanelB('events')">Log one ›</span></div>
     <div style="font-size:11px;color:var(--t2);padding:6px 0;">Nothing logged yet. Every habit tick, focus session and hour log lands here.</div></div>`;
   return `<div class="tl-card">
@@ -5523,7 +5650,7 @@ function renderShieldCard(){
   const s=rescueChipState();
   const pct=Math.min(100,Math.round(s.mins/(s.limit||1)*100));
   return `<div class="card" style="margin-bottom:13px;">
-    <div class="pf-hd" style="margin-bottom:4px;"><span class="pf-t" style="color:var(--ros);">Doomscroll rescue shield</span>
+    <div class="pf-hd" style="margin-bottom:4px;"><span class="pf-t" style="color:var(--ros);">🛡️ Doomscroll rescue shield</span>
       <span class="pf-all" style="color:var(--ros);" onclick="showDoomscroll()">Rescue me now ›</span></div>
     <div style="font-size:11px;color:var(--t1);line-height:1.6;">${s.mins} of ${s.limit} min used today${pct>=100?' — over the line':''}. The intervention fires automatically when you cross it.</div>
     <div class="st-presets">${DS_PRESETS.map(p=>`
@@ -5573,7 +5700,7 @@ renderRewards = function(){
   const p1=openP1s();
   const left=Math.max(0,3-(FU.date===today()?FU.given:0));
   const card=`<div class="card" style="margin-bottom:13px;">
-    <div class="pf-hd" style="margin-bottom:6px;"><span class="pf-t" style="color:var(--saf);">Task follow-ups</span>
+    <div class="pf-hd" style="margin-bottom:6px;"><span class="pf-t" style="color:var(--saf);">🏅 Task follow-ups</span>
       <span style="font-size:9.5px;color:var(--t2);">${left} bonus star${left===1?'':'s'} left today</span></div>
     ${p1.length?p1.slice(0,3).map(t=>`<div class="pf-row">
         <div class="pf-tx">${escH(t.text)}${t.due?` <span class="pf-due">${t.due}</span>`:''}</div>
@@ -5596,8 +5723,8 @@ renderPeakCard = function(){
     <div class="pk3-c"><div class="pk3-l" style="color:var(--vio);">Evening reflection</div><div class="pk3-v">${fmt(a.evening)}</div></div>
   </div>`;
   let html=_v22PeakCard();
-  html=html.replace('<div class="ct" style="margin-bottom:2px;">Your energy by hour</div>',
-    `<div class="ct" style="margin-bottom:2px;">Your energy by hour<span class="pk3-b">${a.confidence}% confidence</span></div>`);
+  html=html.replace('<div class="ct" style="margin-bottom:2px;">🔋 Your energy by hour</div>',
+    `<div class="ct" style="margin-bottom:2px;">🔋 Your energy by hour<span class="pk3-b">${a.confidence}% confidence</span></div>`);
   html=html.replace('<div class="pk-bars">',three+'<div class="pk-bars">');
   return html;
 };
@@ -5667,7 +5794,7 @@ function renderInsightLine(){
   if(done) line += ` ${done} task${done===1?'':'s'} finished so far.`;
   if(!line.trim()) return '';
   return `<div class="rc-card" style="border-left-color:var(--saf);">
-    <div class="rc-l" style="color:var(--saf);">This week</div>
+    <div class="rc-l" style="color:var(--saf);">📈 This week</div>
     <div class="rc-t">${line.trim()}</div>
     <div class="rc-a" onclick="goPanelB('insights')">Full insights ›</div></div>`;
 }
@@ -5682,12 +5809,488 @@ renderDashboard = function(){
 };
 function v25Init(){ syncInsightHub(); }
 
+
+/* ═══════════════════════════════════════════════
+   LIFE OS v2.6 — BACKGROUND FOCUS ⏱ + EMOJI PASS 🎨
+   The timer itself is now wall-clock based (see
+   focusTick). This layer wires up the resync hooks
+   and puts an emoji on every panel header, nudge
+   and empty state.
+═══════════════════════════════════════════════ */
+
+/* ── ⏱ FOCUS: keep running in the background ─── */
+function focusChipPaint(){
+  let el=document.getElementById('focuschip');
+  if(!S.focusRunning){if(el)el.remove();return;}
+  if(!el){
+    const tr=document.querySelector('#top .tright');if(!tr)return;
+    el=document.createElement('div');el.id='focuschip';
+    el.onclick=()=>{const ov=document.getElementById('fov');if(ov)ov.classList.add('on');};
+    tr.insertBefore(el,tr.firstChild);
+  }
+  const m=String(Math.floor(S.focusSecs/60)).padStart(2,'0'), s=String(S.focusSecs%60).padStart(2,'0');
+  el.innerHTML=`⏱ <span class="fc-t">${m}:${s}</span>`;
+}
+function v26Init(){
+  focusRestore();
+  // 👁 the moment the tab is visible again, recompute from the clock
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)focusResync();});
+  window.addEventListener('focus',focusResync);
+  window.addEventListener('pageshow',focusResync);
+  // 💾 don't lose a running session if the browser unloads the page
+  window.addEventListener('pagehide',focusPersist);
+  window.addEventListener('beforeunload',focusPersist);
+  setInterval(focusChipPaint,1000);
+  applyPanelEmoji();
+}
+
+/* ── 🎨 EMOJI PASS ────────────────────────────── */
+const PANEL_EMOJI={
+  dashboard:'🏠', planner:'📅', tasks:'✅', goals:'🎯', habits:'🔁', events:'⚡',
+  hourly:'⏳', capture:'🎤', screentime:'📱', sleep:'😴', rewards:'⭐',
+  insights:'💡', feedback:'🙏', decisions:'⚖️', weekly:'🗓️', audit:'📊',
+  journal:'📝', procrastination:'🧗', settings:'⚙️', garden:'🌱'
+};
+// Adds the emoji to a panel's title the first time that panel renders.
+function applyPanelEmoji(){
+  Object.entries(PANEL_EMOJI).forEach(([id,em])=>{
+    const t=document.querySelector(`#p-${id} .ph-t`);
+    if(t&&!t.dataset.em){t.dataset.em='1';t.textContent=`${em} ${t.textContent}`.trim();}
+  });
+}
+const _v25RenderPanel = renderPanel;
+renderPanel = function(p){
+  _v25RenderPanel(p);
+  applyPanelEmoji();
+};
+
+
+/* ═══════════════════════════════════════════════
+   LIFE OS v2.7 — NEURAL INTERFACE 🧠
+   A · NeuralOrb — 3D dot sphere, rotating, wired
+   B · Boot greeting — name + today's brief
+   C · Voice orb — listen, act, speak back
+═══════════════════════════════════════════════ */
+
+/* ── A · THE ORB ENGINE ───────────────────── */
+// A Fibonacci sphere of nodes, rotated in 3D and projected to 2D each frame.
+// Edges are computed ONCE (they're fixed on the sphere) — per-frame we only
+// rotate, project and draw, which keeps this smooth on a mid-range phone.
+class NeuralOrb{
+  constructor(canvas,opts){
+    const o=opts||{};
+    this.cv=canvas;
+    this.ctx=canvas&&canvas.getContext?canvas.getContext('2d'):null;
+    // No canvas (very old browser, or canvas disabled) — degrade to a static
+    // screen rather than throwing and taking the whole boot sequence with it.
+    this.dead=!this.ctx;
+    this.n=o.nodes||88;
+    this.linkDist=o.linkDist||0.62;
+    this.speed=o.speed||0.0045;
+    this.mode='idle';
+    this.level=0;          // 0–1 audio/energy level
+    this.target=0;
+    this.t=0;
+    this.raf=null;
+    this.reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(this.dead)return;
+    this.build();
+    this.resize();
+  }
+  build(){
+    this.pts=[];
+    const N=this.n, gold=Math.PI*(3-Math.sqrt(5));
+    for(let i=0;i<N;i++){
+      const y=1-(i/(N-1))*2, r=Math.sqrt(Math.max(0,1-y*y)), th=gold*i;
+      this.pts.push({x:Math.cos(th)*r, y, z:Math.sin(th)*r, p:Math.random()*Math.PI*2});
+    }
+    this.edges=[];
+    for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){
+      const a=this.pts[i],b=this.pts[j];
+      const d=Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z);
+      if(d<this.linkDist)this.edges.push([i,j,d]);
+    }
+  }
+  resize(){
+    if(this.dead)return;
+    const dpr=Math.min(window.devicePixelRatio||1,2);
+    const r=this.cv.getBoundingClientRect();
+    const w=Math.max(80,r.width||240), h=Math.max(80,r.height||240);
+    this.cv.width=w*dpr; this.cv.height=h*dpr;
+    this.ctx.setTransform(dpr,0,0,dpr,0,0);
+    this.w=w; this.h=h; this.R=Math.min(w,h)*0.36;
+  }
+  colors(){
+    const cs=getComputedStyle(document.documentElement);
+    const g=v=>(cs.getPropertyValue(v)||'').trim();
+    return {a:g('--ind')||'#6366f1', b:g('--vio')||'#8b5cf6',
+            ok:g('--em')||'#10b981', warn:g('--saf')||'#f59e0b'};
+  }
+  setMode(m){this.mode=m;}
+  setLevel(v){this.target=Math.max(0,Math.min(1,v));}
+  start(){ if(this.dead||this.raf)return; const loop=()=>{this.frame();this.raf=requestAnimationFrame(loop);}; this.raf=requestAnimationFrame(loop); }
+  stop(){ if(this.raf)cancelAnimationFrame(this.raf); this.raf=null; }
+  frame(){
+    if(this.dead)return;
+    const c=this.ctx, C=this.colors();
+    this.level += (this.target-this.level)*0.18;
+    if(this.mode==='listening') this.target*=0.90;      // decay between speech peaks
+    this.t += this.reduced?0.0012:this.speed*(this.mode==='thinking'?2.1:1);
+
+    const accent = this.mode==='listening'?C.ok : this.mode==='thinking'?C.warn : C.b;
+    const puls = this.mode==='idle' ? 0.5+0.5*Math.sin(this.t*9) : this.level;
+    const scale = 1 + puls*(this.mode==='idle'?0.02:0.13);
+
+    c.clearRect(0,0,this.w,this.h);
+    const cx=this.w/2, cy=this.h/2, R=this.R*scale;
+
+    // glow core
+    const gr=c.createRadialGradient(cx,cy,R*0.05,cx,cy,R*1.5);
+    gr.addColorStop(0,this.rgba(accent,0.30+puls*0.22));
+    gr.addColorStop(0.45,this.rgba(C.a,0.09));
+    gr.addColorStop(1,'rgba(0,0,0,0)');
+    c.fillStyle=gr; c.fillRect(0,0,this.w,this.h);
+
+    // rotate + project
+    const sy=Math.sin(this.t), cyr=Math.cos(this.t);
+    const tilt=0.42, st=Math.sin(tilt), ct=Math.cos(tilt);
+    const proj=this.pts.map(p=>{
+      let x=p.x*cyr - p.z*sy, z=p.x*sy + p.z*cyr, y=p.y;
+      const y2=y*ct - z*st, z2=y*st + z*ct;
+      const depth=(z2+1)/2;                       // 0 back → 1 front
+      const persp=0.72+depth*0.42;
+      const jitter=this.mode==='idle'?0:Math.sin(this.t*7+p.p)*this.level*0.035;
+      return {sx:cx+x*R*persp*(1+jitter), sy:cy+y2*R*persp*(1+jitter), d:depth};
+    });
+
+    // edges
+    c.lineWidth=1;
+    for(const [i,j,d] of this.edges){
+      const a=proj[i], b=proj[j];
+      const depth=(a.d+b.d)/2;
+      const alpha=(0.05+depth*0.30)*(1-(d/this.linkDist)*0.55)*(0.55+this.level*0.7);
+      if(alpha<0.02)continue;
+      c.strokeStyle=this.rgba(depth>0.55?accent:C.a,alpha);
+      c.beginPath(); c.moveTo(a.sx,a.sy); c.lineTo(b.sx,b.sy); c.stroke();
+    }
+    // nodes
+    for(let i=0;i<proj.length;i++){
+      const p=proj[i];
+      const r=(0.7+p.d*2.0)*(1+this.level*0.5);
+      c.fillStyle=this.rgba(p.d>0.6?accent:C.a, 0.25+p.d*0.72);
+      c.beginPath(); c.arc(p.sx,p.sy,r,0,Math.PI*2); c.fill();
+    }
+    // orbit rings
+    c.lineWidth=1;
+    for(let k=0;k<2;k++){
+      const rr=R*(1.16+k*0.17), sq=0.30+k*0.06;
+      c.strokeStyle=this.rgba(accent,0.13-k*0.045);
+      c.beginPath(); c.ellipse(cx,cy,rr,rr*sq,this.t*(k?-0.55:0.75),0,Math.PI*2); c.stroke();
+    }
+  }
+  rgba(hex,a){
+    hex=(hex||'#6366f1').trim();
+    if(hex.startsWith('rgb'))return hex.replace(/rgba?\(([^)]+)\)/,(m,g)=>`rgba(${g.split(',').slice(0,3).join(',')},${a})`);
+    const n=parseInt(hex.replace('#',''),16);
+    return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+  }
+}
+
+// class declarations don't attach to window in a classic script — expose it
+// so other layers (and the test harness) can construct orbs.
+window.NeuralOrb = NeuralOrb;
+
+/* ── B · BOOT GREETING ────────────────────── */
+function greetWord(){
+  const h=(typeof simNow==='function'?simNow():new Date()).getHours();
+  return h<5?'Still up':h<12?'Good morning':h<17?'Good afternoon':h<21?'Good evening':'Winding down';
+}
+// The brief is deliberately three facts, not a dashboard. Anything longer and
+// you'd skip it — which would make the whole screen decoration.
+function bootBrief(){
+  const open=S.tasks.filter(t=>!t.done);
+  const p1=open.filter(t=>(t.pri||2)===1);
+  const next=open.filter(t=>t.due).sort((a,b)=>a.due.localeCompare(b.due))[0];
+  const g=(typeof gardenState==='function')?gardenState():null;
+  const bits=[];
+  if(!open.length)bits.push('Nothing open — the list is clear.');
+  else bits.push(`<b>${open.length}</b> task${open.length===1?'':'s'} open${p1.length?`, <b>${p1.length}</b> marked P1`:''}.`);
+  if(next)bits.push(`Next up: ${escH(next.text)} at <b>${next.due}</b>.`);
+  else if(p1.length)bits.push(`Start with: ${escH(p1[0].text)}.`);
+  if(g&&g.streak)bits.push(`Garden streak <b>${g.streak}</b> day${g.streak===1?'':'s'}.`);
+  else if(g)bits.push('Nothing logged yesterday — one entry restarts the garden.');
+  return bits.slice(0,3).join('<br>');
+}
+let BOOT_ORB=null;
+function shouldBoot(){
+  if(DB.get('neuroOff',false))return false;
+  return DB.get('bootShown','')!==today();      // once a day, not every reload
+}
+function showBootOrb(force){
+  if(document.getElementById('neuro-ov'))return;
+  if(!force&&!shouldBoot())return;
+  DB.set('bootShown',today());
+  const ov=document.createElement('div');
+  ov.id='neuro-ov';
+  ov.innerHTML=`
+    <div class="nx-tag">Life OS · online</div>
+    <canvas id="neuro-cv"></canvas>
+    <div class="nx-hello" id="nx-hello"></div>
+    <div class="nx-sub" id="nx-sub"></div>
+    <div class="nx-acts">
+      <div class="nx-b go" id="nx-go">Show me today</div>
+      <div class="nx-b" id="nx-speak">🎤 Speak</div>
+    </div>
+    <div class="nx-skip">tap anywhere to continue</div>`;
+  document.body.appendChild(ov);
+  BOOT_ORB=new NeuralOrb(document.getElementById('neuro-cv'),{nodes:92});
+  BOOT_ORB.start();
+  // gentle idle breathing that lifts while the text types
+  BOOT_ORB.setLevel(0.25);
+
+  const name=(PROFILE.name||'').trim();
+  typeInto(document.getElementById('nx-hello'), `${greetWord()}${name?', '+name:''}.`, 34, ()=>{
+    const sub=document.getElementById('nx-sub');
+    if(sub)sub.innerHTML=bootBrief();
+    BOOT_ORB&&BOOT_ORB.setLevel(0.12);
+    speakBrief();
+  });
+
+  ov.addEventListener('click',e=>{
+    if(e.target.id==='nx-speak'){closeBootOrb(()=>openVoiceOrb());return;}
+    if(e.target.id==='nx-go'){closeBootOrb(()=>goPanelB('tasks'));return;}
+    closeBootOrb();
+  });
+  setTimeout(()=>{if(document.getElementById('neuro-ov'))closeBootOrb();},14000);
+}
+function typeInto(el,text,ms,done){
+  if(!el)return done&&done();
+  if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    el.textContent=text;return done&&done();
+  }
+  let i=0;
+  const tick=()=>{
+    if(!document.body.contains(el))return;
+    el.innerHTML=escH(text.slice(0,++i))+'<span class="nx-cursor"></span>';
+    if(i<text.length)setTimeout(tick,ms);
+    else{el.textContent=text;done&&done();}
+  };
+  tick();
+}
+// Browsers block speech before a user gesture, so this is best-effort: if it's
+// blocked the greeting is still fully readable, and the mic button works.
+function speakBrief(){
+  if(!DB.get('neuroVoice',true))return;
+  if(!('speechSynthesis' in window))return;
+  const name=(PROFILE.name||'').trim();
+  const open=S.tasks.filter(t=>!t.done);
+  const p1=open.filter(t=>(t.pri||2)===1);
+  let txt=`${greetWord()}${name?', '+name:''}. `;
+  txt+= open.length ? `You have ${open.length} task${open.length===1?'':'s'} open${p1.length?`, ${p1.length} marked priority one`:''}.`
+                    : 'Your list is clear.';
+  try{ const u=new SpeechSynthesisUtterance(txt); u.rate=.98; u.pitch=1.02;
+       if(DB.get('voiceLang',''))u.lang=DB.get('voiceLang','');
+       window.speechSynthesis.speak(u); }catch(e){}
+}
+function closeBootOrb(after){
+  const ov=document.getElementById('neuro-ov');if(!ov)return;
+  ov.classList.add('out');
+  setTimeout(()=>{
+    ov.remove();
+    if(BOOT_ORB){BOOT_ORB.stop();BOOT_ORB=null;}
+    if(after)after();
+  },520);
+}
+
+/* ── C · VOICE ORB ────────────────────────── */
+let VORB=null, VREC=null, VTXT='', VBUSY=false;
+function vorbSet(state,msg){
+  const s=document.getElementById('vo-state'), t=document.getElementById('vo-tx');
+  if(s){s.className='vo-state '+state;s.textContent=state;}
+  if(t&&msg!==undefined)t.innerHTML=msg;
+  if(VORB)VORB.setMode(state);
+}
+function openVoiceOrb(){
+  if(document.getElementById('vorb-ov'))return;
+  const ov=document.createElement('div');
+  ov.id='vorb-ov';
+  ov.innerHTML=`
+    <canvas id="vorb-cv"></canvas>
+    <div class="vo-state idle" id="vo-state">idle</div>
+    <div class="vo-tx" id="vo-tx"><span class="dim">Say what happened, or what needs doing.</span></div>
+    <div class="vo-hint" id="vo-hint">“Remind me to call the office at 4” · “Log an hour of deep work” · “What's on today?”</div>
+    <div class="vo-acts">
+      <div class="vo-b go" id="vo-go">🎤 Listen</div>
+      <div class="vo-b" id="vo-close">Close</div>
+    </div>`;
+  document.body.appendChild(ov);
+  VORB=new NeuralOrb(document.getElementById('vorb-cv'),{nodes:70,speed:0.006});
+  VORB.start();
+  document.getElementById('vo-close').onclick=closeVoiceOrb;
+  document.getElementById('vo-go').onclick=toggleVoiceListen;
+  setTimeout(toggleVoiceListen,320);
+}
+function closeVoiceOrb(){
+  try{if(VREC)VREC.abort();}catch(e){}
+  VREC=null;
+  try{window.speechSynthesis&&window.speechSynthesis.cancel();}catch(e){}
+  if(VORB){VORB.stop();VORB=null;}
+  const ov=document.getElementById('vorb-ov');if(ov)ov.remove();
+}
+function toggleVoiceListen(){
+  if(VREC){try{VREC.stop();}catch(e){} return;}
+  if(!VOICE_OK){vorbSet('idle','<span class="dim">Voice input needs Chrome or Safari (iOS 16+).</span>');return;}
+  VTXT='';
+  try{
+    VREC=new SR();
+    VREC.lang=DB.get('voiceLang','en-IN');
+    VREC.interimResults=true;
+    VREC.continuous=false;
+    VREC.onstart=()=>{vorbSet('listening','<span class="dim">Listening…</span>');
+      document.getElementById('vo-go').textContent='■ Stop';};
+    VREC.onresult=e=>{
+      let fin='',int='';
+      for(let i=e.resultIndex;i<e.results.length;i++){
+        const r=e.results[i];
+        if(r.isFinal)fin+=r[0].transcript; else int+=r[0].transcript;
+        // drive the orb from speech confidence — it visibly reacts to your voice
+        if(VORB)VORB.setLevel(Math.min(1,0.45+(r[0].confidence||0.5)*0.55));
+      }
+      if(fin)VTXT+=fin;
+      const shown=(VTXT+int).trim();
+      const t=document.getElementById('vo-tx');
+      if(t)t.innerHTML=shown?escH(shown):'<span class="dim">Listening…</span>';
+    };
+    VREC.onerror=ev=>{
+      VREC=null;
+      const msg=ev&&ev.error==='not-allowed'?'Microphone permission was blocked.':"Didn't catch that.";
+      vorbSet('idle','<span class="dim">'+msg+'</span>');
+      const g=document.getElementById('vo-go');if(g)g.textContent='🎤 Listen';
+    };
+    VREC.onend=()=>{
+      VREC=null;
+      const g=document.getElementById('vo-go');if(g)g.textContent='🎤 Listen';
+      if(VTXT.trim())processVoice(VTXT.trim());
+      else vorbSet('idle','<span class="dim">Nothing heard. Tap Listen to try again.</span>');
+    };
+    VREC.start();
+  }catch(e){vorbSet('idle','<span class="dim">Could not start the microphone.</span>');}
+}
+// Questions get answered out loud; everything else goes through the same
+// capture brain the app already uses, so there's one parser, not two.
+function voiceQuery(text){
+  const l=text.toLowerCase();
+  const open=S.tasks.filter(t=>!t.done);
+  if(/\b(what|what's|whats|how many|show)\b.*\b(today|task|todo|to do|pending|left)\b/.test(l)){
+    if(!open.length)return 'Nothing open today. Your list is clear.';
+    const p1=open.filter(t=>(t.pri||2)===1);
+    const first=(p1[0]||open[0]).text;
+    return `${open.length} task${open.length===1?'':'s'} open${p1.length?`, ${p1.length} priority one`:''}. Start with ${first}.`;
+  }
+  if(/\b(streak|garden|how.*grow)\b/.test(l)&&typeof gardenState==='function'){
+    const g=gardenState();
+    return g.streak?`Your garden is at ${g.name}, ${g.streak} day streak.`:'The garden is wilting. Log one thing today to restart it.';
+  }
+  if(/\b(screen|scroll|doomscroll)\b/.test(l)&&typeof todayScrollMins==='function'){
+    const m=todayScrollMins();
+    return `${m} minutes of scrolling today, against a ${DS.limit} minute limit.`;
+  }
+  if(/\b(focus|pomodoro)\b/.test(l)&&/\b(start|begin)\b/.test(l)){
+    setTimeout(()=>{closeVoiceOrb();openFocus();},900);
+    return 'Starting a focus session.';
+  }
+  return null;
+}
+async function processVoice(text){
+  if(VBUSY)return;
+  VBUSY=true;
+  vorbSet('thinking',escH(text));
+  if(VORB)VORB.setLevel(0.6);
+  try{
+    const answer=voiceQuery(text);
+    if(answer){ speakBack(answer); showVoiceResult(answer); return; }
+    let parsed=null;
+    try{ parsed=await smartParse(text); }catch(e){}
+    if(!parsed||!parsed.length)parsed=parseBrainDump(text);
+    if(!parsed||!parsed.length){
+      const m='I couldn\'t find anything to save in that.';
+      speakBack(m);showVoiceResult(m);return;
+    }
+    capParsed=parsed;
+    autoSaveCapture(false);
+    const counts={};
+    parsed.forEach(p=>{counts[p.type]=(counts[p.type]||0)+1;});
+    const label=Object.entries(counts).map(([k,v])=>`${v} ${k}${v>1?'s':''}`).join(' and ');
+    const line=`Saved ${label}.`;
+    speakBack(line);
+    showVoiceResult(`<b>${escH(line)}</b><br>${parsed.slice(0,3).map(p=>'· '+escH(p.text)).join('<br>')}`);
+  }finally{ VBUSY=false; }
+}
+function showVoiceResult(html){
+  const ov=document.getElementById('vorb-ov');if(!ov)return;
+  let box=document.getElementById('vo-res');
+  if(!box){box=document.createElement('div');box.id='vo-res';box.className='vo-res';
+    ov.querySelector('.vo-acts').insertAdjacentElement('beforebegin',box);}
+  box.innerHTML=html;
+}
+function speakBack(text){
+  vorbSet('speaking');
+  if(VORB)VORB.setLevel(0.75);
+  if(!('speechSynthesis' in window)||!DB.get('neuroVoice',true)){
+    setTimeout(()=>vorbSet('idle'),600);return;
+  }
+  try{
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text);
+    u.rate=.98;u.pitch=1.02;
+    if(DB.get('voiceLang',''))u.lang=DB.get('voiceLang','');
+    u.onboundary=()=>{if(VORB)VORB.setLevel(0.55+Math.random()*0.45);};
+    u.onend=()=>{if(VORB)VORB.setLevel(0.1);vorbSet('idle');};
+    window.speechSynthesis.speak(u);
+  }catch(e){vorbSet('idle');}
+}
+
+/* ── SETTINGS + BOOT ──────────────────────── */
+const _v26Settings = renderSettings;
+renderSettings = function(){
+  _v26Settings();
+  const p=document.getElementById('p-settings');if(!p)return;
+  p.insertAdjacentHTML('beforeend',`
+    <div class="card" style="margin-top:14px;">
+      <div class="ct" style="margin-bottom:4px;">🧠 Neural Interface</div>
+      <div style="font-size:10px;color:var(--t2);line-height:1.6;">The greeting orb appears once a day when you open the app.</div>
+      <div class="set-row" style="margin-top:8px;">
+        <div><div class="set-nm">Show the greeting orb</div>
+        <div class="set-sub">Name, today's brief, and a mic button</div></div>
+        <div class="sw-toggle${DB.get('neuroOff',false)?'':' on'}" onclick="DB.set('neuroOff',!DB.get('neuroOff',false));renderSettings()"></div>
+      </div>
+      <div class="set-row">
+        <div><div class="set-nm">Speak out loud</div>
+        <div class="set-sub">Reads the brief and answers your questions aloud</div></div>
+        <div class="sw-toggle${DB.get('neuroVoice',true)?' on':''}" onclick="DB.set('neuroVoice',!DB.get('neuroVoice',true));renderSettings()"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn bg bsm" style="flex:1;" onclick="showBootOrb(true)">🧠 Preview orb</button>
+        <button class="btn bg bsm" style="flex:1;" onclick="openVoiceOrb()">🎤 Voice mode</button>
+      </div>
+    </div>`);
+};
+function v27Init(){
+  setTimeout(()=>showBootOrb(false),380);
+  window.addEventListener('resize',()=>{
+    if(BOOT_ORB)BOOT_ORB.resize();
+    if(VORB)VORB.resize();
+  });
+}
+
 init();
 v11Init();
 v21Init();
 v22Init();
 v23Init();
 v25Init();
+v26Init();
+v27Init();
 </script>
 </body>
 </html>

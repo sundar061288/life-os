@@ -1,5 +1,5 @@
 // Life OS service worker — offline-first shell cache
-const CACHE = 'life-os-v2-5-0';
+const CACHE = 'life-os-v2-7-0';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
