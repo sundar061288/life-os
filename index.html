@@ -835,6 +835,25 @@ html[data-phase="night"] body::before{background:radial-gradient(120% 60% at 50%
   #neuro-ov,#neuro-ov.out{animation:none}
   .nx-cursor{animation:none}
 }
+/* ── Restored from v2.1: still used by the persona picker (v2.8) and the
+   new orb-shape toggle below. Lost when the cloud-sync CSS block that
+   originally defined it was removed wholesale in v2.4. ── */
+.mode-row{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px}
+.mode-b{background:var(--bg2);border:1px solid var(--b1);border-radius:11px;padding:10px 5px;text-align:center;cursor:pointer}
+.mode-b.on{border-color:var(--ind);background:var(--is)}
+.mode-b .mb-i{font-size:15px;margin-bottom:3px}
+.mode-b .mb-l{font-size:9.5px;font-weight:700;color:var(--t1)}
+.mode-b.on .mb-l{color:var(--t0)}
+
+/* ── v3.0: 3-button energy picker, replaces the 1–10 slider ── */
+.nrg3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:4px 0 6px}
+.nrg3-b{background:var(--bg2);border:1px solid var(--b1);border-radius:11px;padding:10px 4px;
+  text-align:center;cursor:pointer;font-size:20px;line-height:1.3;transition:var(--trans)}
+.nrg3-b span{display:block;font-size:9.5px;font-weight:700;color:var(--t1);margin-top:2px}
+.nrg3-b.on{border-color:var(--saf);background:rgba(245,158,11,.12)}
+.nrg3-b.on span{color:var(--t0)}
+.nrg3-b[data-lvl="low"].on{border-color:var(--sky);background:rgba(56,189,248,.12)}
+.nrg3-b[data-lvl="high"].on{border-color:var(--em);background:var(--es)}
 </style>
 </head>
 <body>
@@ -845,7 +864,7 @@ html[data-phase="night"] body::before{background:radial-gradient(120% 60% at 50%
   <div id="thtog" onclick="cycleTheme()" title="Switch theme">🌙</div>
   <div class="logo">🌱</div>
   <div class="brand">Life OS</div>
-  <span class="ver">v2.9</span>
+  <span class="ver">v3.0</span>
   <div class="sp"></div>
   <div class="tnav" id="tnav"></div>
   <div class="tright">
@@ -1658,15 +1677,91 @@ function briefingText(){
   if(b.doneY)parts.push(`Yesterday you completed ${b.doneY} task${b.doneY>1?'s':''}${b.yAct&&b.yAct.focusMin?` with ${b.yAct.focusMin} minutes of deep focus`:''}. Keep the chain going.`);
   return parts.join(' ');
 }
-function speak(text){
+/* ── VOICE ENGINE ─────────────────────────────
+   One TTS pipeline for the whole app (boot greeting, voice replies, reward
+   encouragement, morning briefing) instead of four separate ad-hoc
+   utterance-builders. Fixes two real problems:
+
+   1. "Not speaking." Browsers block speechSynthesis.speak() until the page
+      has had a genuine user gesture (click/tap/key) in THIS session — a
+      policy, not a bug. The boot orb used to call speak() on a setTimeout
+      chain with no gesture behind it, so it was silently dropped. Anything
+      queued now plays automatically the instant the first tap lands
+      anywhere on the page — including the "tap anywhere to continue" tap
+      that dismisses the orb itself.
+   2. "Female energetic voice." The Web Speech API has no standard gender
+      field, so voice selection is a name-matching heuristic — the only
+      client-side option that exists. "Energetic" is delivered via a
+      faster rate + higher pitch, which is the full extent of what this
+      API can vary; true expressive prosody would need a cloud TTS engine,
+      which isn't something to add silently to an offline-first app. */
+const FEMALE_VOICE_HINTS=[
+  'female','woman','samantha','victoria','karen','moira','tessa','fiona','susan',
+  'zira','jenny','aria','sara','nicky','allison','ava','serena','joanna','salli',
+  'kimberly','ivy','kendra','emma','amy','olivia','natasha','veena','shreya',
+  'swara','neerja','heera','lekha','kalpana','google us english','uk english female'
+];
+function scoreVoiceFemale(v){
+  const n=(v.name||'').toLowerCase();
+  let s=0;
+  if(/\bfemale\b|\bwoman\b/.test(n))s+=100;
+  if(/\bmale\b/.test(n)&&!/female/.test(n))s-=100;
+  FEMALE_VOICE_HINTS.forEach(h=>{if(n.includes(h))s+=40;});
+  const pref=(DB.get('voiceLang','')||navigator.language||'en').toLowerCase().slice(0,2);
+  if((v.lang||'').toLowerCase().startsWith(pref))s+=15;
+  if(v.localService)s+=5;
+  return s;
+}
+function pickFemaleVoice(){
+  const list=(window.speechSynthesis&&speechSynthesis.getVoices())||[];
+  if(!list.length)return null;
+  const overrideURI=DB.get('ttsVoiceURI','');
+  if(overrideURI){const m=list.find(v=>v.voiceURI===overrideURI);if(m)return m;}
+  const scored=list.map(v=>({v,s:scoreVoiceFemale(v)})).sort((a,b)=>b.s-a.s);
+  return (scored[0]&&scored[0].s>0)?scored[0].v:(list[0]||null);
+}
+let VOICE_CACHE=null, VOICE_QUEUE=[], VOICE_UNLOCKED=false;
+function refreshVoiceCache(){
+  try{VOICE_CACHE=pickFemaleVoice();}catch(e){}
+  if(typeof S==='object'&&S.panel==='settings'&&typeof renderSettings==='function')renderSettings();
+}
+function initVoiceEngine(){
+  if(!('speechSynthesis' in window))return;
+  refreshVoiceCache();
+  try{speechSynthesis.onvoiceschanged=refreshVoiceCache;}catch(e){}
+  const unlock=()=>{
+    if(VOICE_UNLOCKED)return;
+    VOICE_UNLOCKED=true;
+    if(!VOICE_CACHE)refreshVoiceCache();
+    const q=VOICE_QUEUE;VOICE_QUEUE=[];
+    q.forEach(([t,o])=>speakLOS(t,o));
+  };
+  document.addEventListener('pointerdown',unlock,{once:true,capture:true});
+  document.addEventListener('keydown',unlock,{once:true,capture:true});
+}
+// Energetic = faster + higher by default; callers can override either.
+function speakLOS(text,opts){
+  opts=opts||{};
+  if(!text||!('speechSynthesis' in window))return;
+  if(!VOICE_UNLOCKED){VOICE_QUEUE.push([text,opts]);return;}
   try{
-    if(!('speechSynthesis'in window))return;
     speechSynthesis.cancel();
     const u=new SpeechSynthesisUtterance(text);
-    u.lang='en-IN';u.rate=1.02;
+    u.rate=opts.rate!==undefined?opts.rate:1.08;
+    u.pitch=opts.pitch!==undefined?opts.pitch:1.16;
+    u.volume=1;
+    if(!VOICE_CACHE)refreshVoiceCache();
+    if(VOICE_CACHE)u.voice=VOICE_CACHE;
+    if(DB.get('voiceLang',''))u.lang=DB.get('voiceLang','');
+    else if(VOICE_CACHE)u.lang=VOICE_CACHE.lang;
+    if(opts.onboundary)u.onboundary=opts.onboundary;
+    if(opts.onend)u.onend=opts.onend;
+    if(opts.onstart)u.onstart=opts.onstart;
     speechSynthesis.speak(u);
   }catch(e){}
 }
+function speak(text){ speakLOS(text); }
+
 function maybeBriefing(){
   if(!BRF.enabled)return;
   const tk=today();
@@ -2601,8 +2696,12 @@ function showHourPrompt(hk,slot){
     <div class="inrow" style="margin-bottom:9px;"><input type="text" class="ti" id="hp-act" placeholder="What were you doing?" onkeydown="if(event.key==='Enter')saveHourPrompt('${slot}','${hk}')">${micBtn('hp-act')}</div>
     ${activityChips('hp-act')}
     <div style="font-size:10px;color:var(--t2);margin-bottom:4px;">Energy during that hour</div>
-    <input type="range" id="hp-en" min="1" max="10" value="6" style="width:100%;margin-bottom:6px;" oninput="document.getElementById('hp-env').textContent=this.value">
-    <div style="text-align:center;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--saf);margin-bottom:14px;"><span id="hp-env">6</span>/10</div>
+    <div class="nrg3" id="hp-nrg3">
+      <div class="nrg3-b" data-lvl="low" onclick="pickHPEnergy(3,this)">😴<span>Low</span></div>
+      <div class="nrg3-b on" data-lvl="med" onclick="pickHPEnergy(6,this)">🙂<span>Medium</span></div>
+      <div class="nrg3-b" data-lvl="high" onclick="pickHPEnergy(9,this)">⚡<span>High</span></div>
+    </div>
+    <input type="hidden" id="hp-en" value="6">
     <div style="display:flex;gap:8px;">
       <button class="btn bg" style="flex:1;padding:11px;" onclick="document.getElementById('hp-ov').remove()">Skip</button>
       <button class="btn bp" style="flex:2;padding:11px;" onclick="saveHourPrompt('${slot}','${hk}')">Save log</button>
@@ -3187,9 +3286,14 @@ function renderHourly(){
       <div style="display:flex;flex-direction:column;gap:8px;">
         <div class="inrow"><input type="text" class="ti" id="hl-activity" placeholder="What were you doing?">${micBtn('hl-activity')}</div>
         <div id="hl-chips"></div>
-        <div style="font-size:9.5px;color:var(--t2);margin-bottom:2px;">Energy Level <span id="hl-e-val">7</span>/10</div>
-        <input type="range" min="1" max="10" value="7" id="hl-energy" oninput="document.getElementById('hl-e-val').textContent=this.value;updateHourEmoji()">
-        <div style="font-size:32px;text-align:center;margin:4px 0" id="hl-emoji">⚡</div>
+        <div style="font-size:9.5px;color:var(--t2);margin-bottom:2px;">Energy during that hour</div>
+        <div class="nrg3" id="hl-nrg3">
+          <div class="nrg3-b" data-lvl="low" onclick="pickHLEnergy(3,this)">😴<span>Low</span></div>
+          <div class="nrg3-b" data-lvl="med" onclick="pickHLEnergy(6,this)">🙂<span>Medium</span></div>
+          <div class="nrg3-b" data-lvl="high" onclick="pickHLEnergy(9,this)">⚡<span>High</span></div>
+        </div>
+        <input type="hidden" id="hl-energy" value="6">
+        <div style="font-size:32px;text-align:center;margin:4px 0" id="hl-emoji">🙂</div>
         <select id="hl-mood" style="background:var(--bg3);border:1px solid var(--b2);border-radius:7px;padding:7px 10px;color:var(--t1);font-size:11.5px;">
           <option>Focused</option><option>Calm</option><option>Anxious</option><option>Tired</option><option>Creative</option><option>Distracted</option>
         </select>
@@ -3231,6 +3335,26 @@ function renderHLGrid(){
   }).join('');
 }
 let currentHLHour=null;
+// Buckets ANY numeric energy value (old 1–10 logs included) into one of the
+// three bands, so editing a log made before this update still highlights
+// the right button instead of showing nothing selected.
+function energyBand(v){ return v<=4?'low':v<=7?'med':'high'; }
+const ENERGY_ICON={low:'😴',med:'🙂',high:'⚡'};
+function syncEnergy3(wrapId,hiddenId,emojiId,v){
+  const band=energyBand(v);
+  const wrap=document.getElementById(wrapId);
+  if(wrap)wrap.querySelectorAll('.nrg3-b').forEach(b=>b.classList.toggle('on',b.dataset.lvl===band));
+  const el=document.getElementById(emojiId);
+  if(el)el.textContent=ENERGY_ICON[band];
+}
+function pickHLEnergy(v,btn){
+  document.getElementById('hl-energy').value=v;
+  syncEnergy3('hl-nrg3','hl-energy','hl-emoji',v);
+}
+function pickHPEnergy(v,btn){
+  document.getElementById('hp-en').value=v;
+  document.querySelectorAll('#hp-nrg3 .nrg3-b').forEach(b=>b.classList.toggle('on',b.dataset.lvl===energyBand(v)));
+}
 function openHLForm(h){
   currentHLHour=h;
   const cw=document.getElementById('hl-chips');
@@ -3238,13 +3362,14 @@ function openHLForm(h){
   document.getElementById('hl-form-title').textContent=`Log ${h}:00`;
   document.getElementById('hl-log-form').style.display='block';
   const ex=S.hourlyLog[today()+'|'+h];
-  if(ex){document.getElementById('hl-activity').value=ex.activity;document.getElementById('hl-energy').value=ex.energy;document.getElementById('hl-e-val').textContent=ex.energy;}
-  updateHourEmoji();
+  const v=ex?(parseInt(ex.energy)||6):6;
+  if(ex)document.getElementById('hl-activity').value=ex.activity;
+  document.getElementById('hl-energy').value=v;
+  syncEnergy3('hl-nrg3','hl-energy','hl-emoji',v);
 }
 function updateHourEmoji(){
-  const v=parseInt(document.getElementById('hl-energy')?.value||7);
-  const el=document.getElementById('hl-emoji');
-  if(el)el.textContent=EMOJIS_ENERGY[Math.min(v-1,9)];
+  const v=parseInt(document.getElementById('hl-energy')?.value||6);
+  syncEnergy3('hl-nrg3','hl-energy','hl-emoji',v);
 }
 function saveHourLog(){
   if(!currentHLHour)return;
@@ -5388,14 +5513,8 @@ function speakEncouragement(){
   const text=`Hello ${PROFILE.name||'there'}. You are at level ${li.level}, ${li.title}, with ${RW.stars} stars`+
     `${g.streak?` and a ${g.streak} day streak`:''}. You have completed ${done} task${done===1?'':'s'} so far.`+
     `${open?` Your next one is: ${open.text}.`:''} Take one honest step now.`;
-  try{
-    window.speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(text);
-    u.rate=.95;u.pitch=1.05;
-    if(DB.get('voiceLang',''))u.lang=DB.get('voiceLang','');
-    window.speechSynthesis.speak(u);
-    toast('🔊','Playing');
-  }catch(e){toast('⚠️','Could not play audio');}
+  speakLOS(text);
+  toast('🔊','Playing');
 }
 const _v21Rewards = renderRewards;
 renderRewards = function(){
@@ -5897,6 +6016,8 @@ class NeuralOrb{
     this.target=0;
     this.t=0;
     this.raf=null;
+    this.waves=[];          // outward-expanding rings, spawned while speaking
+    this._waveTimer=0;
     this.reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if(this.dead)return;
     this.build();
@@ -5931,8 +6052,18 @@ class NeuralOrb{
     return {a:g('--ind')||'#6366f1', b:g('--vio')||'#8b5cf6',
             ok:g('--em')||'#10b981', warn:g('--saf')||'#f59e0b'};
   }
-  setMode(m){this.mode=m;}
-  setLevel(v){this.target=Math.max(0,Math.min(1,v));}
+  setMode(m){ if(m!==this.mode)this.waves=[]; this.mode=m; }
+  setLevel(v){
+    const nv=Math.max(0,Math.min(1,v));
+    // A sharp rise in level while speaking is a syllable landing — spawn a
+    // ring at the centre that expands outward, timed to the voice itself.
+    if(this.mode==='speaking'&&nv-this.target>0.16)this._spawnWave();
+    this.target=nv;
+  }
+  _spawnWave(){
+    if(this.waves.length>5)this.waves.shift();
+    this.waves.push({r:0,a:0.85});
+  }
   start(){ if(this.dead||this.raf)return; const loop=()=>{this.frame();this.raf=requestAnimationFrame(loop);}; this.raf=requestAnimationFrame(loop); }
   stop(){ if(this.raf)cancelAnimationFrame(this.raf); this.raf=null; }
   frame(){
@@ -5944,7 +6075,7 @@ class NeuralOrb{
 
     const accent = this.mode==='listening'?C.ok : this.mode==='thinking'?C.warn : C.b;
     const puls = this.mode==='idle' ? 0.5+0.5*Math.sin(this.t*9) : this.level;
-    const scale = 1 + puls*(this.mode==='idle'?0.02:0.13);
+    const scale = 1 + puls*(this.mode==='idle'?0.02:this.mode==='speaking'?0.24:0.13);
 
     c.clearRect(0,0,this.w,this.h);
     const cx=this.w/2, cy=this.h/2, R=this.R*scale;
@@ -5955,6 +6086,26 @@ class NeuralOrb{
     gr.addColorStop(0.45,this.rgba(C.a,0.09));
     gr.addColorStop(1,'rgba(0,0,0,0)');
     c.fillStyle=gr; c.fillRect(0,0,this.w,this.h);
+
+    // Even when the TTS engine never fires onboundary (some system voices
+    // don't), speaking mode still visibly breathes outward on a steady
+    // pulse, so the reaction never depends on a feature the browser
+    // might not support.
+    if(this.mode==='speaking'){
+      this._waveTimer++;
+      if(this._waveTimer>20){this._waveTimer=0;this._spawnWave();}
+    }
+    this.waves=this.waves.filter(w=>{
+      w.r+=2.6+this.level*4.2; w.a-=0.017;
+      return w.a>0.02&&w.r<R*3;
+    });
+    this.waves.forEach(w=>{
+      c.beginPath();
+      c.strokeStyle=this.rgba(accent,w.a*0.6);
+      c.lineWidth=1.5;
+      c.arc(cx,cy,R*0.42+w.r,0,Math.PI*2);
+      c.stroke();
+    });
 
     // rotate + project
     const sy=Math.sin(this.t), cyr=Math.cos(this.t);
@@ -6005,6 +6156,170 @@ class NeuralOrb{
 // so other layers (and the test harness) can construct orbs.
 window.NeuralOrb = NeuralOrb;
 
+/* ── A2 · TESSERACT ORB ───────────────────────
+   A 4D hypercube (tesseract), not a sphere. 16 vertices — every combination
+   of (±1,±1,±1,±1) — connected to the 4 neighbours that differ in exactly
+   one coordinate (32 edges total). Two independent 4D rotation planes turn
+   it continuously; projecting 4D → 3D → 2D is what makes the inner and
+   outer cubes visibly breathe in and out of each other as it spins — the
+   signature tesseract look, and a distinct silhouette from the sphere.
+   Same public surface as NeuralOrb (setMode/setLevel/start/stop/resize) so
+   it drops into the boot and voice overlays without touching their code. */
+class TesseractOrb{
+  constructor(canvas,opts){
+    const o=opts||{};
+    this.cv=canvas;
+    this.ctx=canvas&&canvas.getContext?canvas.getContext('2d'):null;
+    this.dead=!this.ctx;
+    this.speed=o.speed||0.006;
+    this.mode='idle'; this.level=0; this.target=0; this.t=0; this.raf=null;
+    this.waves=[]; this._waveTimer=0;
+    this.reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(this.dead)return;
+    this.build();
+    this.resize();
+  }
+  build(){
+    // 16 vertices of a tesseract: all sign combinations of 4 coordinates.
+    this.pts=[];
+    for(let i=0;i<16;i++){
+      this.pts.push({
+        x:(i&1)?1:-1, y:(i&2)?1:-1, z:(i&4)?1:-1, w:(i&8)?1:-1,
+        p:Math.random()*Math.PI*2
+      });
+    }
+    // Two vertices are joined iff they differ in exactly one coordinate —
+    // that's the definition of a hypercube edge, and it gives exactly 32.
+    this.edges=[];
+    for(let i=0;i<16;i++)for(let j=i+1;j<16;j++){
+      const a=this.pts[i],b=this.pts[j];
+      const diff=(a.x!==b.x)+(a.y!==b.y)+(a.z!==b.z)+(a.w!==b.w);
+      if(diff===1)this.edges.push([i,j]);
+    }
+  }
+  resize(){
+    if(this.dead)return;
+    const dpr=Math.min(window.devicePixelRatio||1,2);
+    const r=this.cv.getBoundingClientRect();
+    const w=Math.max(80,r.width||240), h=Math.max(80,r.height||240);
+    this.cv.width=w*dpr; this.cv.height=h*dpr;
+    this.ctx.setTransform(dpr,0,0,dpr,0,0);
+    this.w=w; this.h=h; this.R=Math.min(w,h)*0.30;
+  }
+  colors(){
+    const cs=getComputedStyle(document.documentElement);
+    const g=v=>(cs.getPropertyValue(v)||'').trim();
+    return {a:g('--ind')||'#6366f1', b:g('--vio')||'#8b5cf6',
+            ok:g('--em')||'#10b981', warn:g('--saf')||'#f59e0b'};
+  }
+  setMode(m){ if(m!==this.mode)this.waves=[]; this.mode=m; }
+  setLevel(v){
+    const nv=Math.max(0,Math.min(1,v));
+    // A sharp rise in level while speaking is a syllable landing — spawn a
+    // ring at the centre that expands outward, timed to the voice itself.
+    if(this.mode==='speaking'&&nv-this.target>0.16)this._spawnWave();
+    this.target=nv;
+  }
+  _spawnWave(){
+    if(this.waves.length>5)this.waves.shift();
+    this.waves.push({r:0,a:0.85});
+  }
+  start(){ if(this.dead||this.raf)return; const loop=()=>{this.frame();this.raf=requestAnimationFrame(loop);}; this.raf=requestAnimationFrame(loop); }
+  stop(){ if(this.raf)cancelAnimationFrame(this.raf); this.raf=null; }
+  frame(){
+    if(this.dead)return;
+    const c=this.ctx, C=this.colors();
+    this.level += (this.target-this.level)*0.18;
+    if(this.mode==='listening') this.target*=0.90;
+    this.t += this.reduced?0.0012:this.speed*(this.mode==='thinking'?2.2:1);
+
+    const accent = this.mode==='listening'?C.ok : this.mode==='thinking'?C.warn : C.b;
+    const puls = this.mode==='idle' ? 0.5+0.5*Math.sin(this.t*8) : this.level;
+    const scale = 1 + puls*(this.mode==='idle'?0.03:this.mode==='speaking'?0.30:0.16);
+
+    c.clearRect(0,0,this.w,this.h);
+    const cx=this.w/2, cy=this.h/2, R=this.R*scale;
+
+    const gr=c.createRadialGradient(cx,cy,R*0.05,cx,cy,R*2.1);
+    gr.addColorStop(0,this.rgba(accent,0.28+puls*0.22));
+    gr.addColorStop(0.5,this.rgba(C.a,0.08));
+    gr.addColorStop(1,'rgba(0,0,0,0)');
+    c.fillStyle=gr; c.fillRect(0,0,this.w,this.h);
+
+    if(this.mode==='speaking'){
+      this._waveTimer++;
+      if(this._waveTimer>20){this._waveTimer=0;this._spawnWave();}
+    }
+    this.waves=this.waves.filter(w=>{
+      w.r+=2.8+this.level*4.6; w.a-=0.017;
+      return w.a>0.02&&w.r<R*3.2;
+    });
+    this.waves.forEach(w=>{
+      c.beginPath();
+      c.strokeStyle=this.rgba(accent,w.a*0.6);
+      c.lineWidth=1.5;
+      c.arc(cx,cy,R*0.35+w.r,0,Math.PI*2);
+      c.stroke();
+    });
+
+    // rotate in two 4D planes at different speeds — this is what makes the
+    // inner/outer cube swap places as it turns, the defining tesseract motion
+    const a1=this.t, a2=this.t*0.63, c1=Math.cos(a1),s1=Math.sin(a1),
+          c2=Math.cos(a2),s2=Math.sin(a2);
+    const proj=this.pts.map(p=>{
+      // rotate XW
+      let x=p.x*c1 - p.w*s1, w=p.x*s1 + p.w*c1;
+      // rotate YZ
+      let y=p.y*c2 - p.z*s2, z=p.y*s2 + p.z*c2;
+      // perspective project 4D → 3D (w is the 4th-dimension "depth")
+      const wf=1/(2.4-w*0.5);
+      x*=wf; y*=wf; z*=wf;
+      // tilt + perspective project 3D → 2D, same convention as the sphere orb
+      const tilt=0.5, st=Math.sin(tilt), ct=Math.cos(tilt);
+      const y2=y*ct - z*st, z2=y*st + z*ct;
+      const depth=(z2+1.4)/2.8;
+      const persp=0.7+depth*0.5;
+      const jitter=this.mode==='idle'?0:Math.sin(this.t*7+p.p)*this.level*0.03;
+      return {sx:cx+x*R*persp*(1+jitter), sy:cy+y2*R*persp*(1+jitter), d:Math.max(0,Math.min(1,depth))};
+    });
+
+    c.lineWidth=1;
+    for(const [i,j] of this.edges){
+      const a=proj[i], b=proj[j];
+      const depth=(a.d+b.d)/2;
+      const alpha=(0.08+depth*0.34)*(0.55+this.level*0.7);
+      c.strokeStyle=this.rgba(depth>0.55?accent:C.a,alpha);
+      c.beginPath(); c.moveTo(a.sx,a.sy); c.lineTo(b.sx,b.sy); c.stroke();
+    }
+    for(let i=0;i<proj.length;i++){
+      const p=proj[i];
+      const r=(1.3+p.d*2.3)*(1+this.level*0.5);
+      c.fillStyle=this.rgba(p.d>0.6?accent:C.a, 0.3+p.d*0.68);
+      c.beginPath(); c.arc(p.sx,p.sy,r,0,Math.PI*2); c.fill();
+    }
+    c.lineWidth=1;
+    for(let k=0;k<2;k++){
+      const rr=R*(1.5+k*0.2), sq=0.32+k*0.06;
+      c.strokeStyle=this.rgba(accent,0.11-k*0.04);
+      c.beginPath(); c.ellipse(cx,cy,rr,rr*sq,this.t*(k?-0.45:0.65),0,Math.PI*2); c.stroke();
+    }
+  }
+  rgba(hex,a){
+    hex=(hex||'#6366f1').trim();
+    if(hex.startsWith('rgb'))return hex.replace(/rgba?\(([^)]+)\)/,(m,g)=>`rgba(${g.split(',').slice(0,3).join(',')},${a})`);
+    const n=parseInt(hex.replace('#',''),16);
+    return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+  }
+}
+window.TesseractOrb = TesseractOrb;
+// Which shape gets built where the app opens an orb. Defaults to the
+// tesseract; Settings can switch back to the sphere.
+function makeOrb(canvas,opts){
+  return DB.get('orbShape','tesseract')==='sphere'
+    ? new NeuralOrb(canvas,opts)
+    : new TesseractOrb(canvas,opts);
+}
+
 /* ── B · BOOT GREETING ────────────────────── */
 function greetWord(){
   const h=(typeof simNow==='function'?simNow():new Date()).getHours();
@@ -6048,7 +6363,7 @@ function showBootOrb(force){
     </div>
     <div class="nx-skip">tap anywhere to continue</div>`;
   document.body.appendChild(ov);
-  BOOT_ORB=new NeuralOrb(document.getElementById('neuro-cv'),{nodes:92});
+  BOOT_ORB=makeOrb(document.getElementById('neuro-cv'),{nodes:92});
   BOOT_ORB.start();
   // gentle idle breathing that lifts while the text types
   BOOT_ORB.setLevel(0.25);
@@ -6082,15 +6397,18 @@ function typeInto(el,text,ms,done){
   };
   tick();
 }
-// Browsers block speech before a user gesture, so this is best-effort: if it's
-// blocked the greeting is still fully readable, and the mic button works.
+// The queueing that makes this actually audible lives in speakLOS now: if
+// no gesture has happened yet, it queues and plays on the very first tap
+// anywhere — including the tap that dismisses this overlay. onstart fires
+// when the audio genuinely begins (immediately, or later off the queue),
+// which is the moment — not before — the orb should start reacting.
 function speakBrief(){
   if(!DB.get('neuroVoice',true))return;
-  if(!('speechSynthesis' in window))return;
-  const txt=greetingSpeech();
-  try{ const u=new SpeechSynthesisUtterance(txt); u.rate=.98; u.pitch=1.02;
-       if(DB.get('voiceLang',''))u.lang=DB.get('voiceLang','');
-       window.speechSynthesis.speak(u); }catch(e){}
+  speakLOS(greetingSpeech(),{
+    onstart:()=>{if(BOOT_ORB){BOOT_ORB.setMode('speaking');BOOT_ORB.setLevel(0.75);}},
+    onboundary:()=>{if(BOOT_ORB)BOOT_ORB.setLevel(0.5+Math.random()*0.5);},
+    onend:()=>{if(BOOT_ORB){BOOT_ORB.setMode('idle');BOOT_ORB.setLevel(0.12);}}
+  });
 }
 function closeBootOrb(after){
   const ov=document.getElementById('neuro-ov');if(!ov)return;
@@ -6124,7 +6442,7 @@ function openVoiceOrb(){
       <div class="vo-b" id="vo-close">Close</div>
     </div>`;
   document.body.appendChild(ov);
-  VORB=new NeuralOrb(document.getElementById('vorb-cv'),{nodes:70,speed:0.006});
+  VORB=makeOrb(document.getElementById('vorb-cv'),{nodes:70,speed:0.006});
   VORB.start();
   document.getElementById('vo-close').onclick=closeVoiceOrb;
   document.getElementById('vo-go').onclick=toggleVoiceListen;
@@ -6239,15 +6557,10 @@ function speakBack(text){
   if(!('speechSynthesis' in window)||!DB.get('neuroVoice',true)){
     setTimeout(()=>vorbSet('idle'),600);return;
   }
-  try{
-    window.speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(text);
-    u.rate=.98;u.pitch=1.02;
-    if(DB.get('voiceLang',''))u.lang=DB.get('voiceLang','');
-    u.onboundary=()=>{if(VORB)VORB.setLevel(0.55+Math.random()*0.45);};
-    u.onend=()=>{if(VORB)VORB.setLevel(0.1);vorbSet('idle');};
-    window.speechSynthesis.speak(u);
-  }catch(e){vorbSet('idle');}
+  speakLOS(text,{
+    onboundary:()=>{if(VORB)VORB.setLevel(0.55+Math.random()*0.45);},
+    onend:()=>{if(VORB)VORB.setLevel(0.1);vorbSet('idle');}
+  });
 }
 
 /* ── SETTINGS + BOOT ──────────────────────── */
@@ -6255,6 +6568,9 @@ const _v26Settings = renderSettings;
 renderSettings = function(){
   _v26Settings();
   const p=document.getElementById('p-settings');if(!p)return;
+  const shape=DB.get('orbShape','tesseract');
+  const allVoices=('speechSynthesis' in window)?speechSynthesis.getVoices():[];
+  const curURI=VOICE_CACHE?VOICE_CACHE.voiceURI:'';
   p.insertAdjacentHTML('beforeend',`
     <div class="card" style="margin-top:14px;">
       <div class="ct" style="margin-bottom:4px;">🧠 Neural Interface</div>
@@ -6269,12 +6585,40 @@ renderSettings = function(){
         <div class="set-sub">Reads the brief and answers your questions aloud</div></div>
         <div class="sw-toggle${DB.get('neuroVoice',true)?' on':''}" onclick="DB.set('neuroVoice',!DB.get('neuroVoice',true));renderSettings()"></div>
       </div>
+      <div class="set-row">
+        <div style="flex:1;">
+          <div class="set-nm">Orb shape</div>
+          <div class="set-sub" style="margin-bottom:7px;">Tesseract is a rotating 4D hypercube; sphere is the earlier dot-globe.</div>
+          <div class="mode-row" style="grid-template-columns:repeat(2,1fr);">
+            <div class="mode-b${shape==='tesseract'?' on':''}" onclick="DB.set('orbShape','tesseract');renderSettings()">
+              <div class="mb-i">◈</div><div class="mb-l">Tesseract</div></div>
+            <div class="mode-b${shape==='sphere'?' on':''}" onclick="DB.set('orbShape','sphere');renderSettings()">
+              <div class="mb-i">●</div><div class="mb-l">Sphere</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="set-row">
+        <div style="flex:1;">
+          <div class="set-nm">Voice</div>
+          <div class="set-sub" style="margin-bottom:7px;">${allVoices.length?'Auto-picked for a female, energetic tone — change it if it guessed wrong.':'Voices are still loading… try again in a moment.'}</div>
+          ${allVoices.length?`<select id="tts-voice-sel" onchange="DB.set('ttsVoiceURI',this.value);refreshVoiceCache();toast('🔊','Voice updated')"
+            style="width:100%;background:var(--bg3);border:1px solid var(--b2);border-radius:8px;padding:8px 10px;color:var(--t0);font-size:11.5px;margin-bottom:8px;">
+            ${allVoices.map(v=>`<option value="${escH(v.voiceURI)}"${v.voiceURI===curURI?' selected':''}>${escH(v.name)} (${escH(v.lang)})</option>`).join('')}
+          </select>`:''}
+          <button class="btn bg bsm" style="width:100%;" onclick="testVoice()">🔊 Test voice</button>
+        </div>
+      </div>
       <div style="display:flex;gap:8px;margin-top:10px;">
         <button class="btn bg bsm" style="flex:1;" onclick="showBootOrb(true)">🧠 Preview orb</button>
         <button class="btn bg bsm" style="flex:1;" onclick="openVoiceOrb()">🎤 Voice mode</button>
       </div>
     </div>`);
 };
+function testVoice(){
+  const name=(typeof resolveIdentity==='function')?resolveIdentity().speech:'Boss';
+  speakLOS(`Hi ${name}. This is how I'll sound from now on.`);
+  toast('🔊','Playing');
+}
 function v27Init(){
   setTimeout(()=>showBootOrb(false),380);
   window.addEventListener('resize',()=>{
@@ -6715,6 +7059,7 @@ v26Init();
 v27Init();
 v28Init();
 v29Init();
+initVoiceEngine();
 </script>
 </body>
 </html>
