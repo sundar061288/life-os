@@ -854,6 +854,28 @@ html[data-phase="night"] body::before{background:radial-gradient(120% 60% at 50%
 .nrg3-b.on span{color:var(--t0)}
 .nrg3-b[data-lvl="low"].on{border-color:var(--sky);background:rgba(56,189,248,.12)}
 .nrg3-b[data-lvl="high"].on{border-color:var(--em);background:var(--es)}
+/* ── v3.1: ambient focus widget (dashboard, non-modal) ── */
+.fw-card{background:linear-gradient(150deg,rgba(99,102,241,.17),rgba(139,92,246,.06));
+  border:1px solid rgba(99,102,241,.3);border-radius:18px;padding:14px 15px;margin-bottom:13px;
+  display:flex;align-items:center;gap:13px}
+.fw-card.urgent{border-color:rgba(244,63,94,.5);background:linear-gradient(150deg,rgba(244,63,94,.16),rgba(139,92,246,.05))}
+.fw-ring{position:relative;width:54px;height:54px;flex-shrink:0}
+.fw-ring svg{width:54px;height:54px;transform:rotate(-90deg)}
+.fw-ring circle{fill:none;stroke-width:5}
+.fw-rb{stroke:var(--bg4)}
+.fw-rf{stroke:var(--ind);stroke-linecap:round;transition:stroke-dashoffset .3s linear}
+.fw-card.urgent .fw-rf{stroke:var(--ros)}
+.fw-time{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;color:var(--t0)}
+.fw-body{flex:1;min-width:0}
+.fw-lbl{font-size:8.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ind);margin-bottom:3px}
+.fw-card.urgent .fw-lbl{color:var(--ros)}
+.fw-task{font-size:12.5px;font-weight:600;color:var(--t0);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fw-sub{font-size:9.5px;color:var(--t2);margin-top:2px}
+.fw-acts{display:flex;gap:6px;flex-shrink:0}
+.fw-b{width:30px;height:30px;border-radius:50%;border:1px solid var(--b1);background:var(--bg2);
+  color:var(--t1);font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.fw-b:active{background:var(--bg4)}
 </style>
 </head>
 <body>
@@ -864,7 +886,7 @@ html[data-phase="night"] body::before{background:radial-gradient(120% 60% at 50%
   <div id="thtog" onclick="cycleTheme()" title="Switch theme">🌙</div>
   <div class="logo">🌱</div>
   <div class="brand">Life OS</div>
-  <span class="ver">v3.0</span>
+  <span class="ver">v3.1</span>
   <div class="sp"></div>
   <div class="tnav" id="tnav"></div>
   <div class="tright">
@@ -7053,6 +7075,328 @@ init();
 v11Init();
 v21Init();
 v22Init();
+/* ═══════════════════════════════════════════════
+   LIFE OS v3.1 — AMBIENT FOCUS ⏱
+   Starting a focus session no longer opens the big
+   ring modal — it starts immediately in the
+   background and shows as a small card on the
+   dashboard plus the existing header chip. The full
+   ring view becomes optional, reached by expanding
+   the widget or tapping the header chip.
+   Also: a distinct completion alarm (louder and more
+   deliberate than the shared hourly-reminder chime),
+   and an urgent tick for the final 20 seconds.
+═══════════════════════════════════════════════ */
+
+/* ── Sound: completion alarm + countdown tick ── */
+// A separate AudioContext from the app's other tiny sounds, created (and
+// resumed) the moment a session starts — starting a session IS the user
+// gesture, so this context stays unlocked for the rest of that session,
+// including once the tab is in the background.
+let FOCUS_AC=null;
+function focusAC(){
+  try{
+    const K=window.AudioContext||window.webkitAudioContext;if(!K)return null;
+    if(!FOCUS_AC||FOCUS_AC.state==='closed')FOCUS_AC=new K();
+    if(FOCUS_AC.state==='suspended')FOCUS_AC.resume().catch(()=>{});
+    return FOCUS_AC;
+  }catch(e){return null;}
+}
+// Three ascending notes, not one soft blip — meant to be heard from
+// another room, distinct from the gentle hourly-reminder chime().
+function focusAlarm(){
+  const c=focusAC();if(!c)return;
+  try{
+    [523.25,659.25,783.99].forEach((freq,i)=>{
+      const t0=c.currentTime+i*0.16;
+      const o=c.createOscillator(),g=c.createGain();
+      o.type='sine';o.frequency.setValueAtTime(freq,t0);
+      g.gain.setValueAtTime(0,t0);
+      g.gain.linearRampToValueAtTime(.34,t0+.02);
+      g.gain.exponentialRampToValueAtTime(.001,t0+.5);
+      o.connect(g);g.connect(c.destination);
+      o.start(t0);o.stop(t0+.55);
+    });
+    // one more full pass, softer, so it reads as a proper alarm rather
+    // than a single chirp if you're not right next to the device
+    setTimeout(()=>{
+      const c2=focusAC();if(!c2)return;
+      [523.25,659.25,783.99].forEach((freq,i)=>{
+        const t0=c2.currentTime+i*0.16;
+        const o=c2.createOscillator(),g=c2.createGain();
+        o.type='sine';o.frequency.setValueAtTime(freq,t0);
+        g.gain.setValueAtTime(0,t0);
+        g.gain.linearRampToValueAtTime(.22,t0+.02);
+        g.gain.exponentialRampToValueAtTime(.001,t0+.42);
+        o.connect(g);g.connect(c2.destination);
+        o.start(t0);o.stop(t0+.46);
+      });
+    },900);
+  }catch(e){}
+}
+// A short percussive click, once per second for the last 20 seconds.
+// Gets louder AND higher-pitched as it nears zero, like a countdown clock
+// speeding toward the buzzer — most noticeable in the final 5 seconds.
+function focusUrgentTick(secLeft){
+  const c=focusAC();if(!c)return;
+  try{
+    const urgency=Math.max(0,Math.min(1,(20-secLeft)/20));   // 0 at 20s → 1 at 0s
+    const vol=0.16+urgency*0.26;
+    const freq=880+urgency*260;
+    const o=c.createOscillator(),g=c.createGain();
+    o.type='square';o.frequency.setValueAtTime(freq,c.currentTime);
+    g.gain.setValueAtTime(vol,c.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.09);
+    o.connect(g);g.connect(c.destination);
+    o.start();o.stop(c.currentTime+.1);
+  }catch(e){}
+}
+
+/* ── Quick start: no modal ────────────────────── */
+// openFocus()/openFocusTask() are called from ~10 places across the app
+// (header button, quick actions, the command bar, doomscroll rescue, Right
+// Now, voice mode). Rewriting their body here — rather than touching every
+// call site — makes "tap Focus → it just starts" the behaviour everywhere
+// at once, consistently.
+function quickStartFocus(name){
+  ACT.switch('focus');
+  const ft=document.getElementById('ftask');if(ft)ft.textContent=name;
+  fillFSel(name);
+  if(!S.focusRunning)startFocus();
+  paintFocusWidget();
+  toast('⏱',`Focus running · ${name.length>36?name.slice(0,36)+'…':name}`);
+}
+openFocus=function(){
+  const top=(typeof topPriorityTask==='function')?topPriorityTask():null;
+  const name=top?top.text:(FTASKS[0]||'Deep Focus Session');
+  quickStartFocus(name);
+};
+openFocusTask=function(name){ quickStartFocus(name); };
+// The ring view is now opt-in — the header chip and the widget's ⤢ open it
+// without disturbing whatever's already running (no task reset, no restart).
+function expandFocus(){
+  if(!S.focusRunning&&!(S.focusSecs>0&&S.focusSecs<FCFG.work*60)){openFocus();return;}
+  document.getElementById('fov').classList.add('on');
+  updateFocusRing();
+}
+function endFocusFromWidget(){
+  if(!confirm('End this focus session? Progress on the current block is not saved as a completed session.'))return;
+  resetFocus();
+}
+
+/* ── Dashboard widget ──────────────────────────── */
+function focusWidgetHTML(){
+  const dur=FCFG.work*60, prog=1-(S.focusSecs/Math.max(1,dur)), circ=2*Math.PI*24;
+  const m=String(Math.floor(S.focusSecs/60)).padStart(2,'0'), s=String(S.focusSecs%60).padStart(2,'0');
+  const task=(document.getElementById('ftask')||{}).textContent||'Deep Focus Session';
+  const urgent=S.focusRunning&&S.focusSecs<=20;
+  const paused=!S.focusRunning;
+  return `<div class="fw-card${urgent?' urgent':''}">
+    <div class="fw-ring">
+      <svg viewBox="0 0 56 56">
+        <circle class="fw-rb" cx="28" cy="28" r="24"/>
+        <circle class="fw-rf" cx="28" cy="28" r="24"
+          stroke-dasharray="${circ.toFixed(2)}" stroke-dashoffset="${(circ*(1-prog)).toFixed(2)}"/>
+      </svg>
+      <div class="fw-time">${m}:${s}</div>
+    </div>
+    <div class="fw-body">
+      <div class="fw-lbl">${urgent?'⏱ Almost there':paused?'⏸ Focus paused':'🎯 Focus running'}</div>
+      <div class="fw-task">${escH(task)}</div>
+      <div class="fw-sub">${paused?'Tap ▶ to resume':`${Math.ceil(S.focusSecs/60)} min left`} · runs in the background</div>
+    </div>
+    <div class="fw-acts">
+      <div class="fw-b" onclick="toggleFocus()" title="${S.focusRunning?'Pause':'Resume'}">${S.focusRunning?'⏸':'▶'}</div>
+      <div class="fw-b" onclick="expandFocus()" title="Expand">⤢</div>
+      <div class="fw-b" onclick="endFocusFromWidget()" title="End">✕</div>
+    </div>
+  </div>`;
+}
+// Whether a session is "in play" — running OR paused mid-way — tracked
+// explicitly rather than inferred from the clock. Inferring it from
+// S.focusSecs < duration breaks if you pause within the same second you
+// started (elapsed time rounds to zero, focusSecs reads as the full
+// duration again) and the widget would flicker away right as you paused.
+function focusWidgetVisible(){
+  return S.focusRunning || !!S._focusEngaged;
+}
+// O(1) per tick: one lookup, one innerHTML write — never a full dashboard
+// re-render, so a ticking timer can't fight the cached greeting or ribbon.
+function paintFocusWidget(){
+  const slot=document.getElementById('focus-widget-slot');
+  if(!slot)return;
+  slot.innerHTML=focusWidgetVisible()?focusWidgetHTML():'';
+}
+const _v31Dashboard=renderDashboard;
+renderDashboard=function(){
+  _v31Dashboard();
+  const p=document.getElementById('p-dashboard');if(!p)return;
+  const anchor=p.querySelector('.ph');if(!anchor)return;
+  if(!p.querySelector('#focus-widget-slot'))
+    anchor.insertAdjacentHTML('afterend','<div id="focus-widget-slot"></div>');
+  paintFocusWidget();
+};
+
+/* ── Wire sound + widget into the existing timer ── */
+const _v26FocusTick=focusTick;
+focusTick=function(){
+  const wasRunning=S.focusRunning;
+  _v26FocusTick();
+  if(wasRunning&&S.focusRunning&&S.focusSecs>0&&S.focusSecs<=20&&S._lastUrgentSec!==S.focusSecs){
+    S._lastUrgentSec=S.focusSecs;
+    focusUrgentTick(S.focusSecs);
+  }
+  paintFocusWidget();
+};
+const _v26CompleteFocus=completeFocus;
+completeFocus=function(){
+  S._lastUrgentSec=null;
+  S._focusEngaged=false;
+  focusAlarm();                 // the real, louder alarm — chime() still fires from the base function too
+  _v26CompleteFocus();
+  paintFocusWidget();
+};
+const _v26StartFocus=startFocus;
+startFocus=function(){
+  focusAC();                    // unlock/resume audio right on the gesture that starts the session
+  S._lastUrgentSec=null;
+  S._focusEngaged=true;
+  _v26StartFocus();
+  paintFocusWidget();
+};
+const _v26PauseFocus=pauseFocus;
+pauseFocus=function(){ _v26PauseFocus(); paintFocusWidget(); };
+const _v26ResetFocus=resetFocus;
+resetFocus=function(){ S._lastUrgentSec=null; S._focusEngaged=false; _v26ResetFocus(); paintFocusWidget(); };
+const _v26FocusRestore=focusRestore;
+focusRestore=function(){ _v26FocusRestore(); if(S.focusRunning){focusAC();S._focusEngaged=true;} paintFocusWidget(); };
+
+function v31Init(){ paintFocusWidget(); }
+/* ===== LAYER: Focus Rescue (additive, removable) =====
+   Train-and-princess view for an ALREADY RUNNING focus session.
+   It does not own a timer: it reads startedAt + totalSec, so it never drifts from the app's session.
+   API:  FocusRescue.open({title,totalSec,startedAt,onDone,onExpire,onClose})   FocusRescue.close()
+   Toggle: localStorage los_rescueOn = "0" to disable.  Stats: los_rescueStats.                       */
+(function(){
+if(window.FocusRescue)return;
+const SYMS="<svg width=\"0\" height=\"0\" style=\"position:absolute\"><defs>\n<symbol id=\"fr-hero\" viewBox=\"0 0 40 60\">\n  <path d=\"M10 16 L1 54 L20 47 L39 54 L30 16Z\" fill=\"#dc2626\"/>\n  <rect x=\"12\" y=\"38\" width=\"7\" height=\"16\" fill=\"#1d4ed8\"/><rect x=\"21\" y=\"38\" width=\"7\" height=\"16\" fill=\"#1d4ed8\"/>\n  <rect x=\"12\" y=\"50\" width=\"7\" height=\"7\" rx=\"1\" fill=\"#dc2626\"/><rect x=\"21\" y=\"50\" width=\"7\" height=\"7\" rx=\"1\" fill=\"#dc2626\"/>\n  <rect x=\"6\" y=\"18\" width=\"6\" height=\"15\" rx=\"3\" fill=\"#1d4ed8\"/><rect x=\"28\" y=\"18\" width=\"6\" height=\"15\" rx=\"3\" fill=\"#1d4ed8\"/>\n  <rect x=\"11\" y=\"16\" width=\"18\" height=\"24\" rx=\"4\" fill=\"#1d4ed8\"/>\n  <rect x=\"11\" y=\"35\" width=\"18\" height=\"5\" fill=\"#dc2626\"/><rect x=\"18\" y=\"35\" width=\"4\" height=\"5\" fill=\"#facc15\"/>\n  <path d=\"M20 19 L27 24 L20 33 L13 24Z\" fill=\"#facc15\" stroke=\"#dc2626\" stroke-width=\"1.5\"/>\n  <circle cx=\"20\" cy=\"9\" r=\"7\" fill=\"#fcd9b6\"/>\n  <path d=\"M13 9 Q13 1 21 1.5 Q27 2 27 9 Q24 5 19 5.5 Q22 8 19 8 Q15 6 13 9Z\" fill=\"#111827\"/>\n  <circle cx=\"17.5\" cy=\"10\" r=\".9\" fill=\"#111\"/><circle cx=\"22.5\" cy=\"10\" r=\".9\" fill=\"#111\"/>\n  <path d=\"M17.5 13 Q20 15 22.5 13\" stroke=\"#b45309\" fill=\"none\" stroke-width=\".8\"/>\n</symbol>\n<symbol id=\"fr-prin\" viewBox=\"0 0 40 60\">\n  <path d=\"M15 15 L4 57 L36 57 L25 15Z\" fill=\"#ec4899\"/><path d=\"M15 15 L25 15 L27 26 L13 26Z\" fill=\"#db2777\"/>\n  <path d=\"M9 44 Q20 50 31 44\" stroke=\"#fbcfe8\" fill=\"none\" stroke-width=\"2\"/>\n  <rect x=\"8\" y=\"17\" width=\"5\" height=\"14\" rx=\"2.5\" fill=\"#fcd9b6\"/><rect x=\"27\" y=\"17\" width=\"5\" height=\"14\" rx=\"2.5\" fill=\"#fcd9b6\"/>\n  <path d=\"M12 8 Q10 26 15 30 L25 30 Q30 26 28 8Z\" fill=\"#f5c542\"/>\n  <circle cx=\"20\" cy=\"10\" r=\"7\" fill=\"#fcd9b6\"/>\n  <path d=\"M13 8 Q20 -1 27 8 Q20 5 13 8Z\" fill=\"#f5c542\"/>\n  <path d=\"M14 3 L15.5 -3 L18 1 L20 -4 L22 1 L24.5 -3 L26 3Z\" fill=\"#facc15\" stroke=\"#ca8a04\" stroke-width=\".6\"/>\n  <circle cx=\"17.5\" cy=\"10\" r=\".9\" fill=\"#111\"/><circle cx=\"22.5\" cy=\"10\" r=\".9\" fill=\"#111\"/>\n  <path d=\"M18 13 Q20 14.5 22 13\" stroke=\"#be123c\" fill=\"none\" stroke-width=\".9\"/>\n</symbol>\n</defs></svg>", STAGE="<svg viewBox=\"0 0 300 300\">\n      <circle cx=\"150\" cy=\"150\" r=\"115\" fill=\"none\" stroke=\"#c9ccdb\" stroke-width=\"14\" stroke-dasharray=\"2 7\"/>\n      <circle cx=\"150\" cy=\"150\" r=\"121\" fill=\"none\" stroke=\"#8b90aa\" stroke-width=\"2\"/>\n      <circle cx=\"150\" cy=\"150\" r=\"109\" fill=\"none\" stroke=\"#8b90aa\" stroke-width=\"2\"/>\n      <g id=\"fr-smoke\"></g>\n      <!-- princess lying full-length on the track, tied with ropes -->\n      <g id=\"fr-lying\" transform=\"translate(150 35)\">\n        <path d=\"M-6 -5 L26 -8 L26 8 L-6 5Z\" fill=\"#ec4899\"/>\n        <path d=\"M-6 -5 L2 -5 L2 5 L-6 5Z\" fill=\"#db2777\"/>\n        <rect x=\"26\" y=\"-6\" width=\"7\" height=\"4\" rx=\"2\" fill=\"#7c2d12\"/><rect x=\"26\" y=\"2\" width=\"7\" height=\"4\" rx=\"2\" fill=\"#7c2d12\"/>\n        <path d=\"M-24 -6 Q-30 6 -18 9 L-8 6 L-8 -6Z\" fill=\"#f5c542\"/>\n        <circle cx=\"-15\" cy=\"0\" r=\"7\" fill=\"#fcd9b6\"/>\n        <path d=\"M-19 -6 L-22 -11 L-17 -8 L-15 -13 L-13 -8 L-9 -11 L-10 -5Z\" fill=\"#facc15\" stroke=\"#ca8a04\" stroke-width=\".5\"/>\n        <circle cx=\"-17\" cy=\"-1\" r=\".8\" fill=\"#111\"/><circle cx=\"-12\" cy=\"-1\" r=\".8\" fill=\"#111\"/>\n        <ellipse cx=\"-14.5\" cy=\"3.2\" rx=\"1.6\" ry=\"1.2\" fill=\"#be123c\"/>\n        <path d=\"M-8 3 L2 6\" stroke=\"#fcd9b6\" stroke-width=\"3.5\" stroke-linecap=\"round\"/>\n        <g stroke=\"#92400e\" stroke-width=\"3\" stroke-linecap=\"round\"><path d=\"M-3 -9 V9\"/><path d=\"M10 -9 V9\"/><path d=\"M22 -9 V9\"/></g>\n        <text x=\"4\" y=\"-16\" font-size=\"10\" font-weight=\"700\" fill=\"#e11d48\" text-anchor=\"middle\">Help!</text>\n      </g>\n      <g id=\"fr-train\"></g>\n    </svg>", CSS="\n#fr-overlay{position:fixed;inset:0;z-index:99999;background:#070a14;display:flex;align-items:center;justify-content:center;padding:16px;font-family:Inter,system-ui,sans-serif}\n#fr-overlay *{box-sizing:border-box}\n#fr-overlay svg{display:block}\n.fr-card{background:#fff;border-radius:20px;padding:22px;width:100%;max-width:400px;text-align:center;box-shadow:0 0 80px #3b3bd066}\n.fr-eye{font-size:11px;letter-spacing:.12em;font-weight:700;color:#4f46e5}\n.fr-card h1{margin:6px 0 14px;font:700 22px Georgia,serif;color:#111}\n.fr-stage{position:relative;width:100%;max-width:320px;margin:0 auto}\n.fr-stage>svg{width:100%}\n.fr-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}\n#fr-time{font:600 34px ui-monospace,Menlo,monospace;color:#4f46e5}\n#fr-msg{font-size:12px;color:#7a7f99;margin-top:2px;padding:0 20px}\n.fr-pop{font:900 44px Georgia,serif;color:#e11d48;animation:frpop .5s cubic-bezier(.2,1.6,.4,1) both;transform:rotate(-8deg)}\n@keyframes frpop{from{transform:scale(0) rotate(-8deg)}to{transform:scale(1) rotate(-8deg)}}\n.fr-hug{display:flex;align-items:flex-end}\n.fr-hug svg{width:70px;height:105px}\n.fr-hug svg:first-child{animation:frL .8s ease-out both}\n.fr-hug svg:last-child{margin-left:-16px;animation:frR .8s ease-out both}\n@keyframes frL{from{transform:translateX(-60px);opacity:0}}\n@keyframes frR{from{transform:translateX(30px);opacity:0}}\n.fr-heart{position:absolute;bottom:40%;font-size:22px;animation:frup 2s ease-out forwards}\n@keyframes frup{to{transform:translateY(-140px);opacity:0}}\n.fr-btns{display:flex;gap:8px;justify-content:center;margin-top:14px}\n.fr-btns button{border:1px solid #d5d8e4;background:#eff0f6;border-radius:8px;padding:9px 14px;font-weight:600;font-size:13px;cursor:pointer;color:#111}\n.fr-btns button.ok{background:#16a34a;color:#fff;border-color:#16a34a}\n.fr-sess{font-size:12px;color:#9aa0bb;margin-top:12px}.fr-sess b{color:#4f46e5}\n.fr-shake{animation:frsh .25s infinite}@keyframes frsh{50%{transform:translateX(2px)}}\n";
+const R=115,C=150,A0=-10,SWEEP=280,OFFS=[0,-14.5,-27,-39.5,-52],COLORS=['#2563eb','#16a34a','#f59e0b','#9333ea'];
+const $=id=>document.getElementById('fr-'+id);
+let ov=null,raf=0,ctx=null,o=null,state='idle',lastPuff=0;
+const wheel=x=>`<circle cx="${x}" cy="7" r="3" fill="#111827"/>`;
+const ENGINE=`<rect x="-15" y="-10" width="11" height="15" fill="#b91c1c"/><rect x="-4" y="-6" width="20" height="11" rx="2" fill="#1f2937"/><rect x="6" y="-12" width="5" height="7" fill="#374151"/><path d="M16 -4 L21 5 L16 5Z" fill="#6b7280"/><circle cx="14" cy="-1" r="2" fill="#fde047"/><rect x="-12" y="-7" width="5" height="4" fill="#bfdbfe"/>${wheel(-9)}${wheel(0)}${wheel(9)}`;
+const coach=c=>`<rect x="-11" y="-8" width="22" height="14" rx="2" fill="${c}"/><g fill="#dbeafe"><rect x="-8" y="-5" width="4" height="4"/><rect x="-2" y="-5" width="4" height="4"/><rect x="4" y="-5" width="4" height="4"/></g>${wheel(-6)}${wheel(6)}`;
+const pos=a=>[C+R*Math.cos(a*Math.PI/180),C+R*Math.sin(a*Math.PI/180)];
+const fmt=s=>{s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+const dayKey=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()};
+function stats(add){let s=null;try{s=JSON.parse(localStorage.getItem('los_rescueStats'))}catch(e){}
+  if(!s||s.day!==dayKey())s={day:dayKey(),saved:0,lost:0};
+  if(add){s[add]++;try{localStorage.setItem('los_rescueStats',JSON.stringify(s))}catch(e){}}return s}
+function place(a){OFFS.forEach((off,i)=>{const b=a+off,[x,y]=pos(b);$('car'+i).setAttribute('transform',`translate(${x} ${y}) rotate(${b+90})`)})}
+function puff(a){const [x,y]=pos(a+3),c=document.createElementNS('http://www.w3.org/2000/svg','circle'),ox=Math.cos(a*Math.PI/180)*14,oy=Math.sin(a*Math.PI/180)*14;
+  c.setAttribute('cx',x+ox);c.setAttribute('cy',y+oy);c.setAttribute('r',4);c.setAttribute('fill','#b8bcd0');$('smoke').appendChild(c);let k=0;
+  (function f(){k++;c.setAttribute('cx',x+ox*(1+k/25));c.setAttribute('cy',y+oy*(1+k/25));c.setAttribute('r',4+k*.15);c.setAttribute('opacity',.7-k/60);k<42?requestAnimationFrame(f):c.remove()})()}
+/* sounds: synthesised, no files */
+function tone(type,f1,f2,dur,vol,delay=0,vib=0){if(!ctx)return;const os=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime+delay;
+  os.type=type;os.frequency.setValueAtTime(f1,t);os.frequency.exponentialRampToValueAtTime(f2,t+dur);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+dur);
+  if(vib){const l=ctx.createOscillator(),lg=ctx.createGain();l.frequency.value=vib;lg.gain.value=70;l.connect(lg);lg.connect(os.frequency);l.start(t);l.stop(t+dur)}
+  os.connect(g);g.connect(ctx.destination);os.start(t);os.stop(t+dur)}
+const kiss=()=>[0,.35,.7].forEach(d=>{tone('sine',1200,350,.09,.6,d);tone('triangle',2400,700,.05,.2,d)});
+const scream=()=>{[0,7].forEach(dt=>{tone('sawtooth',650+dt*8,1600+dt*8,.5,.16,0,10);tone('sawtooth',1600+dt*8,900+dt*8,.9,.16,.5,11)});tone('square',1900,1200,1.2,.05,.3,14)};
+function build(){
+  const st=document.createElement('style');st.textContent=CSS;document.head.appendChild(st);
+  ov=document.createElement('div');ov.id='fr-overlay';ov.style.display='none';
+  ov.innerHTML=SYMS+`<div class="fr-card"><div class="fr-eye">DEEP FOCUS · RESCUE MODE</div><h1 id="fr-title"></h1>
+  <div class="fr-stage" id="fr-stage">${STAGE}<div class="fr-center" id="fr-center"></div></div>
+  <div class="fr-btns"><button id="fr-exit">✕ Exit</button><button class="ok" id="fr-done">✔ Task Done</button></div>
+  <div class="fr-sess">Princess saved today: <b id="fr-saved"></b> · lost: <b id="fr-lost"></b></div></div>`;
+  document.body.appendChild(ov);
+  $('train').innerHTML=OFFS.map((_,i)=>`<g id="fr-car${i}">${i?coach(COLORS[i-1]):ENGINE}</g>`).join('');
+  $('exit').onclick=close;
+  $('done').onclick=()=>{if(state==='running'&&!$('done').disabled)win()};
+}
+function paintStats(){const s=stats();$('saved').textContent=s.saved;$('lost').textContent=s.lost}
+function hearts(){for(let i=0;i<9;i++){const h=document.createElement('div');h.className='fr-heart';h.textContent=i%2?'❤️':'💖';
+  h.style.left=(20+Math.random()*60)+'%';h.style.animationDelay=(Math.random()*.6)+'s';$('stage').appendChild(h);setTimeout(()=>h.remove(),3000)}}
+function tick(){
+  const rem=o.remaining?o.remaining():o.totalSec-(Date.now()-o.startedAt)/1000, el=o.totalSec-rem;
+  const f=Math.min(Math.max(el/o.totalSec,0),1),a=A0+SWEEP*f, paused=o.isPaused&&o.isPaused();
+  place(a);$('time').textContent=fmt(rem);
+  const locked=f<(o.minPct||0);$('done').disabled=locked;$('done').style.opacity=locked?.45:1;
+  $('msg').textContent=paused?'Paused. The train waits.':locked?'Hero, get to work first. Done unlocks soon.':'Finish the task before the train arrives!';
+  if(f>.85)$('stage').classList.add('fr-shake');
+  if(Date.now()-lastPuff>350){puff(a);lastPuff=Date.now()}
+  if(rem<=0)return fail();raf=requestAnimationFrame(tick)}
+function win(){cancelAnimationFrame(raf);state='saved';stats('saved');paintStats();
+  $('stage').classList.remove('fr-shake');$('done').style.display='none';$('lying').style.display='none';
+  $('center').innerHTML='<div class="fr-hug"><svg><use href="#fr-hero"/></svg><svg><use href="#fr-prin"/></svg></div><div style="font-size:20px">❤️💋</div><div id="fr-msg">She is safe. Well done, hero!</div>';
+  if(ctx)ctx.resume();setTimeout(kiss,700);hearts();try{o.onDone&&o.onDone()}catch(e){console.warn(e)}}
+function fail(){state='failed';stats('lost');paintStats();$('stage').classList.remove('fr-shake');$('done').style.display='none';$('lying').style.opacity=.35;
+  $('center').innerHTML='<div class="fr-pop">OOPS!</div><div id="fr-msg" style="margin-top:8px">Time is up. The train got there first.</div>';
+  setTimeout(scream,700);try{o.onExpire&&o.onExpire()}catch(e){console.warn(e)}}
+function open(opt){
+  if(localStorage.getItem('los_rescueOn')==='0')return;
+  if(!ov)build();o=Object.assign({totalSec:1500,startedAt:Date.now(),title:'Focus Session',minPct:0},opt);
+  try{ctx=(typeof focusAC==='function'&&focusAC())||ctx||new(window.AudioContext||window.webkitAudioContext)();ctx.resume()}catch(e){}
+  cancelAnimationFrame(raf);state='running';$('title').textContent=o.title;
+  $('lying').style.display='';$('lying').style.opacity=1;$('smoke').innerHTML='';$('done').style.display='';$('done').disabled=false;$('stage').classList.remove('fr-shake');
+  $('center').innerHTML=`<svg width="30" height="45"><use href="#fr-hero"/></svg><div id="fr-time"></div><div id="fr-msg"></div>`;
+  paintStats();place(A0);ov.style.display='flex';tick()}
+function close(){cancelAnimationFrame(raf);if(ov)ov.style.display='none';state='idle';try{o&&o.onClose&&o.onClose()}catch(e){}}
+window.FocusRescue={open,close};
+})();
+
+
+/* ===== LAYER: Focus Rescue wiring (Life OS) =====
+   Adds a 🚂 Rescue button to the focus ring and the dashboard focus widget.
+   Task Done = ends the session early and credits only the minutes actually focused.
+   Time up   = your normal completeFocus() still runs (alarm + session credit); the game shows OOPS. */
+function rescueOpen(){
+  if(!S.focusRunning){
+    if(!S.focusSecs||S.focusSecs>FCFG.work*60||S.focusSecs<=0)S.focusSecs=FCFG.work*60;
+    startFocus();
+  }
+  const dur=FCFG.work*60;
+  FocusRescue.open({
+    title:(document.getElementById('ftask')||{}).textContent||'Focus Session',
+    totalSec:dur,
+    minPct:0.1,
+    remaining:()=>S.focusSecs,
+    isPaused:()=>!S.focusRunning&&S.focusSecs>0,
+    onDone:rescueWin,
+    onClose:()=>{ if(typeof paintFocusWidget==='function')paintFocusWidget(); }
+  });
+}
+function rescueWin(){
+  const dur=FCFG.work*60, minsDone=Math.max(1,Math.round((dur-S.focusSecs)/60));
+  clearInterval(S.focusInt);
+  S.focusRunning=false;S.focusEndsAt=null;S._focusEngaged=false;S._lastUrgentSec=null;focusPersist();
+  S.focusSecs=dur;
+  S.focusSessions++;
+  const task=(document.getElementById('ftask')||{}).textContent||'Deep Focus Session';
+  logEvent('focus_session',`Rescue complete: ${task}`,8,9,'deep');
+  ACT.logFocusMin(minsDone);
+  DB.set('focusSessions',S.focusSessions);
+  const tog=document.getElementById('ftog');if(tog)tog.textContent='▶ Start';
+  const fc=document.getElementById('fscount');if(fc)fc.textContent=S.focusSessions;
+  const ss=document.getElementById('ss-fs');if(ss)ss.textContent=S.focusSessions;
+  updateFocusRing();paintFocusWidget();computeLifeScore();
+  toast('🦸','Princess saved! '+minsDone+' min of focus logged.');
+}
+(function(){
+  const bar=document.querySelector('#fov .fbtns');
+  if(bar&&!document.getElementById('frbtn')){
+    const b=document.createElement('button');b.className='btn bg bsm';b.id='frbtn';b.textContent='🚂 Rescue';b.onclick=rescueOpen;
+    bar.insertBefore(b,bar.children[2]||null);   // between Start and Reset
+  }
+})();
+const _frWidget=focusWidgetHTML;
+focusWidgetHTML=function(){
+  return _frWidget().replace('<div class="fw-b" onclick="expandFocus()"','<div class="fw-b" onclick="rescueOpen()" title="Rescue mode">🚂</div>\n      <div class="fw-b" onclick="expandFocus()"');
+};
+/* ===== END LAYER: Focus Rescue ===== */
+
 v23Init();
 v25Init();
 v26Init();
@@ -7060,6 +7404,7 @@ v27Init();
 v28Init();
 v29Init();
 initVoiceEngine();
+v31Init();
 </script>
 </body>
 </html>
